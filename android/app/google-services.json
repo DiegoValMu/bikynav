@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "272211341877",
+    "project_id": "bikynav",
+    "storage_bucket": "bikynav.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272211341877:android:17c02b1b4796f483d0f77c",
+        "android_client_info": {
+          "package_name": "com.example.bikynav"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLSXURj7m7J69vVvMq37Rhe_7fixFnXQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:272211341877:android:4720d264f65550d7d0f77c",
+        "android_client_info": {
+          "package_name": "com.example.login_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLSXURj7m7J69vVvMq37Rhe_7fixFnXQ8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
