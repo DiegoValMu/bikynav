@@ -108,8 +108,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         markerId: const MarkerId('start'),
         position: destination.points.first,
         infoWindow: const InfoWindow(
-          title: 'Inicio',
-          snippet: 'Tu ubicación'
+          title: 'Ubicación inicial',
         )
         );
 
@@ -117,8 +116,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         markerId: const MarkerId('end'),
         position: destination.points.last,
         infoWindow: InfoWindow(
-          title: destination.endPlace.properties.name,
-          snippet: '$tripDuration min, $kms km'
+          title: 'Destino',
+          snippet: destination.endPlace.properties.name
         )
         );  
 

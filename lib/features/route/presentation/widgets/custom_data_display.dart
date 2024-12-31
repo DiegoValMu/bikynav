@@ -19,11 +19,12 @@ class CustomDataDisplay extends StatelessWidget {
     final place = searchBloc.state.history;
 
     List<Feature> features = place;
-    final dataPlace = features[0];
+    final dataPlace = features.first;
 
-    final data = dataPlace.properties.name;
-
-
+    final name = dataPlace.properties.name;
+    final distance = dataPlace.properties.distancia;
+    final time = (dataPlace.properties.duracion);
+    double tripDuration = (time! / 60).floorToDouble();
 
     return SafeArea(
       bottom: true,
@@ -57,8 +58,43 @@ class CustomDataDisplay extends StatelessWidget {
                   ),
                 ),
               ),
-              ListTile(
-                title: Text('$data'),
+              Padding(
+                padding: const EdgeInsets.only( top: 10),
+                child: ListTile(
+                  leading: Column(
+                    children: [
+                      const Icon( Icons.timelapse ),
+                      Text(
+                        '$tripDuration min', 
+                        style: const TextStyle( fontSize: 20 ),
+                        ),
+                    ],
+                  ),
+                  title: Column(
+                    children: [
+                      const Text(
+                        'Dirección',
+                        style: TextStyle( 
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold, 
+                          ),
+                        ),
+                      Text(
+                        '$name', 
+                        style: const TextStyle( fontSize: 20 ),
+                      )
+                    ]
+                  ),
+                  trailing: Column(
+                    children: [
+                      const Icon( Icons.directions_bike ),
+                      Text(
+                        '$distance kms',
+                        style: const TextStyle( fontSize: 20 ),
+                        ),
+                    ],
+                  ),
+                ),
               )
             ],
           ),
