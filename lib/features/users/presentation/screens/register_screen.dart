@@ -1,8 +1,12 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
+import 'package:provider/provider.dart';
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -206,21 +210,39 @@ class _RegisterFormState extends State<_RegisterForm> {
                     final user = <String, dynamic>{
                       'email': email,
                       'nombre': _nombreController.text.trim(),
-                      'apellido': _apellidoController.text.trim(),
+                      'apellidos': _apellidoController.text.trim(),
                       'ciudad': _ciudadController.text.trim(),
                       'region': _regionController.text.trim(),
                     };
 
                     try {
+
+                      //Guardar los datos del usuario en mongodb
+                      final userServices = Provider.of<UserServices>(context, listen: false);
+                      await userServices.userRegister(user);
+
                       // Guardar los datos del usuario en Firestore
                       await db.collection("users").add(user).then((DocumentReference doc) {
                         print('DocumentSnapshot added with ID: ${doc.id}');
                       });
+
+                      showDialog(
+                        context: context,
+                        builder: (_) => AlertDialog(
+                          title: const Text('Usuario registrado con exito'),
+                          content: const Icon( Icons.check_circle ),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('Aceptar'),
+                            ),
+                          ],
+                        ),
+                      );
+
                     } catch (e) {
                       print("Error al guardar los datos en Firestore: $e");
                     }
-
-
 
                     // Redirigir o mostrar mensaje de éxito
                     context.go('/login');

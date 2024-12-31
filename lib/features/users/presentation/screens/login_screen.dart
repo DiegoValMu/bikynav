@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously, duplicate_ignore
+
 import 'dart:convert';
 
 import 'package:bikynav/features/users/app/services/user_services.dart';
@@ -65,46 +67,34 @@ class _LoginFormViewState extends State<_LoginFormView> {
 
     String? idToken = await credential.user?.getIdToken();
     // Usuario autenticado con éxito
-    print('Usuario autenticado: ${credential.user?.email}');
+    //print('Usuario autenticado: ${credential.user?.email}');
     
-   
-    // Realiza la petición al backend
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:3000/api/login'),
-      headers: {
-        'Authorization': 'Bearer $idToken', // Incluye el token en el encabezado
-        'Content-Type': 'application/json',
-      }
-    );
+    final userServices = Provider.of<UserServices>(context, listen: false);
 
-   
+    final res = await userServices.authFireInMongo(idToken);
 
+    final Map<String, dynamic> usr = json.decode(res);
 
-    if (response.statusCode == 200) {
-
-      print(response.body);
-
-      final Map<String, dynamic> userData = json.decode(response.body);
-
-      final userServices = Provider.of<UserServices>(context, listen: false);
-      userServices.userData(userData['_id']);
-      //// Petición exitosa, redirige al usuario
-      //context.go('/loading');
+    if (res.isNotEmpty) {
+      userServices.userData(usr['_id']);
+      // Petición exitosa, redirige al usuario
+      // ignore: use_build_context_synchronously
+      context.go('/loading');
     } else {
       // Error en el backend
-      throw Exception('Error en el backend: ${response.body}');
+      throw Exception('Error en el backend: ${res}');
     }
 
-    context.go('/loading');
 
   } catch (e) {
     // Manejo de errores
-    print('Error al iniciar sesión: ${e.toString()}');
+    //print('Error al iniciar sesión: ${e.toString()}');
     showDialog(
+      // ignore: use_build_context_synchronously
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Error en firebase'),
-        content: Text(e.toString()),
+        title: const Text('Error al iniciar sesión'),
+        content: const Text('Credenciales incorrectas'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

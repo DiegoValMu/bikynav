@@ -1,5 +1,6 @@
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/app/services/services.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/shared/services/socket_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -44,7 +45,8 @@ class MainApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SocketService()),
-        ChangeNotifierProvider(create: (_) => UserServices())
+        ChangeNotifierProvider(create: (_) => UserServices()),
+        ChangeNotifierProvider(create: (_) => RouteServices())
       ],
       child: MaterialApp.router(
         routerConfig: appRouter,

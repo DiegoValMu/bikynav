@@ -5,6 +5,8 @@ class Usuario {
   String? apellidos;
   String? fechaNacimiento;
   String? telefono;
+  String? ciudad;
+  String? region;
   String? email;
   String? direccion;
   String? rol;
@@ -14,6 +16,8 @@ class Usuario {
     this.nombre,
     this.apellidos,
     this.fechaNacimiento,
+    this.ciudad,
+    this.region,
     this.telefono,
     this.email,
     this.direccion,

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bikynav/shared/services/socket_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +37,7 @@ class SideMenu extends StatelessWidget {
               Container(
                 child: (socketService.serverStatus == ServerStatus.Online )
                 ? const Icon(Icons.check_circle, color: Colors.green)
-                : const Icon(Icons.offline_bolt, color: Colors.red,),
+                : const Icon(Icons.offline_bolt, color: Colors.red, ),
               )
             ,
             actions: [
@@ -47,55 +49,74 @@ class SideMenu extends StatelessWidget {
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
-          body: ListView(
+          body: Column(
             children: [
-              Row(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only( left: 10 ),
-                    child: Image(
-                      image: AssetImage('assets/images/login.png'),
-                      height: 100,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: ListView(
+                  children: [
+                    Row(
                       children: [
-                        Text('¡Hola, ${userServices.usuario.nombre}!', style: 
-                          const TextStyle( 
-                            fontWeight: FontWeight.bold, 
-                            fontSize: 24.0
-                            )),
-                        FilledButton(
-                          onPressed: () async {
-                                // Redirige a la pantalla de inicio de sesión
-                              },
-                          child: const Text('Ver perfil')
+                        const Padding(
+                          padding: EdgeInsets.only(left: 10),
+                          child: Image(
+                            image: AssetImage('assets/images/login.png'),
+                            height: 100,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('¡Hola, ${userServices.usuario.nombre}!', style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 24.0
+                              )),
+                              FilledButton(
+                                onPressed: () async {
+                                  // Redirige a la pantalla de perfil
+                                },
+                                child: const Text('Ver perfil'),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  
-                ],
+                    const Padding(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Divider(),
+                    ),
+                    const ListTile(
+                      leading: Icon(Icons.directions_bike),
+                      title: Text('Bicicletas'),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.route),
+                      title: Text('Recorridos'),
+                      onTap: () {
+                          context.push('/route');
+                          // Redirige a la pantalla de recorridos
+                      },
+                    ),
+                  ],
+                ),
               ),
               Padding(
-                padding: const EdgeInsets.only( top: 10 ),
-                child: Divider(),
-              ),
-              const ListTile(title: Text('Opción 1')),
-              const ListTile(title: Text('Opción 2')),
-
-              FilledButton(
-                onPressed: () async {
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: FilledButton(
+                    onPressed: () async {
                       await FirebaseAuth.instance.signOut();
                       await FirebaseAuth.instance.currentUser?.reload();
                       context.push('/'); // Redirige a la pantalla de inicio de sesión
                     },
-                child: const Icon( Icons.logout)),
-              // Agrega más opciones aquí
+                    child: const Text('Cerrar Sesión'),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

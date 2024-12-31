@@ -152,7 +152,7 @@ class _CustomSearchBarBody extends StatelessWidget {
                   },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-                    margin: EdgeInsets.only( bottom: 25),
+                    margin: const EdgeInsets.only( bottom: 25),
                     width: width, // Asegura que el ancho sea completo
                     decoration: BoxDecoration(
                       color: Colors.grey[200],
@@ -161,29 +161,23 @@ class _CustomSearchBarBody extends StatelessWidget {
                     child: const Row(
                       children: [
                         Icon(Icons.search, color: Colors.black87), // Icono de búsqueda
-                        SizedBox(width: 10), // Espacio entre el icono y el texto
+                        SizedBox(width: 10),
                         Text('¿Dónde quieres ir?',
                             style: TextStyle(color: Colors.black87)),
                       ],
                     ),
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        FilledButton(
-                          onPressed: () async {
-                                await FirebaseAuth.instance.signOut();
-                                await FirebaseAuth.instance.currentUser?.reload();
-                                context.push('/'); // Redirige a la pantalla de inicio de sesión
-                              },
-                          child: const Icon( Icons.logout )),
+                        Divider()
                       ],
                     ),
                   ),
                 ),
-                // Aquí puedes agregar más widgets que desees mostrar al expandir
+                //widgets al expandir
               ],
             ),
           ),

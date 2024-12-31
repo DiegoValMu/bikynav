@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:http/http.dart';
+
 class UserServices with ChangeNotifier {
 
   Usuario usuario = Usuario();
@@ -29,7 +31,7 @@ class UserServices with ChangeNotifier {
       usuario.email = data['email'];
       usuario.direccion = data['direccion'];
 
-      
+
       print("nombre2: ${usuario.nombre}");  // Guarda los datos en la variable interna
       notifyListeners();  // Notifica a los consumidores
     } else {
@@ -37,26 +39,37 @@ class UserServices with ChangeNotifier {
     }
   }
 
-
-
-
-
-
-  /*Map<String, dynamic> _userData = {};
-
-  Map<String, dynamic> get userData => _userData;
-
-  Future<void> fetchUserData(String id) async {
-    final response = await http.get(Uri.parse('http://10.0.2.2:3000/usuarios/$id'));
+  Future<String> authFireInMongo( String? idToken )async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:3000/api/login'),
+      headers: {
+        'Authorization': 'Bearer $idToken', // Incluye el token en el encabezado
+        'Content-Type': 'application/json',
+      }
+    );
     if (response.statusCode == 200) {
-      var data = json.decode(response.body);
-      _userData = data;  // Guarda los datos en la variable interna
-      notifyListeners();  // Notifica a los consumidores
+      return response.body;
     } else {
-      throw Exception('Error al cargar los datos');
+      // Error en el backend
+      throw Exception('Error en el backend: ${response.body}');
     }
-  
-  }*/
+  }
+
+  Future<bool> userRegister( Map<String, dynamic> user ) async {
+    final response = await http.post(
+      Uri.parse('http://10.0.2.2:3000/api/usuarios'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(user),
+    );
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      // Error en el backend
+      throw Exception('Error en el backend: ${response.body}');
+    }
+  }
 
 
 }
