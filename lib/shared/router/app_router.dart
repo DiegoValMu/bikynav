@@ -8,7 +8,6 @@ import 'package:bikynav/features/nav/presentation/screens/screens.dart';
 
 import 'package:bikynav/features/users/presentation/screens/screens.dart';
 import 'package:provider/provider.dart';
-import 'package:http/http.dart' as http;
 
 final appRouter = GoRouter(
   redirect: (context, state) async {

@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:http/http.dart';
-
 class UserServices with ChangeNotifier {
 
   Usuario usuario = Usuario();
@@ -17,7 +15,7 @@ class UserServices with ChangeNotifier {
 
   Future userData( String id) async {
 
-    final response = await http.get(Uri.parse('http://10.0.2.2:3000/api/usuarios/$id'));
+    final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios/$id'));
     if (response.statusCode == 200) {
       exists = true;
       var data = json.decode(response.body);
@@ -41,7 +39,7 @@ class UserServices with ChangeNotifier {
 
   Future<String> authFireInMongo( String? idToken )async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:3000/api/login'),
+      Uri.parse('https://serverbikynav-production.up.railway.app/api/login'),
       headers: {
         'Authorization': 'Bearer $idToken', // Incluye el token en el encabezado
         'Content-Type': 'application/json',
@@ -57,7 +55,7 @@ class UserServices with ChangeNotifier {
 
   Future<bool> userRegister( Map<String, dynamic> user ) async {
     final response = await http.post(
-      Uri.parse('http://10.0.2.2:3000/api/usuarios'),
+      Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios'),
       headers: {
         'Content-Type': 'application/json',
       },

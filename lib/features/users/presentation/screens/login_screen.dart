@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -82,7 +81,7 @@ class _LoginFormViewState extends State<_LoginFormView> {
       context.go('/loading');
     } else {
       // Error en el backend
-      throw Exception('Error en el backend: ${res}');
+      throw Exception('Error en el backend: $res');
     }
 
 

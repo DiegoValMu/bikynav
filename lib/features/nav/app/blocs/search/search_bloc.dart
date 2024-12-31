@@ -41,11 +41,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final latLngList = points.map( (coor) => LatLng( coor[0].toDouble(), coor[1].toDouble() ) ).toList();
 
     //por ver duplicados
-  //  double kms = distance / 1000;
-  //  kms = (kms * 10).roundToDouble() / 10;
+    double kms = distance / 1000;
+    kms = (kms * 10).roundToDouble() / 10;
 //
-  //  endPlace.properties.distancia = kms;
-  //  endPlace.properties.duracion = duration;
+    endPlace.properties.distancia = kms;
+    endPlace.properties.duracion = duration;
 
 
     if ( !state.history.contains( endPlace) ){

@@ -17,7 +17,7 @@ class SocketService with ChangeNotifier {
   }
 
   void _initConfig(){
-    Socket socket = io('http://10.0.2.2:3000', 
+    Socket socket = io('https://serverbikynav-production.up.railway.app', 
       OptionBuilder()
         .setTransports(['websocket']) // for Flutter or Dart VM // disable auto-connection
         .build()

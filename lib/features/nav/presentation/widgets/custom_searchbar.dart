@@ -1,6 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/presentation/widgets/btn_toggle_user_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -92,6 +93,11 @@ class _CustomSearchBarBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    final mapBloc = BlocProvider.of<MapBloc>(context);
+    final locationBloc = BlocProvider.of<LocationBloc>(context);
+
+    final userLocation = locationBloc.state.myLocationHistory;
+
     final width = MediaQuery.of(context).size.width;
 
     return SafeArea(
@@ -172,7 +178,8 @@ class _CustomSearchBarBody extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Divider()
+                        Divider(),
+                        BtnToggleUserRoute(),
                       ],
                     ),
                   ),

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ffi';
 
+import 'package:bikynav/features/route/config/models/routes.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -40,9 +42,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   
     locationBloc.stream.listen((locationState) { 
 
-      if (locationState.lastKnowlocation != null) {
-        add( UpdateUserPolylineEvent( locationState.myLocationHistory ) );
-      }
+      //if (locationState.lastKnowlocation != null) {
+      //  add( UpdateUserPolylineEvent( locationState.myLocationHistory ) );
+      //}
 
       if ( !state.isfollowingUser ) return;
       if ( locationState.lastKnowlocation == null ) return;
@@ -126,6 +128,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final currentMarkers = Map<String, Marker>.from( state.markers );
       currentMarkers['start'] = startMarker;
       currentMarkers['end'] = endMarker;
+
 
       add( DisplayPolylinesEvent( currentPolylines, currentMarkers ) );
 

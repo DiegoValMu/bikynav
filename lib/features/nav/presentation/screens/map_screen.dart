@@ -1,3 +1,4 @@
+import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/features/users/presentation/views/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -62,16 +63,16 @@ class _MapScreenState extends State<MapScreen> {
                         if (mapState.inRoute)
                           const Positioned(
                             top: 50,
-                            left: 20,
+                            right: 20,
                             child: BtnCancelRoute(),
                           ),
-                        const Positioned(
+                        Positioned(
                           bottom: 0,
                           left: 0,
                           right: 0,
                           child: Column(
                             children: [
-                              Row(
+                              const Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Padding(
@@ -80,7 +81,9 @@ class _MapScreenState extends State<MapScreen> {
                                   ),
                                 ],
                               ),
-                              CustomSearchBar(),
+                              (mapState.inRoute)
+                              ? const CustomDataDisplay()
+                              : const CustomSearchBar(),
                             ],
                           ),
                         ),

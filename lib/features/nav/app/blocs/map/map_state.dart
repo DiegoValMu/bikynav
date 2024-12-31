@@ -6,7 +6,7 @@ class MapState extends Equatable {
   final bool isfollowingUser;
   final bool showMyRoute;
   final bool inRoute;
-
+ 
   //polylines
   final Map<String, Polyline> polylines;
   //markers
@@ -30,14 +30,14 @@ class MapState extends Equatable {
     bool? showMyRoute,
     bool? inRoute,
     Map<String, Polyline>? polylines,
-    Map<String, Marker>? markers
+    Map<String, Marker>? markers,
   }) => MapState(
     isMapInitialized: isMapInitialized ?? this.isMapInitialized,
     isfollowingUser: isfollowingUser ?? this.isfollowingUser,
     polylines: polylines ?? this.polylines,
     showMyRoute: showMyRoute ?? this.showMyRoute,
     markers: markers ?? this.markers,
-    inRoute: inRoute ?? this.inRoute
+    inRoute: inRoute ?? this.inRoute,
   );
 
   @override
