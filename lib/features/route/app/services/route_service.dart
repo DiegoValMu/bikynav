@@ -5,21 +5,31 @@ import 'dart:convert';
 
 class RouteServices with ChangeNotifier {
 
-  //BikeRoute route;
-  bool? exists;
+  RouteServices();
 
-  RouteServices() {
-    // Inicialmente, no hay usuario y no hay datos existentes
-    exists = false;
-  }
+  Future<bool> routeRegister( BikeRoute rt ) async {
 
-  Future<bool> routeRegister( Map<String, dynamic> rt ) async {
+    Map<String, dynamic> route;
+
+    route = {
+      'nombre': rt.nombre,
+      'distancia': rt.distancia,
+      'ubicacion_inicial': rt.ubicacionInicial,
+      'ubicacion_final': rt.ubicacionFinal,
+      'tiempo': rt.tiempoUtilizado,
+      'ruta': rt.ruta,
+      'fecha': rt.fecha.toString(),
+      'usuario': rt.user,
+    };
+
+
+
     final response = await http.post(
       Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos'),
       headers: {
         'Content-Type': 'application/json',
       },
-      body: jsonEncode(rt),
+      body: jsonEncode(route),
     );
     if (response.statusCode == 200) {
       return true;

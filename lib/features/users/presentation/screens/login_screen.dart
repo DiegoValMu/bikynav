@@ -76,6 +76,8 @@ class _LoginFormViewState extends State<_LoginFormView> {
 
     if (res.isNotEmpty) {
       userServices.userData(usr['_id']);
+
+      
       // Petición exitosa, redirige al usuario
       // ignore: use_build_context_synchronously
       context.go('/loading');

@@ -1,5 +1,8 @@
 import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
+import 'package:bikynav/features/users/app/services/user_services.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
@@ -15,6 +18,8 @@ class BtnSaveRoute extends StatelessWidget {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final routeServices = Provider.of<RouteServices>(context, listen: false);
+        final userServices = Provider.of<UserServices>(context, listen: false);
 
     final stopwatchProvider = Provider.of<StopwatchProvider>(context);
 
@@ -48,7 +53,7 @@ class BtnSaveRoute extends StatelessWidget {
             myRoute = BikeRoute(
               nombre: '',
               tiempoUtilizado: stopwatchProvider.totalTimeStopped,
-              ubicacionInicial: ubicacionInicial.toString(),
+              ubicacionInicial: ubicacionInicial,
               ruta: ruta
             );
 
@@ -56,7 +61,7 @@ class BtnSaveRoute extends StatelessWidget {
               LatLng point1 = coordinates[i];
               LatLng point2 = coordinates[i + 1];
 
-              double distance = await Geolocator.distanceBetween(
+              double distance = Geolocator.distanceBetween(
                 point1.latitude, point1.longitude,
                 point2.latitude, point2.longitude,
               );
@@ -66,14 +71,19 @@ class BtnSaveRoute extends StatelessWidget {
 
             myRoute.nombre = '';
             myRoute.tiempoUtilizado = stopwatchProvider.totalTimeStopped;
-            myRoute.ubicacionInicial = ubicacionInicial.toString();
-            myRoute.ubicacionFinal = ubicacionFinal.toString();
+            myRoute.ubicacionInicial = ubicacionInicial;
+            myRoute.ubicacionFinal = ubicacionFinal;
             myRoute.ruta = ruta;
             myRoute.fecha = DateTime.now();
+            myRoute.user = userServices.usuario.id;
 
-            print('route: $myRoute');
+            if (kDebugMode) {
+              print('route: ${myRoute.toString()}');
+            }
 
-            
+            await routeServices.routeRegister(myRoute);
+
+            stopwatchProvider.resetTimer();
             mapBloc.add( OnCancelRoute() );
 
             // Lógica del botón

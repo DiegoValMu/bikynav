@@ -1,6 +1,7 @@
 
 
 class Usuario {
+  String? id;
   String? nombre;
   String? apellidos;
   String? fechaNacimiento;
@@ -13,6 +14,7 @@ class Usuario {
   String? imagen;
 
   Usuario({
+    this.id,
     this.nombre,
     this.apellidos,
     this.fechaNacimiento,

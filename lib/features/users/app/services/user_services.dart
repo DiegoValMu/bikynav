@@ -22,6 +22,7 @@ class UserServices with ChangeNotifier {
       print('data: $data');
 
       print("nombre1: ${data['nombre']}");
+      usuario.id = data['_id'];
       usuario.nombre = data['nombre'];
       usuario.apellidos = data['apellidos'];
       usuario.fechaNacimiento = data['fechaNacimiento'];
