@@ -1,3 +1,4 @@
+import 'package:bikynav/features/route/presentation/widgets/btn_save_route.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/features/users/presentation/views/side_menu.dart';
 import 'package:flutter/material.dart';
@@ -71,16 +72,13 @@ class _MapScreenState extends State<MapScreen> {
                           left: 0,
                           right: 0,
                           child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Padding(
+                              const Padding(
                                     padding: EdgeInsets.only( right: 10 ),
                                     child: BtnCurrentLocation(),
-                                  ),
-                                ],
-                              ),
+                                ),
                               (mapState.inRoute)
                               ? const CustomDataDisplay()
                               : const CustomSearchBar(),

@@ -1,12 +1,15 @@
+import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:provider/provider.dart';
 
 class BtnCancelRoute extends StatelessWidget {
   const BtnCancelRoute({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final stopwatchProvider = Provider.of<StopwatchProvider>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
     //final locationBloc = BlocProvider.of<LocationBloc>(context);
 
@@ -22,6 +25,7 @@ class BtnCancelRoute extends StatelessWidget {
                   mapBloc.add( OnCancelRoute() );
                   if ( mapBloc.state.showMyRoute ){
                     //locationBloc.state.myLocationHistory = [];
+                    stopwatchProvider.resetTimer();
                     mapBloc.add( OnCancelToggleUserRoute() );
                   }
                   

@@ -1,12 +1,15 @@
 
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class BikeRoute {
   String? nombre;
   String? ubicacionInicial;
   String? ubicacionFinal;
-  String? fecha;
-  String? tiempoEstimado;
-  String? tiempoUtilizado;
+  DateTime? fecha;
+  double? distancia;
+  int? tiempoUtilizado;
+  Map<String, Polyline> ruta;
   String? imagen;
 
   BikeRoute({
@@ -14,8 +17,9 @@ class BikeRoute {
     this.ubicacionInicial,
     this.ubicacionFinal,
     this.fecha,
-    this.tiempoEstimado,
+    this.distancia,
     this.tiempoUtilizado,
+    required this.ruta,
     this.imagen,
   });
 }

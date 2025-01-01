@@ -1,7 +1,7 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:animate_do/animate_do.dart';
-import 'package:bikynav/features/nav/presentation/widgets/btn_toggle_user_route.dart';
+import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -37,6 +37,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     on<OnCancelRoute>((event, emit) => emit( state.copyWith( inRoute:  false )));
 
+    on<DisplayMarkerEvent>((event, emit) => emit( state.copyWith( markers: event.markers )));
+
     on<DisplayPolylinesEvent>((event, emit) => emit( state.copyWith( polylines: event.polylines, markers: event.markers )));
 
     on<OnInitRoute>((event, emit) => emit( state.copyWith( inRoute:  true )));
@@ -85,6 +87,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       final currentPolylines = Map<String, Polyline>.from( state.polylines );
       currentPolylines['myRoute'] = myRoute;
+
       emit (state.copyWith(polylines: currentPolylines));
 
   }

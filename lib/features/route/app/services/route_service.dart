@@ -5,7 +5,7 @@ import 'dart:convert';
 
 class RouteServices with ChangeNotifier {
 
-  BikeRoute route = BikeRoute();
+  //BikeRoute route;
   bool? exists;
 
   RouteServices() {

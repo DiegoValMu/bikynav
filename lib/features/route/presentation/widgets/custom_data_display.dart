@@ -4,17 +4,39 @@ import 'package:bikynav/features/nav/app/blocs/location/location_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/map/map_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/search/search_bloc.dart';
 import 'package:bikynav/features/nav/config/models/models.dart';
+import 'package:bikynav/features/route/presentation/widgets/btn_save_route.dart';
+import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 
-class CustomDataDisplay extends StatelessWidget {
+class CustomDataDisplay extends StatefulWidget {
   const CustomDataDisplay({super.key});
+
+  @override
+  State<CustomDataDisplay> createState() => _CustomDataDisplayState();
+}
+
+class _CustomDataDisplayState extends State<CustomDataDisplay> {
+  @override
+  void initState() {
+    super.initState();
+    // Iniciar el cronómetro cuando se muestre la pantalla
+    Provider.of<StopwatchProvider>(context, listen: false).startTimer();
+  }
 
   @override
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final searchBloc = BlocProvider.of<SearchBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
+
+    final stopwatchProvider = Provider.of<StopwatchProvider>(context);
+    final int seconds = stopwatchProvider.elapsedSeconds;
+
+    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
+    final displaySeconds = (seconds % 60).toString().padLeft(2, '0');
+
 
     final place = searchBloc.state.history;
     String name = '';
@@ -65,18 +87,22 @@ class CustomDataDisplay extends StatelessWidget {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only( top: 10),
+                padding: const EdgeInsets.only( top: 5),
                 child: ListTile(
                   leading: Column(
                     children: [
                       const Icon( Icons.timelapse ),
-                      Text(
+                      (mapBloc.state.showMyRoute)
+                      ? Text('$minutes:$displaySeconds', style: TextStyle( fontSize: 20 ),)
+                      : Text(
                         '$tripDuration min', 
                         style: const TextStyle( fontSize: 20 ),
                         ),
                     ],
                   ),
-                  title: Column(
+                  title: (mapBloc.state.showMyRoute)
+                  ? BtnSaveRoute()
+                  : Column(
                     children: [
                       const Text(
                         'Dirección',
@@ -86,7 +112,7 @@ class CustomDataDisplay extends StatelessWidget {
                           ),
                         ),
                       Text(
-                        '$name', 
+                        name, 
                         style: const TextStyle( fontSize: 20 ),
                       )
                     ]
