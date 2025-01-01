@@ -14,7 +14,7 @@ class MapState extends Equatable {
 
 
   const MapState({
-    this.showMyRoute = true,  
+    this.showMyRoute = false,  
     Map<String, Polyline>? polylines,
     Map<String, Marker>? markers,
     this.isMapInitialized = false, 

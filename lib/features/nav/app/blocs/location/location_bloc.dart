@@ -16,6 +16,16 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
     on<OnStartFollowingUser>((event, emit) => emit( state.copyWith(followingUser: true)));
     on<OnStopFollowingUser>((event, emit) => emit( state.copyWith(followingUser: false)));
+
+    on<OnNewRouteEvent>((event, emit) {
+      emit(
+        state.copyWith(
+          lastKnowlocation: event.newLocation,
+          myLocationHistory: [event.newLocation],
+        )
+        );
+      // TODO: implement event handler
+    });
     
     on<OnNewUserLocationEvent>((event, emit) {
       emit(

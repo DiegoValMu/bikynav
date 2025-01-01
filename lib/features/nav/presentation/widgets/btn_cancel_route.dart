@@ -8,6 +8,7 @@ class BtnCancelRoute extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
+    //final locationBloc = BlocProvider.of<LocationBloc>(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -16,11 +17,19 @@ class BtnCancelRoute extends StatelessWidget {
         child: BlocBuilder<MapBloc, MapState>(
           builder: (context, state) {
             return IconButton(
-                icon: Icon( Icons.clear),
+                icon: const Icon( Icons.clear),
                 onPressed: () {
                   mapBloc.add( OnCancelRoute() );
-                  mapBloc.state.markers.remove('start');
-                  mapBloc.state.markers.remove('end');
+                  if ( mapBloc.state.showMyRoute ){
+                    //locationBloc.state.myLocationHistory = [];
+                    mapBloc.add( OnCancelToggleUserRoute() );
+                  }
+                  
+                  if (mapBloc.state.markers.isNotEmpty){
+                    mapBloc.state.polylines.remove('route');
+                    mapBloc.state.markers.remove('start');
+                    mapBloc.state.markers.remove('end');
+                  }
                 });
           },
         ),

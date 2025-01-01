@@ -31,6 +31,8 @@ class _ManualMarkerBody extends StatelessWidget {
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
 
+    final position = locationBloc.state.lastKnowlocation;
+
     return SizedBox(
       width: size.width,
       height: size.height,
@@ -59,6 +61,8 @@ class _ManualMarkerBody extends StatelessWidget {
                   height: 50,
                   shape: const StadiumBorder(),
                   onPressed: () async {
+                    
+                    locationBloc.add( OnNewRouteEvent(position!));
                     
                     final start = locationBloc.state.lastKnowlocation;
                     if( start == null ) return;

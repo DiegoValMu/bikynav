@@ -32,7 +32,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     on<UpdateUserPolylineEvent>( _onPolylineNewPoint);
 
-    on<OnToggleUserRoute>((event, emit) => emit( state.copyWith( showMyRoute:  !state.showMyRoute )));
+    on<OnToggleUserRoute>((event, emit) => emit( state.copyWith( showMyRoute:  true )));
+    on<OnCancelToggleUserRoute>((event, emit) => emit( state.copyWith( showMyRoute: false )));
 
     on<OnCancelRoute>((event, emit) => emit( state.copyWith( inRoute:  false )));
 
@@ -42,9 +43,9 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   
     locationBloc.stream.listen((locationState) { 
 
-      //if (locationState.lastKnowlocation != null) {
-      //  add( UpdateUserPolylineEvent( locationState.myLocationHistory ) );
-      //}
+      if (locationState.lastKnowlocation != null) {
+        add( UpdateUserPolylineEvent( locationState.myLocationHistory ) );
+      }
 
       if ( !state.isfollowingUser ) return;
       if ( locationState.lastKnowlocation == null ) return;
@@ -75,7 +76,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   void _onPolylineNewPoint (UpdateUserPolylineEvent event, Emitter<MapState> emit){
     final myRoute = Polyline(
       polylineId: const PolylineId('myRoute'),
-      color: Colors.black,
+      color: Colors.black54,
       width: 5,
       startCap: Cap.roundCap,
       endCap: Cap.roundCap,

@@ -10,8 +10,9 @@ class BtnToggleUserRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
 
-    final userLocation = locationBloc.state.myLocationHistory;
+    final position = locationBloc.state.lastKnowlocation;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
@@ -20,7 +21,7 @@ class BtnToggleUserRoute extends StatelessWidget {
         title: const Text('Trazar ruta'), // Título
         onTap: () {
           mapBloc.add(OnToggleUserRoute());
-          mapBloc.add(UpdateUserPolylineEvent(userLocation));
+          locationBloc.add( OnNewRouteEvent(position!));
           mapBloc.add(OnInitRoute());
 
         },

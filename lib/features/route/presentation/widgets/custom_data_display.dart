@@ -17,14 +17,20 @@ class CustomDataDisplay extends StatelessWidget {
     final locationBloc = BlocProvider.of<LocationBloc>(context);
 
     final place = searchBloc.state.history;
+    String name = '';
+    double? distance = 0; 
+    double tripDuration = 0;
 
     List<Feature> features = place;
-    final dataPlace = features.first;
+    if (features.isNotEmpty){
+      final dataPlace = features.first;
 
-    final name = dataPlace.properties.name;
-    final distance = dataPlace.properties.distancia;
-    final time = (dataPlace.properties.duracion);
-    double tripDuration = (time! / 60).floorToDouble();
+      name = dataPlace.properties.name;
+      distance = dataPlace.properties.distancia;
+      final time = (dataPlace.properties.duracion);
+      tripDuration = (time! / 60).floorToDouble();
+    };
+    
 
     return SafeArea(
       bottom: true,
