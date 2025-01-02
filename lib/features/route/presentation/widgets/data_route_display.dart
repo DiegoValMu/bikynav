@@ -12,14 +12,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-class CustomDataDisplay extends StatefulWidget {
-  const CustomDataDisplay({super.key});
+class DataRouteDisplay extends StatefulWidget {
+  const DataRouteDisplay({super.key});
 
   @override
-  State<CustomDataDisplay> createState() => _CustomDataDisplayState();
+  State<DataRouteDisplay> createState() => _DataRouteDisplayState();
 }
 
-class _CustomDataDisplayState extends State<CustomDataDisplay> {
+class _DataRouteDisplayState extends State<DataRouteDisplay> {
   @override
   void initState() {
     super.initState();
@@ -30,29 +30,12 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
   @override
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
-    final searchBloc = BlocProvider.of<SearchBloc>(context);
-
-    final stopwatchProvider = Provider.of<StopwatchProvider>(context);
-    final int seconds = stopwatchProvider.elapsedSeconds;
-
-    final minutes = (seconds ~/ 60).toString().padLeft(2, '0');
-    final displaySeconds = (seconds % 60).toString().padLeft(2, '0');
 
 
-    final place = searchBloc.state.history;
+
     String name = '';
     double distance = 0; 
     double tripDuration = 0;
-
-    List<Feature> features = place;
-    if (features.isNotEmpty){
-      final dataPlace = features.first;
-
-      name = dataPlace.properties.name;
-      distance = dataPlace.properties.distancia!;
-      final time = (dataPlace.properties.duracion);
-      tripDuration = (time! / 60).floorToDouble();
-    };
 
   
     return SafeArea(
@@ -94,7 +77,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                     children: [
                       const Icon( Icons.timelapse ),
                       (mapBloc.state.showMyRoute)
-                      ? Text('$minutes:$displaySeconds', style: TextStyle( fontSize: 20 ),)
+                      ? Text('', style: TextStyle( fontSize: 20 ),)
                       : Text(
                         '$tripDuration min', 
                         style: const TextStyle( fontSize: 20 ),

@@ -17,7 +17,7 @@ class RouteServices with ChangeNotifier {
     Map<String, dynamic> route;
 
     route = {
-      'nombre': rt.nombre,
+      'etiqueta': rt.etiqueta,
       'distancia': rt.distancia,
       'ubicacion_inicial': rt.ubicacionInicial,
       'ubicacion_final': rt.ubicacionFinal,
@@ -48,17 +48,26 @@ class RouteServices with ChangeNotifier {
 
     final response = await http.post(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridosUsuario'),
     headers: {
-      'Authorization': '$id',
+      'Authorization': id,
     });
     if (response.statusCode == 200) {
       rutas = json.decode(response.body);
       //var data = json.decode(response.body);
       print('data: $rutas');
-
-      print("nombre2: ${myRoute.nombre}");  // Guarda los datos en la variable interna
+      print("nombre2: ${myRoute.etiqueta}");  // Guarda los datos en la variable interna
       notifyListeners();  // Notifica a los consumidores
     } else {
       throw Exception('Error al cargar los datos');
+    }
+  }
+
+  Future deleteRoute( String id) async {
+
+    final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$id'));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Error en el backend: ${response.body}');
     }
   }
 

@@ -4,7 +4,7 @@ import 'dart:math';
 
 class BikeRoute {
   String? id;
-  String? nombre;
+  String? etiqueta;
   LatLng? ubicacionInicial;
   LatLng? ubicacionFinal;
   DateTime? fecha;
@@ -17,7 +17,7 @@ class BikeRoute {
 
   BikeRoute({
     this.id,
-    this.nombre,
+    this.etiqueta,
     this.ubicacionInicial,
     this.ubicacionFinal,
     this.fecha,
@@ -48,7 +48,7 @@ class BikeRoute {
 
     return BikeRoute(
       id: json['_id'],
-      nombre: json['nombre'],  // Asumiendo que el nombre de la ruta viene desde el backend
+      etiqueta: json['etiqueta'],  // Asumiendo que el nombre de la ruta viene desde el backend
       ubicacionInicial: ubicacionInicial,
       ubicacionFinal: ubicacionFinal,
       fecha: json['fecha'] != null ? DateTime.parse(json['fecha']) : null,
@@ -65,7 +65,7 @@ class BikeRoute {
   Map<String, dynamic> toJson() {
     return {
       '_id': id,
-      'nombre': nombre,
+      'etiqueta': etiqueta,
       'ubicacion_inicial': ubicacionInicial != null
           ? [ubicacionInicial!.latitude, ubicacionInicial!.longitude]
           : null,

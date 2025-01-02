@@ -72,7 +72,6 @@ class BtnSaveRoute extends StatelessWidget {
               myRoute.distancia = distance;
             }
 
-            myRoute.nombre = '';
             myRoute.tiempoUtilizado = stopwatchProvider.totalTimeStopped;
             myRoute.ubicacionInicial = ubicacionInicial;
             myRoute.ubicacionFinal = ubicacionFinal;
@@ -105,14 +104,14 @@ class BtnSaveRoute extends StatelessWidget {
                         placeholder: 'Etiqueta',
                         inputType: TextInputType.name,
                         controller: nameController,
-                        )
+                      )
                     ],
                   ),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () async {
-                      myRoute.nombre = nameController.text;
+                      myRoute.etiqueta = nameController.text;
                       await routeServices.routeRegister(myRoute);
                       stopwatchProvider.resetTimer();
                       mapBloc.add(OnCancelToggleUserRoute());

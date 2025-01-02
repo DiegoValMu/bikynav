@@ -34,7 +34,7 @@ class UserServices with ChangeNotifier {
       print("nombre2: ${usuario.nombre}");  // Guarda los datos en la variable interna
       notifyListeners();  // Notifica a los consumidores
     } else {
-      throw Exception('Error al cargar los datos');
+      throw Exception('Error en el backend: ${response.body}');
     }
   }
 
