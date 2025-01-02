@@ -42,6 +42,12 @@ class RouteScreen extends StatelessWidget {
             trailing: IconButton(
               onPressed: (){
                 routeServices.deleteRoute( route.id! );
+
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Eliminado correctamente')),
+                );
+                context.push('/nav');
               }, 
               icon: Icon( Icons.delete)
               ),
