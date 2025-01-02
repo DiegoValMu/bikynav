@@ -1,3 +1,4 @@
+import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
@@ -85,15 +86,33 @@ class BtnSaveRoute extends StatelessWidget {
               print('route: ${myRoute.toString()}');
             }
 
+            final TextEditingController nameController = TextEditingController();
+
             showDialog(
             context: context,
             builder: (BuildContext dialogcontext) {
               return AlertDialog(
                 title: Text('Confirmar guardado'),
-                content: Text('¿Desea guardar la ruta?'),
+                content: SizedBox(
+                  height: 100,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Divider(),
+                      Text('Etiqueta para la ruta'),
+                      CustomTextFormField( 
+                        placeholder: 'Etiqueta',
+                        inputType: TextInputType.name,
+                        controller: nameController,
+                        )
+                    ],
+                  ),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () async {
+                      myRoute.nombre = nameController.text;
                       await routeServices.routeRegister(myRoute);
                       stopwatchProvider.resetTimer();
                       mapBloc.add(OnCancelToggleUserRoute());

@@ -117,13 +117,16 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                       )
                     ]
                   ),
-                  trailing: Column(
+                  trailing: 
+                    ( mapBloc.state.showMyRoute )
+                    ? const Text('')
+                    : Column(
                     children: [
                       const Icon( Icons.directions_bike ),
                       Text(
                         '$distance kms',
                         style: const TextStyle( fontSize: 20 ),
-                        ),
+                      ),
                     ],
                   ),
                 ),

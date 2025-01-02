@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/shared/services/socket_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -95,7 +96,13 @@ class SideMenu extends StatelessWidget {
                     ListTile(
                       leading: Icon(Icons.route),
                       title: Text('Recorridos'),
-                      onTap: () {
+                      onTap: () async {
+                          final routeServices = Provider.of<RouteServices>(context, listen: false);
+                          final userServices = Provider.of<UserServices>(context, listen: false);
+
+                          await routeServices.getRoutes(userServices.usuario.id!);
+
+                        
                           context.push('/route');
                           // Redirige a la pantalla de recorridos
                       },

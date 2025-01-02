@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CustomTextFormField extends StatelessWidget {
-  final IconData icon;
+  final IconData? icon;
   final String placeholder;
   final String? errorMessage;
   final TextInputType inputType; // Tipo de entrada
@@ -15,7 +15,7 @@ class CustomTextFormField extends StatelessWidget {
 
   CustomTextFormField({
     super.key,
-    required this.icon,
+    this.icon,
     required this.placeholder,
     this.inputType = TextInputType.text, // Por defecto es texto normal
     this.isPassword = false, // Por defecto no es una contraseña

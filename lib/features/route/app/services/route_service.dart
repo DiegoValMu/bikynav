@@ -5,7 +5,12 @@ import 'dart:convert';
 
 class RouteServices with ChangeNotifier {
 
+  List<dynamic> rutas = [];
+
+  BikeRoute myRoute = BikeRoute();
+
   RouteServices();
+
 
   Future<bool> routeRegister( BikeRoute rt ) async {
 
@@ -36,6 +41,24 @@ class RouteServices with ChangeNotifier {
     } else {
       // Error en el backend
       throw Exception('Error en el backend: ${response.body}');
+    }
+  }
+
+  Future getRoutes( String id) async {
+
+    final response = await http.post(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridosUsuario'),
+    headers: {
+      'Authorization': '$id',
+    });
+    if (response.statusCode == 200) {
+      rutas = json.decode(response.body);
+      //var data = json.decode(response.body);
+      print('data: $rutas');
+
+      print("nombre2: ${myRoute.nombre}");  // Guarda los datos en la variable interna
+      notifyListeners();  // Notifica a los consumidores
+    } else {
+      throw Exception('Error al cargar los datos');
     }
   }
 
