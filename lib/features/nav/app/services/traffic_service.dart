@@ -1,3 +1,4 @@
+import 'package:bikynav/features/nav/config/models/traffic_response_cycling.dart';
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
 import 'package:bikynav/features/nav/config/models/models.dart';
@@ -16,15 +17,15 @@ class TrafficService {
       _dioPlaces = Dio();
 
 
-  Future<TrafficResponse> getCoorsStartToEnd( LatLng start, LatLng end ) async {
+  Future<TrafficResponseCycling> getCoorsStartToEnd( LatLng start, LatLng end ) async {
 
     final coorsString = '${ start.longitude },${ start.latitude };${ end.longitude },${ end.latitude }';
     
-    final url = '$_baseTrafficUrl/driving/$coorsString';
+    final url = '$_baseTrafficUrl/cycling/$coorsString';
 
     final resp = await _dioTraffic.get(url);
 
-    final data = TrafficResponse.fromMap(resp.data);
+    final data = TrafficResponseCycling.fromMap(resp.data);
     
     return data;
 
@@ -50,7 +51,7 @@ class TrafficService {
   }
 
   Future<Feature> getInformationByCoors( LatLng coors ) async {
-    final url = 'https://api.mapbox.com/search/geocode/v6/reverse?country=cl&language=es';
+    final url = 'https://api.mapbox.com/search/geocode/v6/reverse?country=cl&language=es&continue_straight=true';
 
     final resp = await _dioPlaces.get( url, queryParameters: {
       'longitude': coors.longitude,

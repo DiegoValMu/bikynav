@@ -19,7 +19,7 @@ class BtnSaveRoute extends StatelessWidget {
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final searchBloc = BlocProvider.of<SearchBloc>(context);
     final routeServices = Provider.of<RouteServices>(context, listen: false);
-        final userServices = Provider.of<UserServices>(context, listen: false);
+    final userServices = Provider.of<UserServices>(context, listen: false);
 
     final stopwatchProvider = Provider.of<StopwatchProvider>(context);
 
@@ -37,6 +37,8 @@ class BtnSaveRoute extends StatelessWidget {
           onPressed: () async {
             stopwatchProvider.stopTimer();
 
+            
+
             final startMarker = Marker(
               markerId: const MarkerId('end'),
               position: ubicacionFinal!,
@@ -51,10 +53,10 @@ class BtnSaveRoute extends StatelessWidget {
             mapBloc.add( DisplayMarkerEvent( currentMarkers ) );
 
             myRoute = BikeRoute(
-              nombre: '',
               tiempoUtilizado: stopwatchProvider.totalTimeStopped,
               ubicacionInicial: ubicacionInicial,
-              ruta: ruta
+              ruta: ruta,  
+
             );
 
             for (int i = 0; i < coordinates.length - 1; i++) {
@@ -75,18 +77,57 @@ class BtnSaveRoute extends StatelessWidget {
             myRoute.ubicacionFinal = ubicacionFinal;
             myRoute.ruta = ruta;
             myRoute.fecha = DateTime.now();
-            myRoute.user = userServices.usuario.id;
+            myRoute.usrId = userServices.usuario.id;
+
+            stopwatchProvider.resetTimer();
 
             if (kDebugMode) {
               print('route: ${myRoute.toString()}');
             }
 
-            await routeServices.routeRegister(myRoute);
+            showDialog(
+            context: context,
+            builder: (BuildContext dialogcontext) {
+              return AlertDialog(
+                title: Text('Confirmar guardado'),
+                content: Text('¿Desea guardar la ruta?'),
+                actions: [
+                  TextButton(
+                    onPressed: () async {
+                      await routeServices.routeRegister(myRoute);
+                      stopwatchProvider.resetTimer();
+                      mapBloc.add(OnCancelToggleUserRoute());
+                      mapBloc.add(OnCancelRoute());
+                      mapBloc.state.markers.remove('start');
+                      mapBloc.state.markers.remove('end');
 
-            stopwatchProvider.resetTimer();
-            mapBloc.add( OnCancelRoute() );
+                      //necesito un pop que diga ruta guardada
 
-            // Lógica del botón
+                      Navigator.of(context).pop(); // Cierra el diálogo después de la acción
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Ruta guardada'),
+                          backgroundColor: Colors.green, 
+                          )
+                      );
+                    },
+                    child: Text('Confirmar')
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      stopwatchProvider.resetTimer();
+                      mapBloc.add(OnCancelToggleUserRoute());
+                      mapBloc.add(OnCancelRoute());
+                      Navigator.of(context).pop(); // Cierra el diálogo al cancelar
+                    },
+                    child: Text('Cancelar')
+                  )
+                ]
+              );
+            }
+          );
+
           },
           icon: const Icon(Icons.save),
           label: const Text('Guardar ruta'),

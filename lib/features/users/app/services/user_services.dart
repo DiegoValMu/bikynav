@@ -21,7 +21,7 @@ class UserServices with ChangeNotifier {
       var data = json.decode(response.body);
       print('data: $data');
 
-      print("nombre1: ${data['nombre']}");
+      print("id: ${data['_id']}");
       usuario.id = data['_id'];
       usuario.nombre = data['nombre'];
       usuario.apellidos = data['apellidos'];

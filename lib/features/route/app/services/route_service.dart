@@ -19,7 +19,7 @@ class RouteServices with ChangeNotifier {
       'tiempo': rt.tiempoUtilizado,
       'ruta': rt.ruta,
       'fecha': rt.fecha.toString(),
-      'usuario': rt.user,
+      'usuario': rt.usrId,
     };
 
 
@@ -31,7 +31,7 @@ class RouteServices with ChangeNotifier {
       },
       body: jsonEncode(route),
     );
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       return true;
     } else {
       // Error en el backend
