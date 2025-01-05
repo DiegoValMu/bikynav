@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/shared/services/socket_service.dart';
@@ -22,7 +20,6 @@ class SideMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final socketService = Provider.of<SocketService>(context);
     final userServices = Provider.of<UserServices>(context);
 
@@ -35,13 +32,11 @@ class SideMenu extends StatelessWidget {
         child: Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            leading: 
-              Container(
-                child: (socketService.serverStatus == ServerStatus.Online )
-                ? const Icon(Icons.check_circle, color: Colors.green)
-                : const Icon(Icons.offline_bolt, color: Colors.red, ),
-              )
-            ,
+            leading: Container(
+              child: (socketService.serverStatus == ServerStatus.Online)
+                  ? const Icon(Icons.check_circle, color: Colors.green)
+                  : const Icon(Icons.offline_bolt, color: Colors.red),
+            ),
             actions: [
               IconButton(
                 icon: const Icon(Icons.close),
@@ -72,8 +67,8 @@ class SideMenu extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('¡Hola, ${userServices.usuario.nombre}!', style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 24.0
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 24.0
                               )),
                               FilledButton(
                                 onPressed: () async {
@@ -98,17 +93,20 @@ class SideMenu extends StatelessWidget {
                       leading: Icon(Icons.route),
                       title: Text('Recorridos'),
                       onTap: () async {
-
+                        // Mostrar el mensaje de carga
                         showLoadingMessage(context);
 
-                          final routeServices = Provider.of<RouteServices>(context, listen: false);
-                          final userServices = Provider.of<UserServices>(context, listen: false);
+                        final routeServices = Provider.of<RouteServices>(context, listen: false);
+                        final userServices = Provider.of<UserServices>(context, listen: false);
 
-                          await routeServices.getRoutes(userServices.usuario.id!);
+                        // Realizar la operación de carga (por ejemplo, obtener las rutas)
+                        await routeServices.getRoutes(userServices.usuario.id!);
 
-                        
-                          context.push('/route');
-                          // Redirige a la pantalla de recorridos
+                        // Ocultar el mensaje de carga después de la operación
+     //                   Navigator.pop(context); // Esto oculta el mensaje de carga si fue implementado con un `showDialog`
+                        hideLoadingMessage(context);
+                        // Redirigir a la pantalla de recorridos
+                        context.push('/route');
                       },
                     ),
                   ],

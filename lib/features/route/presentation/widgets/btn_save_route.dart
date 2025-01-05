@@ -139,6 +139,8 @@ class BtnSaveRoute extends StatelessWidget {
                       stopwatchProvider.resetTimer();
                       mapBloc.add(OnCancelToggleUserRoute());
                       mapBloc.add(OnCancelRoute());
+                      mapBloc.state.markers.remove('start');
+                      mapBloc.state.markers.remove('end');
                       Navigator.of(context).pop(); // Cierra el diálogo al cancelar
                     },
                     child: Text('Cancelar')

@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+
+import '../../app/helpers/real_time_provider.dart';
 
 class BtnToggleUserRoute extends StatelessWidget {
   const BtnToggleUserRoute({super.key});
@@ -13,6 +16,7 @@ class BtnToggleUserRoute extends StatelessWidget {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     //final searchBloc = BlocProvider.of<SearchBloc>(context);
+      final stopwatchProvider = Provider.of<StopwatchProvider>(context);
 
     final LatLng? position = locationBloc.state.lastKnowlocation;
 
@@ -22,6 +26,10 @@ class BtnToggleUserRoute extends StatelessWidget {
         leading: const Icon(Icons.route), // Icono que representa la acción
         title: const Text('Trazar ruta'), // Título
         onTap: () {
+
+          stopwatchProvider.resetTimer();
+
+
 
           final startMarker = Marker(
             markerId: const MarkerId('start'),

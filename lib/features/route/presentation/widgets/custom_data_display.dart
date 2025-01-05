@@ -51,7 +51,8 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
       distance = dataPlace.properties.distancia!;
       final time = (dataPlace.properties.duracion);
       tripDuration = (time! / 60).floorToDouble();
-    }else if ( routeServices.myRoute.toString().isNotEmpty ){
+
+    }else if ( routeServices.rutas.length > 0 ){
       name = routeServices.myRoute.etiqueta!;
       kms = routeServices.myRoute.distancia!;
       distance = (kms * 10).roundToDouble() / 10;

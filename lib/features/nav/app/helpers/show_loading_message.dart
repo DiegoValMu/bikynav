@@ -20,6 +20,12 @@ void showLoadingMessage( BuildContext context) {
         )),
     ));
 
+   
+
     return;
 
 }
+
+ void hideLoadingMessage(BuildContext context) {
+      Navigator.pop(context);  // Cierra el diálogo de carga
+    }
