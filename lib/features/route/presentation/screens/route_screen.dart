@@ -30,88 +30,111 @@ class RouteScreen extends StatelessWidget {
     // Simulamos las respuestas recibida
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Recorridos guardados'),
-      ),
-      body: ListView.builder(
-        itemCount: rutas.length,
-        itemBuilder: (context, index) {
-          BikeRoute route = rutas[index];
-          return Column(
-            children: [
-              ListTile(
-                trailing: IconButton(
-                  onPressed: (){
-                    routeServices.deleteRoute( route.id! );
-              
-              
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Eliminado correctamente')),
-                    );
-                    context.push('/nav');
-                  }, 
-                  icon: Icon( Icons.delete)
-                  ),
-                title: Text(route.etiqueta ?? 'Ruta sin nombre'),
-                leading: const Icon(Icons.route),
-                onTap: () async {
-              
-                  final startMarker = Marker(
-                    markerId: const MarkerId('start'),
-                    position: route.ubicacionInicial!,
-                    infoWindow: const InfoWindow(
-                      title: 'Ubicación inicial',
-                    )
-                  );
-              
-                  final endMarker = Marker(
-                    markerId: const MarkerId('end'),
-                    position: route.ubicacionFinal!,
-                    infoWindow: InfoWindow(
-                      title: 'Destino',
-                      snippet: route.etiqueta
-                    )
-                  );
-              
-                  final currentPolylines = Map<String, Polyline>.from( mapBloc.state.polylines );
-                  final points = route.ruta!['myRoute']?.points;
-              
-                  final myRoute = Polyline(
-                    polylineId: const PolylineId('route'),
-                    color: Colors.black,
-                    width: 5,
-                    points: points!,
-                    startCap: Cap.roundCap,
-                    endCap: Cap.roundCap
-                  );
-                  
-                  final currentMarkers = Map<String, Marker>.from( mapBloc.state.markers );
-                  currentMarkers['start'] = startMarker;
-                  currentMarkers['end'] = endMarker;
-              
-                  currentPolylines['route'] = myRoute;      
-              
-                  mapBloc.add( DisplayPolylinesEvent( currentPolylines , currentMarkers) );
-                  mapBloc.add( OnInitRoute() );
-              
-                  routeServices.myRoute = route;
-              
-                  // Acción al seleccionar una ruta
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Seleccionaste ${route.etiqueta ?? "una ruta"}')),
-                  );
-              
-                  searchBloc.state.copyWith( history: const []);
-              
-                  context.push('/nav');
-              
-                },
-                
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight), // Altura estándar del AppBar
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // Fondo blanco para el AppBar
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // Color de la sombra
+                offset: const Offset(0, 4), // Sombra hacia abajo
+                blurRadius: 6, // Difusión de la sombra
               ),
-              const Divider(),  
             ],
-          );
-        }
+          ),
+          child: AppBar(
+            title: const Text('Recorridos'),
+            elevation: 0, // Sin sombra por elevación
+            backgroundColor: Colors.transparent, // Fondo transparente para el AppBar
+            centerTitle: true, // Centrar el título
+          ),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.only( top: 8),
+        child: ListView.builder(
+          itemCount: rutas.length,
+          itemBuilder: (context, index) {
+            BikeRoute route = rutas[index];
+            return Column(
+              children: [
+                ListTile(
+                  trailing: IconButton(
+                    onPressed: (){
+                      routeServices.deleteRoute( route.id! );
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Eliminado correctamente')),
+                      );
+                      context.push('/nav');
+                    }, 
+                    icon: const Icon( 
+                      Icons.delete,
+                      color: Colors.red,
+                      )
+                    ),
+                  title: Text(route.etiqueta ?? 'Ruta sin nombre'),
+                  leading: const Icon(Icons.route),
+                  onTap: () async {
+                
+                    final startMarker = Marker(
+                      markerId: const MarkerId('start'),
+                      position: route.ubicacionInicial!,
+                      infoWindow: const InfoWindow(
+                        title: 'Ubicación inicial',
+                      )
+                    );
+                
+                    final endMarker = Marker(
+                      markerId: const MarkerId('end'),
+                      position: route.ubicacionFinal!,
+                      infoWindow: InfoWindow(
+                        title: 'Destino',
+                        snippet: route.etiqueta
+                      )
+                    );
+                
+                    final currentPolylines = Map<String, Polyline>.from( mapBloc.state.polylines );
+                    final points = route.ruta!['myRoute']?.points;
+                
+                    final myRoute = Polyline(
+                      polylineId: const PolylineId('route'),
+                      color: Colors.black,
+                      width: 5,
+                      points: points!,
+                      startCap: Cap.roundCap,
+                      endCap: Cap.roundCap
+                    );
+                    
+                    final currentMarkers = Map<String, Marker>.from( mapBloc.state.markers );
+                    currentMarkers['start'] = startMarker;
+                    currentMarkers['end'] = endMarker;
+                
+                    currentPolylines['route'] = myRoute;      
+                
+                    mapBloc.add( DisplayPolylinesEvent( currentPolylines , currentMarkers) );
+                    mapBloc.add( OnInitRoute() );
+                
+                    routeServices.myRoute = route;
+                
+                    // Acción al seleccionar una ruta
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Seleccionaste ${route.etiqueta ?? "una ruta"}')),
+                    );
+                
+                    searchBloc.state.copyWith( history: const []);
+                
+                    context.push('/nav');
+                
+                  },
+                  
+                ),
+                const Divider(),  
+              ],
+            );
+          }
+        ),
       )
     );
   }

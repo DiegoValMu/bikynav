@@ -72,6 +72,7 @@ class SideMenu extends StatelessWidget {
                               )),
                               FilledButton(
                                 onPressed: () async {
+                                  context.push('/perfil');
                                   // Redirige a la pantalla de perfil
                                 },
                                 child: const Text('Ver perfil'),

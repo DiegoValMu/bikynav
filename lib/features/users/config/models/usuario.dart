@@ -11,7 +11,10 @@ class Usuario {
     String? telefono;
     String? email;
     String? direccion;
+    String? ciudad;
+    String? region;
     String? rol;
+    String? comuna;
 
     Usuario({
         this.imagen,
@@ -24,7 +27,10 @@ class Usuario {
         this.telefono,
         this.email,
         this.direccion,
-        this.rol,
+        this.rol, 
+        this.ciudad, 
+        this.region, 
+        this.comuna,
     });
 
     factory Usuario.fromRawJson(String str) => Usuario.fromJson(json.decode(str));
@@ -42,6 +48,9 @@ class Usuario {
         telefono: json["telefono"],
         email: json["email"],
         direccion: json["direccion"],
+        ciudad: json["ciudad"],
+        region: json["region"],
+        comuna: json["comuna"],
         rol: json["rol"],
     );
 
@@ -56,6 +65,9 @@ class Usuario {
         "telefono": telefono,
         "email": email,
         "direccion": direccion,
+        "ciudad": ciudad,
+        "region": region,
+        "comuna": comuna,
         "rol": rol,
     };
 }

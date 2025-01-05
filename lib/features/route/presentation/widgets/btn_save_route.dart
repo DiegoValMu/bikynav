@@ -38,8 +38,6 @@ class BtnSaveRoute extends StatelessWidget {
           onPressed: () async {
             stopwatchProvider.stopTimer();
 
-            
-
             final startMarker = Marker(
               markerId: const MarkerId('end'),
               position: ubicacionFinal!,
@@ -93,15 +91,15 @@ class BtnSaveRoute extends StatelessWidget {
             context: context,
             builder: (BuildContext dialogcontext) {
               return AlertDialog(
-                title: Text('Confirmar guardado'),
+                title: const Text('Confirmar guardado'),
                 content: SizedBox(
                   height: 100,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Divider(),
-                      Text('Etiqueta para la ruta'),
+                      const Divider(),
+                      const Text('Etiqueta para la ruta'),
                       CustomTextFormField( 
                         placeholder: 'Etiqueta',
                         inputType: TextInputType.name,
@@ -126,13 +124,13 @@ class BtnSaveRoute extends StatelessWidget {
                       Navigator.of(context).pop(); // Cierra el diálogo después de la acción
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text('Ruta guardada'),
                           backgroundColor: Colors.green, 
-                          )
+                        )
                       );
                     },
-                    child: Text('Confirmar')
+                    child: const Text('Confirmar')
                   ),
                   TextButton(
                     onPressed: () {
@@ -143,7 +141,7 @@ class BtnSaveRoute extends StatelessWidget {
                       mapBloc.state.markers.remove('end');
                       Navigator.of(context).pop(); // Cierra el diálogo al cancelar
                     },
-                    child: Text('Cancelar')
+                    child: const Text('Cancelar')
                   )
                 ]
               );

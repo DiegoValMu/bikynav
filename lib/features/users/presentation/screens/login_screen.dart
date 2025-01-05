@@ -80,7 +80,7 @@ class _LoginFormViewState extends State<_LoginFormView> {
 
     if (res.isNotEmpty) {
       userServices.userData(usr['_id']);
-
+      hideLoadingMessage(context);
       
       // Petición exitosa, redirige al usuario
       // ignore: use_build_context_synchronously
@@ -92,6 +92,7 @@ class _LoginFormViewState extends State<_LoginFormView> {
 
 
   } catch (e) {
+    hideLoadingMessage(context);
     // Manejo de errores
     //print('Error al iniciar sesión: ${e.toString()}');
     showDialog(

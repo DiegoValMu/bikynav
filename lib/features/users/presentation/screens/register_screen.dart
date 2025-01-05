@@ -124,6 +124,8 @@ class _RegisterFormState extends State<_RegisterForm> {
   final _apellidoController = TextEditingController();
   final _ciudadController = TextEditingController();
   final _regionController = TextEditingController();
+  final _comunaController = TextEditingController(); // Campo para comuna
+  final _telefonoController = TextEditingController(); // Campo para teléfono
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
@@ -163,6 +165,19 @@ class _RegisterFormState extends State<_RegisterForm> {
             controller: _regionController,
             icon: Icons.home,
             placeholder: 'Región',
+          ),
+          const SizedBox(height: 10),
+          CustomTextFormField(
+            controller: _comunaController, // Campo de comuna
+            icon: Icons.location_on,
+            placeholder: 'Comuna',
+          ),
+          const SizedBox(height: 10),
+          CustomTextFormField(
+            controller: _telefonoController, // Campo de teléfono
+            icon: Icons.phone,
+            placeholder: 'Teléfono',
+            inputType: TextInputType.phone,
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
@@ -213,10 +228,11 @@ class _RegisterFormState extends State<_RegisterForm> {
                       'apellidos': _apellidoController.text.trim(),
                       'ciudad': _ciudadController.text.trim(),
                       'region': _regionController.text.trim(),
+                      'comuna': _comunaController.text.trim(), // Guardar comuna
+                      'telefono': _telefonoController.text.trim(), // Guardar teléfono
                     };
 
                     try {
-
                       //Guardar los datos del usuario en mongodb
                       final userServices = Provider.of<UserServices>(context, listen: false);
                       await userServices.userRegister(user);
