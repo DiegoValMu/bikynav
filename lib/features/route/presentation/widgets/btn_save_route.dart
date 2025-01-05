@@ -18,7 +18,7 @@ class BtnSaveRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
-    final searchBloc = BlocProvider.of<SearchBloc>(context);
+    //final searchBloc = BlocProvider.of<SearchBloc>(context);
     final routeServices = Provider.of<RouteServices>(context, listen: false);
     final userServices = Provider.of<UserServices>(context, listen: false);
 

@@ -1,7 +1,4 @@
-import 'dart:convert';
-import 'package:intl/intl.dart';
 
-import 'package:bikynav/features/nav/app/blocs/location/location_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/map/map_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/search/search_bloc.dart';
 import 'package:bikynav/features/nav/config/models/models.dart';
@@ -24,7 +21,6 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
   void initState() {
     super.initState();
     // Iniciar el cronómetro cuando se muestre la pantalla
-    Provider.of<StopwatchProvider>(context, listen: false).resetTimer();
     Provider.of<StopwatchProvider>(context, listen: false).startTimer();
   }
 

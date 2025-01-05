@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
 
-import 'package:bikynav/features/route/config/models/routes.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -105,8 +103,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
       double kms = destination.distance / 1000;
       kms = (kms * 10).roundToDouble() / 10;
-
-      double tripDuration = (destination.duration / 60).floorToDouble();
 
       final startMarker = Marker(
         markerId: const MarkerId('start'),

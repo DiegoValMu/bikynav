@@ -2,6 +2,7 @@
 
 import 'dart:convert';
 
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -58,6 +59,9 @@ class _LoginFormViewState extends State<_LoginFormView> {
 
   Future<void> _loginUser() async {
   try {
+
+     showLoadingMessage(context);
+
     // Intentar iniciar sesión con Firebase Auth
     final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: emailController.text.trim(),

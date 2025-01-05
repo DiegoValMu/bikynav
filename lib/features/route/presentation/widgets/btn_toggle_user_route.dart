@@ -1,3 +1,4 @@
+// ignore: unused_import
 import 'package:bikynav/features/nav/presentation/screens/navegacion_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -11,7 +12,7 @@ class BtnToggleUserRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
-    final searchBloc = BlocProvider.of<SearchBloc>(context);
+    //final searchBloc = BlocProvider.of<SearchBloc>(context);
 
     final LatLng? position = locationBloc.state.lastKnowlocation;
 

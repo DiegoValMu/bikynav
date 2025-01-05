@@ -13,7 +13,7 @@ void showLoadingMessage( BuildContext context) {
         margin: const EdgeInsets.only( top: 10 ),
         child: const Column(
           children: [
-            Text('Calculando ruta'),
+            Text('Procesando solicitud'),
             SizedBox( height: 15 ),
             CircularProgressIndicator( strokeWidth: 3, color: Colors.black)
           ],

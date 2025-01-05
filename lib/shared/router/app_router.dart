@@ -17,7 +17,7 @@ final appRouter = GoRouter(
     if (user != null && loggingIn) {
       final userServices = Provider.of<UserServices>(context, listen: false);
 
-      String? idToken = await user?.getIdToken();
+      String? idToken = await user.getIdToken();
 
       final res = await userServices.authFireInMongo(idToken);
 

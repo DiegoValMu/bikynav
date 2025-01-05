@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/shared/services/socket_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -97,6 +98,8 @@ class SideMenu extends StatelessWidget {
                       leading: Icon(Icons.route),
                       title: Text('Recorridos'),
                       onTap: () async {
+
+                        showLoadingMessage(context);
 
                           final routeServices = Provider.of<RouteServices>(context, listen: false);
                           final userServices = Provider.of<UserServices>(context, listen: false);

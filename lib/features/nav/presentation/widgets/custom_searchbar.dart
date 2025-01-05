@@ -2,10 +2,8 @@
 
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/app/delegates/delegates.dart';
@@ -15,6 +13,7 @@ class CustomSearchBar extends StatefulWidget {
   const CustomSearchBar({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _CustomSearchBarState createState() => _CustomSearchBarState();
 }
 
@@ -93,10 +92,10 @@ class _CustomSearchBarBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final mapBloc = BlocProvider.of<MapBloc>(context);
-    final locationBloc = BlocProvider.of<LocationBloc>(context);
+    //final mapBloc = BlocProvider.of<MapBloc>(context);
+    //final locationBloc = BlocProvider.of<LocationBloc>(context);
 
-    final userLocation = locationBloc.state.myLocationHistory;
+    //final userLocation = locationBloc.state.myLocationHistory;
 
     final width = MediaQuery.of(context).size.width;
 
