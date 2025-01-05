@@ -17,6 +17,7 @@ class RouteScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final routeServices = Provider.of<RouteServices>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
 
     List<BikeRoute> rutas = routeServices.rutas.map<BikeRoute>((ruta) {
       if (ruta is Map<String, dynamic>) {
@@ -93,11 +94,14 @@ class RouteScreen extends StatelessWidget {
               mapBloc.add( DisplayPolylinesEvent( currentPolylines , currentMarkers) );
               mapBloc.add( OnInitRoute() );
 
+              routeServices.myRoute = route;
 
               // Acción al seleccionar una ruta
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(content: Text('Seleccionaste ${route.etiqueta ?? "una ruta"}')),
               );
+
+              searchBloc.state.history.clear();
 
               context.push('/nav');
 

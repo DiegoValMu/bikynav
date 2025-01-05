@@ -59,7 +59,7 @@ class Route {
         weightName: json["weight_name"],
         weight: json["weight"]?.toDouble(),
         duration: json["duration"]?.toDouble(),
-        distance: json["distance"],
+        distance: json["distance"]?.toDouble(),
     );
 
     Map<String, dynamic> toMap() => {
@@ -96,7 +96,7 @@ class Leg {
         summary: json["summary"],
         weight: json["weight"]?.toDouble(),
         duration: json["duration"]?.toDouble(),
-        distance: json["distance"],
+        distance: json["distance"]?.toDouble(),
     );
 
     Map<String, dynamic> toMap() => {
@@ -293,7 +293,7 @@ class EnumValues<T> {
     EnumValues(this.map);
 
     Map<T, String> get reverse {
-            reverseMap = map.map((k, v) => MapEntry(v, k));
-            return reverseMap;
+        reverseMap = map.map((k, v) => MapEntry(v, k));
+        return reverseMap;
     }
 }

@@ -24,6 +24,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
   void initState() {
     super.initState();
     // Iniciar el cronómetro cuando se muestre la pantalla
+    Provider.of<StopwatchProvider>(context, listen: false).resetTimer();
     Provider.of<StopwatchProvider>(context, listen: false).startTimer();
   }
 
@@ -31,6 +32,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final searchBloc = BlocProvider.of<SearchBloc>(context);
+    final routeServices = Provider.of<RouteServices>(context);
 
     final stopwatchProvider = Provider.of<StopwatchProvider>(context);
     final int seconds = stopwatchProvider.elapsedSeconds;
@@ -43,6 +45,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
     String name = '';
     double distance = 0; 
     double tripDuration = 0;
+    double kms;
 
     List<Feature> features = place;
     if (features.isNotEmpty){
@@ -52,13 +55,19 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
       distance = dataPlace.properties.distancia!;
       final time = (dataPlace.properties.duracion);
       tripDuration = (time! / 60).floorToDouble();
-    };
+    }else if ( routeServices.myRoute.toString().isNotEmpty ){
+      name = routeServices.myRoute.etiqueta!;
+      kms = routeServices.myRoute.distancia!;
+      distance = (kms * 10).roundToDouble() / 10;
+      final time = (routeServices.myRoute.tiempoUtilizado);
+      tripDuration = (time! / 60).floorToDouble();
+    }
 
   
     return SafeArea(
       bottom: true,
       child: Container(
-        height: 100, // Altura fija
+        height: 110, // Altura fija
         decoration: BoxDecoration(
           color: Colors.white, // Color de fondo
           borderRadius: const BorderRadius.vertical(

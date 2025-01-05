@@ -67,6 +67,7 @@ class _MapScreenState extends State<MapScreen> {
                             right: 20,
                             child: BtnCancelRoute(),
                           ),
+                          
                         Positioned(
                           bottom: 0,
                           left: 0,
@@ -75,6 +76,10 @@ class _MapScreenState extends State<MapScreen> {
                             mainAxisAlignment: MainAxisAlignment.end,
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
+                              const Padding(
+                                    padding: EdgeInsets.only( right: 10 ),
+                                    child: BtnFollowUser(),
+                                ),
                               const Padding(
                                     padding: EdgeInsets.only( right: 10 ),
                                     child: BtnCurrentLocation(),

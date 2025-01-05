@@ -19,8 +19,8 @@ class CustomSearchBar extends StatefulWidget {
 }
 
 class _CustomSearchBarState extends State<CustomSearchBar> {
-  double _height = 100; // Altura inicial del contenedor
-  final double _minHeight = 100; // Altura mínima
+  double _height = 110; // Altura inicial del contenedor
+  final double _minHeight = 110; // Altura mínima
   final double _maxHeight = 400; // Altura máxima
 
   @override

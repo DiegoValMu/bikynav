@@ -41,7 +41,7 @@ class _DataRouteDisplayState extends State<DataRouteDisplay> {
     return SafeArea(
       bottom: true,
       child: Container(
-        height: 100, // Altura fija
+        height: 110, // Altura fija
         decoration: BoxDecoration(
           color: Colors.white, // Color de fondo
           borderRadius: const BorderRadius.vertical(
