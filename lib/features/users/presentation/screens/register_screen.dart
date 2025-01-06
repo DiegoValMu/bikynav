@@ -1,12 +1,17 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'dart:convert';
+
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
+import 'package:bikynav/features/users/config/models/country.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -124,10 +129,72 @@ class _RegisterFormState extends State<_RegisterForm> {
   final _apellidoController = TextEditingController();
   final _ciudadController = TextEditingController();
   final _regionController = TextEditingController();
-  final _comunaController = TextEditingController(); // Campo para comuna
-  final _telefonoController = TextEditingController(); // Campo para teléfono
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  List<Region> regiones = [];
+  List<String> comunas = [];
+  String? selectedRegion;
+  String? selectedComuna;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRegionsAndComunas();
+  }
+
+
+  Future<void> _loadRegionsAndComunas() async {
+     final String response = await rootBundle.loadString('assets/data/regiones_comunas.json');
+    // Decodificar el JSON
+    final data = json.decode(response) as Map<String, dynamic>;
+
+    // Crear la instancia de CountryData a partir del JSON
+    final countryData = CountryData.fromMap(data);
+
+    // Obtener las regiones y asignarlas al estado
+    setState(() {
+      // Asignar las regiones procesadas del objeto CountryData
+      regiones = countryData.regions;
+    });
+  }
+
+  void _updateComunas(String regionName) async {
+    // Cargar el archivo JSON
+    final String response = await rootBundle.loadString('assets/data/regiones_comunas.json');
+
+    // Decodificar el JSON
+    final data = json.decode(response) as Map<String, dynamic>;
+
+    // Crear la instancia de CountryData a partir del JSON
+    final countryData = CountryData.fromMap(data);
+
+    // Encontrar la región correspondiente por su nombre
+    final selectedRegion = countryData.regions.firstWhere(
+      (region) => region.name == regionName
+    );
+
+    // Si la región es válida, actualizar las comunas
+    if (selectedRegion != null) {
+      setState(() {
+        // Asignar las comunas de la región seleccionada
+        comunas = selectedRegion.communes.map((commune) => commune.name).toList();
+      });
+    } else {
+      // Si no se encuentra la región, manejar el caso apropiadamente
+      setState(() {
+        comunas = [];
+      });
+    }
+  }
+
+  String capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -155,29 +222,82 @@ class _RegisterFormState extends State<_RegisterForm> {
             inputType: TextInputType.name,
           ),
           const SizedBox(height: 10),
-          CustomTextFormField(
-            controller: _ciudadController,
-            icon: Icons.location_city,
-            placeholder: 'Ciudad',
+          DropdownButtonFormField<String>(
+            value: selectedRegion,
+            items: regiones
+                .map((region) => DropdownMenuItem<String>(
+                      value: region.name, // Mostrar el nombre de la región
+                      child: Text(region.name),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedRegion = value;
+                selectedComuna = null; // Resetea la comuna cuando cambias de región
+                comunas.clear(); // Limpiar la lista de comunas
+                if (value != null) {
+                  _updateComunas(value); // Actualiza las comunas de la región seleccionada
+                }
+              });
+            },
+            decoration: InputDecoration(
+              labelText: 'Región',
+              prefixIcon: const Icon(Icons.home, color: Colors.grey),
+              hintText: 'Región',
+              filled: true,
+              fillColor: Colors.grey[200],
+              contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+              border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              ),
+            ),
           ),
+
           const SizedBox(height: 10),
-          CustomTextFormField(
-            controller: _regionController,
-            icon: Icons.home,
-            placeholder: 'Región',
-          ),
-          const SizedBox(height: 10),
-          CustomTextFormField(
-            controller: _comunaController, // Campo de comuna
-            icon: Icons.location_on,
-            placeholder: 'Comuna',
-          ),
-          const SizedBox(height: 10),
-          CustomTextFormField(
-            controller: _telefonoController, // Campo de teléfono
-            icon: Icons.phone,
-            placeholder: 'Teléfono',
-            inputType: TextInputType.phone,
+
+          // Widget de Dropdown para seleccionar la comuna
+          DropdownButtonFormField<String>(
+            value: selectedComuna,
+            items: comunas
+                .map((comuna) => DropdownMenuItem<String>(
+                      value: comuna, // Mostrar el nombre de la comuna
+                      child: Text(comuna),
+                    ))
+                .toList(),
+            onChanged: (value) {
+              setState(() {
+                selectedComuna = value;
+              });
+            },
+            decoration: InputDecoration(
+              labelText: 'Comuna',
+              prefixIcon: Icon(Icons.location_on, color: Colors.grey),
+              hintText: 'Comuna',
+              filled: true,
+              fillColor: Colors.grey[200],
+              contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+              border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).primaryColor),
+              ),
+            ),
           ),
           const SizedBox(height: 10),
           CustomTextFormField(
@@ -200,6 +320,7 @@ class _RegisterFormState extends State<_RegisterForm> {
               width: double.infinity,
               child: FilledButton(
                 onPressed: () async {
+                  showLoadingMessage(context);
                   final email = _emailController.text.trim();
                   final password = _passwordController.text.trim();
                   final confirmPassword = _confirmPasswordController.text.trim();
@@ -224,15 +345,14 @@ class _RegisterFormState extends State<_RegisterForm> {
 
                     final user = <String, dynamic>{
                       'email': email,
-                      'nombre': _nombreController.text.trim(),
-                      'apellidos': _apellidoController.text.trim(),
-                      'ciudad': _ciudadController.text.trim(),
-                      'region': _regionController.text.trim(),
-                      'comuna': _comunaController.text.trim(), // Guardar comuna
-                      'telefono': _telefonoController.text.trim(), // Guardar teléfono
+                      'nombre': capitalize(_nombreController.text.trim()),
+                      'apellidos': capitalize(_apellidoController.text.trim()) ,
+                      'comuna': selectedComuna,
+                      'region': selectedRegion,
                     };
 
                     try {
+
                       //Guardar los datos del usuario en mongodb
                       final userServices = Provider.of<UserServices>(context, listen: false);
                       await userServices.userRegister(user);
@@ -242,23 +362,17 @@ class _RegisterFormState extends State<_RegisterForm> {
                         print('DocumentSnapshot added with ID: ${doc.id}');
                       });
 
-                      showDialog(
-                        context: context,
-                        builder: (_) => AlertDialog(
-                          title: const Text('Usuario registrado con exito'),
-                          content: const Icon( Icons.check_circle ),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('Aceptar'),
-                            ),
-                          ],
-                        ),
-                      );
+                      
 
                     } catch (e) {
                       print("Error al guardar los datos en Firestore: $e");
                     }
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Usuario registrado correctamente'), 
+                        backgroundColor: Colors.green, ),
+                    );
 
                     // Redirigir o mostrar mensaje de éxito
                     context.go('/login');

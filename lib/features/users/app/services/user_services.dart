@@ -87,6 +87,8 @@ class UserServices with ChangeNotifier {
    
       final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios/$id'));
       if (response.statusCode == 200) {
+        await FirebaseAuth.instance.signOut();
+        await FirebaseAuth.instance.currentUser?.reload();
         return true;
       } else {
         throw Exception('Error al eliminar: ${response.body}');

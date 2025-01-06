@@ -47,7 +47,7 @@ class PerfilScreen extends StatelessWidget {
                   const CircleAvatar(
                     radius: 50,
                     backgroundImage: NetworkImage(
-                        'https://via.placeholder.com/150'), // Imagen de ejemplo
+                        ''), // Imagen de ejemplo
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -107,7 +107,7 @@ class PerfilScreen extends StatelessWidget {
                     height: 100, // Ajusta este valor según la cantidad de contenido
                     child: ListView(
                       children: [
-                        _buildInfoRow('Ciudad', '${userServices.usuario.ciudad}'),
+                        _buildInfoRow('Comuna', '${userServices.usuario.comuna}'),
                         _buildInfoRow('Región', '${userServices.usuario.region}'),
                       ],
                     ),
@@ -179,17 +179,15 @@ class PerfilScreen extends StatelessWidget {
               onPressed: () async {
                  // Cerrar el diálogo
 
-                userServices.deleteUser( userServices.usuario.id! );
+                await userServices.deleteUser( userServices.usuario.id! );
 
-                Navigator.of(context).pop();
-                await FirebaseAuth.instance.signOut();
-                await FirebaseAuth.instance.currentUser?.reload();
-                  // Lógica para eliminar cuenta
                 showLoadingMessage(context);
                 const SnackBar(
                           content: Text('Usuario eliminado', style: TextStyle( color: Colors.white),),
                           backgroundColor: Colors.red, 
                 );
+                  // Lógica para eliminar cuenta
+                
                 context.push('/');
 
               },

@@ -1,3 +1,4 @@
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bikynav/features/nav/presentation/views/views.dart';
@@ -33,7 +34,11 @@ class HomeScreen extends StatelessWidget {
                   width: double.infinity,
                   child: ElevatedButton(
                     child: const Text('Registrarse' , style: TextStyle( fontSize: 20)),
-                    onPressed: () => context.push('/new-user'),
+                    onPressed: (){
+                      showLoadingMessage(context);
+                      context.push('/new-user');
+                      hideLoadingMessage(context);
+                    },
                   ),
                 ),
               ),

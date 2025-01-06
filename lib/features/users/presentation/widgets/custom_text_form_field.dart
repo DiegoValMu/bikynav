@@ -11,6 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final bool isFilled; // Indica si el campo tiene contenido
   final String? Function(String?)? validator; //
   final bool isNotEmpty;
+  final String? prefix;
   final ValueNotifier<bool> _isObscureNotifier = ValueNotifier(true); // Notificador para la visibilidad de la contraseña
 
   CustomTextFormField({
@@ -25,6 +26,7 @@ class CustomTextFormField extends StatelessWidget {
     this.isFilled = false, 
     this.validator, 
     this.isNotEmpty = true, 
+    this.prefix,
   });
 
   @override
@@ -39,7 +41,10 @@ class CustomTextFormField extends StatelessWidget {
           keyboardType: inputType, // Define el tipo de entrada
           obscureText: isPassword ? isObscure : false, // Oculta el texto si es contraseña
           decoration: InputDecoration(
+            labelText: placeholder,
             prefixIcon: Icon(icon, color: isFilled ? Colors.green : Colors.grey),
+            prefixText: prefix,
+            prefixStyle: TextStyle(color: Colors.black),
             hintText: placeholder,
             filled: true,
             fillColor: Colors.grey[200],
