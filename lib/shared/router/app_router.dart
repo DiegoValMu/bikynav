@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bikynav/features/route/presentation/screens/route_screen.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/features/users/presentation/screens/perfil_screen.dart';
+import 'package:bikynav/features/users/presentation/screens/update_user_data_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:go_router/go_router.dart';
 import 'package:bikynav/features/nav/presentation/screens/screens.dart';
@@ -63,6 +64,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/perfil',
       builder: (context, state) => const PerfilScreen(),
+    ),
+    GoRoute(
+      path: '/update_perfil',
+      builder: (context, state) => const UpdateUserDataScreen(),
     ),
 
   ],

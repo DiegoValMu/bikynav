@@ -127,8 +127,6 @@ class _RegisterFormState extends State<_RegisterForm> {
   final _emailController = TextEditingController();
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
-  final _ciudadController = TextEditingController();
-  final _regionController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 

@@ -1,4 +1,5 @@
 import 'package:bikynav/features/users/config/models/usuario.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -26,11 +27,7 @@ class UserServices with ChangeNotifier {
       usuario.id = data['_id'];
       usuario.nombre = data['nombre'];
       usuario.apellidos = data['apellidos'];
-      usuario.fechaNacimiento = data['fechaNacimiento'];
-      usuario.telefono = data['telefono'];
       usuario.email = data['email'];
-      usuario.direccion = data['direccion'];
-      usuario.ciudad = data['ciudad'];
       usuario.region = data['region'];
       usuario.comuna = data['comuna'];
 
@@ -74,34 +71,56 @@ class UserServices with ChangeNotifier {
     }
   }
 
-  Future deleteUser( String id) async {
 
+  Future<void> updateUser(String id, Map<String, dynamic> formData) async {
+    final url = Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios/$id');
 
     try {
-    // Obtén la instancia del usuario actual
-    User? user = FirebaseAuth.instance.currentUser;
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(formData),
+      );
 
-    if (user != null) {
-      // Elimina el usuario
-      await user.delete();
-   
+      if (response.statusCode == 200) {
+      //User? user = FirebaseAuth.instance.currentUser;
+
+        DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc('userId');
+        
+        final updatedData = json.decode(response.body);
+        usuario.id = updatedData['_id'];
+        usuario.nombre = updatedData['nombre'];
+        usuario.apellidos = updatedData['apellidos'];
+        usuario.email = updatedData['email'];
+        usuario.region = updatedData['region'];
+        usuario.comuna = updatedData['comuna'];
+
+        await docRef.set({
+          'nombre': usuario.nombre,
+          'apellidos': usuario.apellidos,
+          'comuna': usuario.comuna,
+          'region': usuario.region,
+        });
+
+        notifyListeners(); 
+ // Actualiza los datos locales
+      } else {
+        throw Exception('Error: ${response.body}');
+      }
+    } catch (e) {
+      throw Exception('Error al actualizar: $e');
+    }
+  }
+
+  Future deleteUser( String id) async {
+
       final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios/$id'));
       if (response.statusCode == 200) {
-        await FirebaseAuth.instance.signOut();
         await FirebaseAuth.instance.currentUser?.reload();
         return true;
       } else {
         throw Exception('Error al eliminar: ${response.body}');
       }
-    } else {
-      print("No hay usuario autenticado.");
-    }
-    } catch (e) {
-      // Manejo de errores
-      print("Error al eliminar usuario: $e");
-    }
-
-    
   }
 
 

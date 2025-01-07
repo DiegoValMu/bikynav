@@ -44,11 +44,6 @@ class PerfilScreen extends StatelessWidget {
             Center(
               child: Column(
                 children: [
-                  const CircleAvatar(
-                    radius: 50,
-                    backgroundImage: NetworkImage(
-                        ''), // Imagen de ejemplo
-                  ),
                   const SizedBox(height: 16),
                   Text(
                     '${userServices.usuario.nombre} ${userServices.usuario.apellidos}',
@@ -95,6 +90,7 @@ class PerfilScreen extends StatelessWidget {
                       const Spacer(),
                       IconButton(
                         onPressed: () {
+                          context.push('/update_perfil');
                           // Lógica para editar perfil
                         },
                         icon: const Icon(Icons.edit),
@@ -178,6 +174,10 @@ class PerfilScreen extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                  // Cerrar el diálogo
+
+                User? user = FirebaseAuth.instance.currentUser;
+
+                await user?.delete();
 
                 await userServices.deleteUser( userServices.usuario.id! );
 
