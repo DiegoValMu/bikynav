@@ -13,6 +13,7 @@ import 'package:provider/provider.dart';
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,6 +76,10 @@ class _LoginFormViewState extends State<_LoginFormView> {
     final userServices = Provider.of<UserServices>(context, listen: false);
 
     final res = await userServices.authFireInMongo(idToken);
+
+    userServices.usuario.password = passwordController.text.trim();
+
+    userServices.usuario.token = idToken;
 
     final Map<String, dynamic> usr = json.decode(res);
 

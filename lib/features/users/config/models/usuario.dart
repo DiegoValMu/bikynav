@@ -15,6 +15,8 @@ class Usuario {
     String? region;
     String? rol;
     String? comuna;
+    String? token;
+    String? password;
 
     Usuario({
         this.imagen,
@@ -31,6 +33,8 @@ class Usuario {
         this.ciudad, 
         this.region, 
         this.comuna,
+        this.token,
+        this.password
     });
 
     factory Usuario.fromRawJson(String str) => Usuario.fromJson(json.decode(str));
@@ -51,6 +55,8 @@ class Usuario {
         ciudad: json["ciudad"],
         region: json["region"],
         comuna: json["comuna"],
+        token: json["token"],
+        password: json["password"],
         rol: json["rol"],
     );
 
@@ -68,6 +74,8 @@ class Usuario {
         "ciudad": ciudad,
         "region": region,
         "comuna": comuna,
+        "token": token,
+        "password": password,
         "rol": rol,
     };
 }

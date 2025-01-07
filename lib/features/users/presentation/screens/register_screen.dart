@@ -327,7 +327,9 @@ class _RegisterFormState extends State<_RegisterForm> {
                     // Mostrar un mensaje de error si las contraseñas no coinciden
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Las contraseñas no coinciden")),
+                      
                     );
+                    Navigator.of(context).pop(); // Cerrar el diálogo
                     return;
                   }
 

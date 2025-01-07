@@ -72,7 +72,8 @@ class UserServices with ChangeNotifier {
   }
 
 
-  Future<void> updateUser(String id, Map<String, dynamic> formData) async {
+  Future<void> updateUser(String id, Map<String, dynamic> formData, String password, String currentPassword ) async {
+
     final url = Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios/$id');
 
     try {
@@ -82,8 +83,10 @@ class UserServices with ChangeNotifier {
         body: json.encode(formData),
       );
 
+
+
       if (response.statusCode == 200) {
-      //User? user = FirebaseAuth.instance.currentUser;
+        User? user = FirebaseAuth.instance.currentUser;
 
         DocumentReference docRef = FirebaseFirestore.instance.collection('users').doc('userId');
         
@@ -102,6 +105,17 @@ class UserServices with ChangeNotifier {
           'region': usuario.region,
         });
 
+        if ( password.isNotEmpty){
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
+            email: usuario.email!,
+            password: currentPassword,
+          );
+          
+          await user?.updatePassword( password );
+        }
+        
+        
+
         notifyListeners(); 
  // Actualiza los datos locales
       } else {
@@ -112,16 +126,46 @@ class UserServices with ChangeNotifier {
     }
   }
 
-  Future deleteUser( String id) async {
+  Future deleteUser( String id, String password) async {
+      User? user = FirebaseAuth.instance.currentUser;
 
       final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/usuarios/$id'));
       if (response.statusCode == 200) {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: usuario.email!,
+          password: password,
+        );
+        await user?.delete();
         await FirebaseAuth.instance.currentUser?.reload();
         return true;
       } else {
         throw Exception('Error al eliminar: ${response.body}');
       }
   }
+
+  Future<void> deleteUserAccount() async {
+  try {
+    // Obtén el usuario autenticado
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Verifica si el usuario está autenticado
+      await user.delete();
+      print('Usuario eliminado correctamente.');
+    } else {
+      print('No hay usuario autenticado.');
+    }
+  } on FirebaseAuthException catch (e) {
+    // Si el usuario necesita iniciar sesión nuevamente
+    if (e.code == 'requires-recent-login') {
+      print('El usuario debe iniciar sesión nuevamente para eliminar la cuenta.');
+      // Aquí puedes pedirle al usuario que vuelva a iniciar sesión antes de proceder.
+      
+    } else {
+      print('Error al eliminar el usuario: ${e.message}');
+    }
+  }
+}
 
 
 }
