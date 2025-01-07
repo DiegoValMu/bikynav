@@ -86,10 +86,10 @@ class SideMenu extends StatelessWidget {
                       padding: EdgeInsets.only(top: 10),
                       child: Divider(),
                     ),
-                    const ListTile(
-                      leading: Icon(Icons.directions_bike),
-                      title: Text('Bicicletas'),
-                    ),
+                    //const ListTile(
+                    //  leading: Icon(Icons.directions_bike),
+                    //  title: Text('Bicicletas'),
+                    //),
                     ListTile(
                       leading: Icon(Icons.route),
                       title: Text('Recorridos'),
