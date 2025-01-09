@@ -1,5 +1,4 @@
-// ignore: unused_import
-import 'package:bikynav/features/nav/presentation/screens/navegacion_screen.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';

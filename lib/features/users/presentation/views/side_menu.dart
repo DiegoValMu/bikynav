@@ -119,9 +119,14 @@ class SideMenu extends StatelessWidget {
                   width: double.infinity,
                   child: FilledButton(
                     onPressed: () async {
+                      onClose();
                       await FirebaseAuth.instance.signOut();
                       await FirebaseAuth.instance.currentUser?.reload();
+
+        
+
                       context.push('/'); // Redirige a la pantalla de inicio de sesión
+                      onClose();
                     },
                     child: const Text('Cerrar Sesión'),
                   ),
