@@ -11,11 +11,20 @@ class GpsAccessScreen extends StatelessWidget {
       body: Center(
         child: BlocBuilder<GpsBloc, GpsState>(
           builder: (context, state) {
-            return !state.isGpsEnabled
-            ? const _EnableGpsMessage()
-            : const _AccessButton();
-          })
-        //_AccessButton(),
+            // Si el GPS no está habilitado, mostramos el mensaje para habilitarlo
+            if (!state.isGpsEnabled) {
+              return const _EnableGpsMessage();
+            }
+
+            // Si el GPS está habilitado pero el permiso no está concedido, mostramos el botón para solicitarlo
+            if (!state.isGpsPermissionGranted) {
+              return const _AccessButton();
+            }
+
+            // Si todo está habilitado y el permiso está concedido, podemos continuar con la app
+            return const Text('GPS habilitado y con acceso permitido');
+          },
+        ),
       ),
     );
   }
@@ -31,15 +40,16 @@ class _AccessButton extends StatelessWidget {
       children: [
         const Text('Es necesario el acceso a GPS'),
         MaterialButton(
-        color: Colors.black,
-        shape: const StadiumBorder(),
-        elevation: 0,
-        splashColor: Colors.transparent,
-        onPressed: (){
-          final gpsBloc = BlocProvider.of<GpsBloc>(context);
-          gpsBloc.askGpsAccess();
-        },
-        child: const Text('Solicitar Acceso', style: TextStyle( color: Colors.white),))
+          color: Colors.black,
+          shape: const StadiumBorder(),
+          elevation: 0,
+          splashColor: Colors.transparent,
+          onPressed: () {
+            final gpsBloc = BlocProvider.of<GpsBloc>(context);
+            gpsBloc.requestGpsPermission();
+          },
+          child: const Text('Solicitar Acceso', style: TextStyle(color: Colors.white)),
+        ),
       ],
     );
   }
@@ -52,7 +62,7 @@ class _EnableGpsMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Text(
       'Debe habilitar el GPS',
-      style: TextStyle(fontSize: 25, fontWeight: FontWeight.w300)
+      style: TextStyle(fontSize: 25, fontWeight: FontWeight.w300),
     );
   }
 }

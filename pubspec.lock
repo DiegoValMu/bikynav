@@ -241,6 +241,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.1"
+  fluto_plugin_platform_interface:
+    dependency: "direct main"
+    description:
+      name: fluto_plugin_platform_interface
+      sha256: aaed1f20fe5886473ff295612349c8b6ba5a0ad382fc0831287920255e1bc0bf
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   flutter:
     dependency: "direct main"
     description: flutter

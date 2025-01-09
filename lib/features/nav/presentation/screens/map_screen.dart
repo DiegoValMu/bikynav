@@ -40,7 +40,19 @@ class _MapScreenState extends State<MapScreen> {
           BlocBuilder<LocationBloc, LocationState>(
             builder: (context, locationState) {
               if (locationState.lastKnowlocation == null) {
-                return const Center(child: Text('Espere por favor...'));
+                return const Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,  // Centra verticalmente
+                    crossAxisAlignment: CrossAxisAlignment.center,  // Centra horizontalmente
+                    children: [
+                      Text('Espere por favor...'),
+                      SizedBox(height: 10),  // Añade un espacio entre los textos
+                      CircularProgressIndicator(),
+                      SizedBox(height: 10),  // Añade un espacio entre el progreso y el texto
+                      Text('Estamos calculando su ubicación...'),
+                    ],
+                  ),
+                );
               }
               return BlocBuilder<MapBloc, MapState>(
                 builder: (context, mapState) {
@@ -66,7 +78,6 @@ class _MapScreenState extends State<MapScreen> {
                             right: 20,
                             child: BtnCancelRoute(),
                           ),
-                          
                         Positioned(
                           bottom: 0,
                           left: 0,
@@ -76,16 +87,16 @@ class _MapScreenState extends State<MapScreen> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               const Padding(
-                                    padding: EdgeInsets.only( right: 10 ),
-                                    child: BtnFollowUser(),
-                                ),
+                                padding: EdgeInsets.only(right: 10),
+                                child: BtnFollowUser(),
+                              ),
                               const Padding(
-                                    padding: EdgeInsets.only( right: 10 ),
-                                    child: BtnCurrentLocation(),
-                                ),
+                                padding: EdgeInsets.only(right: 10),
+                                child: BtnCurrentLocation(),
+                              ),
                               (mapState.inRoute)
-                              ? const CustomDataDisplay()
-                              : const CustomSearchBar(),
+                                  ? const CustomDataDisplay()
+                                  : const CustomSearchBar(),
                             ],
                           ),
                         ),
@@ -97,6 +108,7 @@ class _MapScreenState extends State<MapScreen> {
               );
             },
           ),
+          // Aquí está el SideMenu dentro de un Positioned en el Stack.
           Positioned(
             top: 0,
             left: 0,
@@ -123,15 +135,12 @@ class _MapScreenState extends State<MapScreen> {
                   FloatingActionButton(
                     onPressed: () {
                       setState(() {
-                        _isMenuOpen = true;
+                        _isMenuOpen = true; // Abre el menú
                       });
                     },
                     child: const Icon(Icons.menu),
                   ),
                   const SizedBox(height: 15),
-                  //const BtnCurrentLocation(),
-                  //const BtnFollowUser(),
-                  //const BtnToggleUserRoute(),
                 ],
               ),
             ),
