@@ -1,4 +1,5 @@
 import 'package:bikynav/features/route/config/models/routes.dart';
+import 'package:bikynav/features/route/config/models/routesById.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -66,6 +67,22 @@ class RouteServices with ChangeNotifier {
     final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$id'));
     if (response.statusCode == 200) {
       return true;
+    } else {
+      throw Exception('Error en el backend: ${response.body}');
+    }
+  }
+
+  Future getRouteById( String id ) async {
+
+    final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$id'));
+    if (response.statusCode == 200) {
+      
+      Map<String, dynamic> jsonMap = jsonDecode(response.body);
+
+      // Convert to Ruta object
+      Ruta ruta = Ruta.fromJson(jsonMap);
+      
+      return ruta;
     } else {
       throw Exception('Error en el backend: ${response.body}');
     }
