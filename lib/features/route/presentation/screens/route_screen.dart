@@ -74,7 +74,7 @@ class RouteScreen extends StatelessWidget {
           itemBuilder: (context, index) {
             BikeRoute route = rutas[index];
             final time = route.tiempoUtilizado!.toDouble();
-            final tripDuration = (time! / 10);
+            final tripDuration = (time! / 60).toStringAsFixed(2);
             final kms = route.distancia;
             final distance = (kms! * 10).roundToDouble() / 10;
 
@@ -209,8 +209,6 @@ class RouteScreen extends StatelessWidget {
   final routeServices = Provider.of<RouteServices>(context, listen: false);
   final TextEditingController idController = TextEditingController();
   final mapBloc = BlocProvider.of<MapBloc>(context);
-  final searchBloc = BlocProvider.of<SearchBloc>(context);
- 
 
     return showDialog(
       context: context,
@@ -311,8 +309,6 @@ class RouteScreen extends StatelessWidget {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Seleccionaste ${routeById.etiqueta ?? "una ruta"}')),
                   );
-              
-                  searchBloc.state.copyWith( history: const []);
               
                   context.push('/nav');
 

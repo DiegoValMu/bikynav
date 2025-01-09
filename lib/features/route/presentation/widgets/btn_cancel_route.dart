@@ -26,6 +26,7 @@ class BtnCancelRoute extends StatelessWidget {
                   if ( mapBloc.state.showMyRoute ){
                     //locationBloc.state.myLocationHistory = [];
                     stopwatchProvider.resetTimer();
+                    
                     mapBloc.add( OnCancelToggleUserRoute() );
                   }
                   

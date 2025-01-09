@@ -38,7 +38,7 @@ class Ruta {
     );
   }
 
-  // Función para calcular la distancia total de la ruta en metros
+  // Función para calcular la distancia total de la ruta en kilómetros
   double calcularDistancia() {
     double distanciaTotal = 0.0;
 
@@ -49,7 +49,8 @@ class Ruta {
       distanciaTotal += _distanciaEntrePuntos(punto1, punto2);
     }
 
-    return distanciaTotal;
+    // Convertimos la distancia de metros a kilómetros
+    return distanciaTotal / 1000;
   }
 
   // Función que calcula la distancia entre dos puntos en metros utilizando la fórmula de Haversine
