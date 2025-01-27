@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:convert';
 
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
@@ -87,19 +89,12 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
       selectedComuna = null;
   
       // Si la región es válida, actualizar las comunas
-      if (selectedRegion != null) {
-        setState(() {
-          
-          // Asignar las comunas de la región seleccionada
-          comunas = selectedRegion.communes.map((commune) => commune.name).toList();
-        });
-      } else {
-        // Si no se encuentra la región, manejar el caso apropiadamente
-        setState(() {
-          comunas = [];
-        });
-      }
-    }
+      setState(() {
+        
+        // Asignar las comunas de la región seleccionada
+        comunas = selectedRegion.communes.map((commune) => commune.name).toList();
+      });
+        }
 
     
 
@@ -184,10 +179,8 @@ Widget build(BuildContext context) {
                       selectedRegion = value!;
                       selectedComuna = null;
                       comunas.clear();
-                      if (value != null) {
-                        _updateComunas(value);
-                      }
-                    });
+                      _updateComunas(value);
+                                        });
                   },
                   decoration: InputDecoration(
                     labelText: 'Región',
@@ -225,7 +218,7 @@ Widget build(BuildContext context) {
                     ),
                   ),
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 const Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
@@ -236,7 +229,7 @@ Widget build(BuildContext context) {
                     ),
                   ),
                 ),
-                Divider(),
+                const Divider(),
                 const SizedBox(height: 10),
                 CustomTextFormField(
                   controller: passwordController,

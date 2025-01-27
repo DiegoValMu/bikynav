@@ -173,18 +173,11 @@ class _RegisterFormState extends State<_RegisterForm> {
     );
 
     // Si la región es válida, actualizar las comunas
-    if (selectedRegion != null) {
-      setState(() {
-        // Asignar las comunas de la región seleccionada
-        comunas = selectedRegion.communes.map((commune) => commune.name).toList();
-      });
-    } else {
-      // Si no se encuentra la región, manejar el caso apropiadamente
-      setState(() {
-        comunas = [];
-      });
+    setState(() {
+      // Asignar las comunas de la región seleccionada
+      comunas = selectedRegion.communes.map((commune) => commune.name).toList();
+    });
     }
-  }
 
   String capitalize(String text) {
     if (text.isEmpty) return text;

@@ -1,7 +1,6 @@
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 
 import 'package:bikynav/features/users/app/services/user_services.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
