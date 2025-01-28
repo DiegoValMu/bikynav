@@ -86,13 +86,16 @@ class SideMenu extends StatelessWidget {
                       padding: EdgeInsets.only(top: 10),
                       child: Divider(),
                     ),
-                    //const ListTile(
-                    //  leading: Icon(Icons.directions_bike),
-                    //  title: Text('Bicicletas'),
-                    //),
                     ListTile(
-                      leading: Icon(Icons.route),
-                      title: Text('Recorridos'),
+                      leading: const Icon(Icons.directions_bike),
+                      title: const Text('Bicicletas'),
+                      onTap: () {
+                        context.push('/bikes');
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(Icons.route),
+                      title: const Text('Recorridos'),
                       onTap: () async {
                         // Mostrar el mensaje de carga
                         showLoadingMessage(context);
@@ -125,6 +128,7 @@ class SideMenu extends StatelessWidget {
 
         
 
+                      // ignore: use_build_context_synchronously
                       context.push('/'); // Redirige a la pantalla de inicio de sesión
                       onClose();
                     },

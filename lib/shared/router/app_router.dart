@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:bikynav/features/bikes/presentation/screens/add_bike_screen.dart';
+import 'package:bikynav/features/bikes/presentation/screens/bikes_screen.dart';
 import 'package:bikynav/features/route/presentation/screens/route_screen.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/features/users/presentation/screens/perfil_screen.dart';
@@ -68,6 +70,14 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/update_perfil',
       builder: (context, state) => const UpdateUserDataScreen(),
+    ),
+    GoRoute(
+      path: '/bikes',
+      builder: (context, state) => const BikesScreen(),
+    ),
+    GoRoute(
+      path: '/add_bike',
+      builder: (context, state) => const AddBikeScreen(),
     ),
 
   ],

@@ -26,7 +26,19 @@ class RouteScreen extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: _buildAppBar(context),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white, // Fondo blanco para el AppBar
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2), // Color de la sombra
+                offset: Offset(0, 4), // Sombra hacia abajo
+                blurRadius: 6, // Difusión de la sombra
+              ),
+            ],
+          ),
+          child: _buildAppBar(context)
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 8),
