@@ -75,6 +75,7 @@ class RouteScreen extends StatelessWidget {
         IconButton(
           onPressed: () => _inputRoute(context),
           icon: const Icon(Icons.link),
+          color: Colors.deepPurple,
         ),
       ],
     );

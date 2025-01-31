@@ -47,7 +47,7 @@ class _RegisterForm extends StatefulWidget {
   State<_RegisterForm> createState() => _RegisterFormState();
 }
 
-class _RegisterFormState extends State<_RegisterForm> {
+class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserver {
   final _emailController = TextEditingController();
   final _nombreController = TextEditingController();
   final _apellidoController = TextEditingController();
@@ -66,19 +66,23 @@ class _RegisterFormState extends State<_RegisterForm> {
     super.initState();
     _loadRegionsAndComunas();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkKeyboardVisibility();
-    });
+    WidgetsBinding.instance.addObserver(this);
   }
 
-  void _checkKeyboardVisibility() {
-    // Verificar la visibilidad del teclado
-    final keyboardVisibility = MediaQuery.of(context).viewInsets.bottom > 0;
+ 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.platformDispatcher.views.first.viewInsets.bottom;
     setState(() {
-      _isKeyboardVisible = keyboardVisibility;
+      _isKeyboardVisible = bottomInset > 0;
     });
   }
-
 
   Future<void> _loadRegionsAndComunas() async {
     final response = await rootBundle.loadString('assets/data/regiones_comunas.json');
@@ -155,7 +159,9 @@ class _RegisterFormState extends State<_RegisterForm> {
             ),
           ),
         ),
-        Align(
+        (_isKeyboardVisible)
+        ? Text('')
+        : Align(
           alignment: Alignment.bottomCenter,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
@@ -169,61 +175,57 @@ class _RegisterFormState extends State<_RegisterForm> {
                   final confirmPassword = _confirmPasswordController.text.trim();
 
                   if (password != confirmPassword) {
-                    // Mostrar un mensaje de error si las contraseñas no coinciden
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text("Las contraseñas no coinciden")),
-
                     );
-                    Navigator.of(context).pop(); // Cerrar el diálogo
+                    Navigator.of(context).pop();
                     return;
                   }
 
                   try {
-                    // Crear usuario con Firebase Auth
-                    // ignore: unused_local_variable
-                    final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
                       email: email,
                       password: password,
                     );
 
-                    var db = FirebaseFirestore.instance;
-
                     final user = <String, dynamic>{
                       'email': email,
                       'nombre': capitalize(_nombreController.text.trim()),
-                      'apellidos': capitalize(_apellidoController.text.trim()) ,
+                      'apellidos': capitalize(_apellidoController.text.trim()),
                       'comuna': selectedComuna,
                       'region': selectedRegion,
                     };
 
                     try {
-                    
-                      //Guardar los datos del usuario en mongodb
                       final userServices = Provider.of<UserServices>(context, listen: false);
                       await userServices.userRegister(user);
 
-                      // Guardar los datos del usuario en Firestore
-                      await db.collection("users").add(user).then((DocumentReference doc) {
-                        print('DocumentSnapshot added with ID: ${doc.id}');
-                      });
-
-
+                      await FirebaseFirestore.instance.collection("users").add(user);
 
                     } catch (e) {
-                      print("Error al guardar los datos en Firestore: $e");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("Problemas con el servicio")),
+                      );
+                      Navigator.of(context).pop();
+                      return;
                     }
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text('Usuario registrado correctamente'), 
-                        backgroundColor: Colors.green, ),
+                        content: Text('Usuario registrado correctamente'),
+                        backgroundColor: Colors.green,
+                      ),
                     );
 
-                    // Redirigir o mostrar mensaje de éxito
                     context.go('/login');
+
                   } on FirebaseAuthException catch (e) {
-                    // Manejo de errores
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? "Error desconocido")));
+                    Navigator.of(context).pop();
+                  } finally {
+                    if (Navigator.of(context).canPop()) {
+                      Navigator.of(context).pop(); 
+                    }
                   }
                 },
                 child: const Text('Registrar'),

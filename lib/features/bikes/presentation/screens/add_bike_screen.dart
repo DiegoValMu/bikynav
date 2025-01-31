@@ -34,6 +34,7 @@ class AddBikeScreen extends StatelessWidget {
       actions: [
         IconButton(
           icon: const Icon(Icons.save),
+          color: Colors.deepPurple,
           onPressed: () {
             // TODO: Save bike data
             Navigator.pop(context);

@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 
 import 'package:bikynav/features/users/app/services/user_services.dart';
@@ -14,14 +16,14 @@ class PerfilScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(kToolbarHeight), // Altura estándar del AppBar
+        preferredSize: const Size.fromHeight(kToolbarHeight), // Altura estándar del AppBar
         child: Container(
           decoration: BoxDecoration(
             color: Colors.white, // Fondo blanco para el AppBar
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2), // Color de la sombra
-                offset: Offset(0, 4), // Sombra hacia abajo
+                offset: const Offset(0, 4), // Sombra hacia abajo
                 blurRadius: 6, // Difusión de la sombra
               ),
             ],
@@ -30,35 +32,48 @@ class PerfilScreen extends StatelessWidget {
             title: const Text('Perfil'),
             elevation: 0, // Sin sombra por elevación
             backgroundColor: Colors.transparent, // Fondo transparente para el AppBar
-            centerTitle: true, // Centrar el título
+            centerTitle: true,
+            actions: [
+              IconButton(
+                onPressed: () {
+                  context.push('/update_perfil');
+                  // Lógica para editar perfil
+                },
+                icon: const Icon(Icons.edit),
+              )
+            ], // Centrar el título
           ),
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 16),
+        padding: EdgeInsets.zero,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            // Avatar y nombre
-            Center(
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage( 'assets/images/banner.png' ), // Si es desde una URL
+                  fit: BoxFit.cover, // Esto asegura que la imagen cubra todo el fondo
+                ),
+              ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const SizedBox(height: 16),
                   Text(
                     '${userServices.usuario.nombre} ${userServices.usuario.apellidos}',
-                    style: const TextStyle(fontSize: 24),
-                  ),
-                  Text(
-                    userServices.usuario.email!,
-                    style: const TextStyle( fontSize: 18),
+                    style: const TextStyle(fontSize: 24, color: Colors.white), // Color blanco para el texto
                   ),
                   const SizedBox(height: 8),
-                  
                 ],
               ),
             ),
-            
 
+            
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
@@ -69,7 +84,7 @@ class PerfilScreen extends StatelessWidget {
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1), // Color de la sombra
                     blurRadius: 10, // Difuminado de la sombra
-                    offset: Offset(0, 5), // Desplazamiento de la sombra
+                    offset: const Offset(0, 5), // Desplazamiento de la sombra
                   ),
                 ],
               ),
@@ -78,13 +93,6 @@ class PerfilScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                     ExpansionTile(
-                      leading: IconButton(
-                        onPressed: () {
-                          context.push('/update_perfil');
-                          // Lógica para editar perfil
-                        },
-                        icon: const Icon(Icons.edit),
-                      ),
                       title: const Text(
                         'Información basica',
                         style: TextStyle(
@@ -106,9 +114,10 @@ class PerfilScreen extends StatelessWidget {
                             const Divider(),
                             const SizedBox(height: 10),
                             SizedBox(
-                              height: 70, // Ajusta este valor según la cantidad de contenido
+                              height: 100, // Ajusta este valor según la cantidad de contenido
                               child: ListView(
                                 children: [
+                                  _buildInfoRow('Correo', '${userServices.usuario.email}'),
                                   _buildInfoRow('Comuna', '${userServices.usuario.comuna}'),
                                   _buildInfoRow('Región', '${userServices.usuario.region}'),
                                 ],
@@ -123,22 +132,9 @@ class PerfilScreen extends StatelessWidget {
               ),
             ),
 
-            const Spacer(),
 
 
             // Botón eliminar cuenta
-            Center(
-              child: ElevatedButton(
-                onPressed: () async {
-                  
-                  _confirmDeleteAccount(context);
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                ),
-                child: const Text('Eliminar cuenta', style: TextStyle( color: Colors.white ),),
-              ),
-            ),
           ],
         ),
       ),
@@ -166,97 +162,6 @@ class PerfilScreen extends StatelessWidget {
     );
   }
 
-  void _confirmDeleteAccount(BuildContext context) {
-  final userServices = Provider.of<UserServices>(context, listen: false);
-  final TextEditingController passwordController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Eliminar cuenta'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Contraseña',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Cerrar el diálogo
-            },
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final password = passwordController.text.trim();
-
-              if (password.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Por favor, ingresa tu contraseña.'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-                return;
-              }
-
-              try {
-                await userServices.deleteUser(
-                  userServices.usuario.id!,
-                  password,
-                );
-
-                showLoadingMessage(context);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Usuario eliminado',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                context.push('/');
-              } catch (error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Error al eliminar la cuenta: $error',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-
-                Navigator.of(context).pop(); // Cerrar el diálogo
-                
-              } finally {
-                hideLoadingMessage(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      );
-    },
-  );
-}
+  
 
 }

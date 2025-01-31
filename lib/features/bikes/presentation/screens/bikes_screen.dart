@@ -40,6 +40,7 @@ class BikesScreen extends StatelessWidget {
             context.push('/add_bike');
           },
           icon: const Icon(Icons.add_circle),
+          color: Colors.deepPurple,
         ),
       ],
     );
