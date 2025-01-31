@@ -134,115 +134,179 @@ Widget build(BuildContext context) {
     body: Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only(top: 16.0),
           child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 10),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Información basica',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 6,
+                      ),
+                    ],
                   ),
-                ),
-                const Divider(),
-                const SizedBox(height: 10),
-                CustomTextFormField(
-                  controller: nameController,
-                  placeholder: nameController.text,
-                  icon: Icons.person,
-                  inputType: TextInputType.name,
-                ),
-                const SizedBox(height: 10),
-                CustomTextFormField(
-                  controller: apellidoController,
-                  placeholder: apellidoController.text,
-                  icon: Icons.person,
-                  inputType: TextInputType.name,
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  value: selectedRegion,
-                  items: regiones
-                      .map((region) => DropdownMenuItem<String>(
-                            value: region.name,
-                            child: Text(region.name),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedRegion = value!;
-                      selectedComuna = null;
-                      comunas.clear();
-                      _updateComunas(value);
-                                        });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Región',
-                    prefixIcon: const Icon(Icons.home, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric( horizontal:  16.0),
+                    child: ExpansionTile(
+                      leading: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: (){}, 
+                        icon: const Icon( Icons.info )),
+                      title: const Text(
+                        'Información básica',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      initiallyExpanded: true,
+                      maintainState: true,
+                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
+                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
+                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      children: [ 
+                        Column(
+                          children: [
+                            const Divider(),
+                            const SizedBox(height: 10),
+                            CustomTextFormField(
+                              controller: nameController,
+                              placeholder: '    Nombre',
+                              icon: Icons.person,
+                              inputType: TextInputType.name,
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextFormField(
+                              controller: apellidoController,
+                              placeholder: '    Apellidos',
+                              icon: Icons.person,
+                              inputType: TextInputType.name,
+                            ),
+                            const SizedBox(height: 10),
+                            DropdownButtonFormField<String>(
+                              value: selectedRegion,
+                              items: regiones
+                                  .map((region) => DropdownMenuItem<String>(
+                                        value: region.name,
+                                        child: Text(region.name),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedRegion = value!;
+                                  selectedComuna = null;
+                                  comunas.clear();
+                                  _updateComunas(value);
+                                                    });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Región',
+                                prefixIcon: const Icon(Icons.home, color: Colors.grey),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            DropdownButtonFormField<String>(
+                              value: selectedComuna,
+                              items: comunas
+                                  .map((comuna) => DropdownMenuItem<String>(
+                                        value: comuna,
+                                        child: Text(comuna),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedComuna = value!;
+                                });
+                              },
+                              decoration: InputDecoration(
+                                labelText: 'Comuna',
+                                prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        ),
+                      ]
                     ),
-                  ),
+                  )
                 ),
                 const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  value: selectedComuna,
-                  items: comunas
-                      .map((comuna) => DropdownMenuItem<String>(
-                            value: comuna,
-                            child: Text(comuna),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedComuna = value!;
-                    });
-                  },
-                  decoration: InputDecoration(
-                    labelText: 'Comuna',
-                    prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric( horizontal:  16.0),
+                    child: ExpansionTile(
+                      leading: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: (){}, 
+                        icon: const Icon( Icons.info )),
+                      title: const Text(
+                        'Información sensible',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      maintainState: true,
+                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
+                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
+                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      children: [ 
+                        Column(
+                          children: [
+                            const Divider(),
+                            const SizedBox(height: 10),
+                            CustomTextFormField(
+                              controller: passwordController,
+                              icon: Icons.lock,
+                              placeholder: 'Contraseña',
+                              isPassword: true,
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextFormField(
+                              controller: confirmPasswordController,
+                              icon: Icons.lock,
+                              placeholder: 'Repetir Contraseña',
+                              isPassword: true,
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        ),
+                      ]
                     ),
-                  ),
-                ),
-                const SizedBox(height: 15),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Información sensible',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Divider(),
-                const SizedBox(height: 10),
-                CustomTextFormField(
-                  controller: passwordController,
-                  icon: Icons.lock,
-                  placeholder: 'Contraseña',
-                  isPassword: true,
-                ),
-                const SizedBox(height: 10),
-                CustomTextFormField(
-                  controller: confirmPasswordController,
-                  icon: Icons.lock,
-                  placeholder: 'Repetir Contraseña',
-                  isPassword: true,
+                  )
                 ),
                 const SizedBox(height: 80), // Espacio para el botón
               ],

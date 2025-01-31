@@ -15,7 +15,7 @@ class AddBikeScreen extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2),
-                offset: Offset(0, 4),
+                offset: const Offset(0, 4),
                 blurRadius: 6,
               ),
             ],
@@ -31,6 +31,15 @@ class AddBikeScreen extends StatelessWidget {
     return AppBar(
       title: const Text('Registrar bicicleta'),
       elevation: 0,
+      actions: [
+        IconButton(
+          icon: const Icon(Icons.save),
+          onPressed: () {
+            // TODO: Save bike data
+            Navigator.pop(context);
+          },
+        ),
+      ],
       backgroundColor: Colors.transparent,
       centerTitle: true,
     );
@@ -70,192 +79,247 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> {
     return Stack(
       children: [
         Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.only( top: 16 ),
           child: SingleChildScrollView(
             child: Column(
               children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric( horizontal:  16.0),
+                    child: ExpansionTile(
+                      leading: IconButton(
+                        padding: EdgeInsets.zero,
+                        onPressed: (){}, 
+                        icon: const Icon( Icons.info )),
+                      title: const Text(
+                        'Información básica',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      initiallyExpanded: true,
+                      maintainState: true,
+                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
+                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
+                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      children: [ 
+                        Column(
+                          children: [
+                            const Divider(),
+                            CustomTextFormField(
+                              controller: _etiquetaController,
+                              icon: Icons.edit,
+                              placeholder: 'Etiqueta',
+                              inputType: TextInputType.emailAddress,
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextFormField(
+                              controller: _marcaController,
+                              icon: Icons.directions_bike,
+                              placeholder: 'Marca',
+                              inputType: TextInputType.name,
+                            ),
+                            const SizedBox(height: 10),
+                            CustomTextFormField(
+                              controller: _modeloController,
+                              icon: Icons.build,
+                              placeholder: 'Modelo',
+                              inputType: TextInputType.name,
+                            ),
+                            const SizedBox(height: 10),
+                            DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                labelText: 'Color principal',
+                                prefixIcon: const Icon(Icons.colorize_sharp, color: Colors.grey),
+                                filled: true,
+                                fillColor: Colors.grey[200],
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              value: selectedColorPrincipal,
+                              items: colores
+                                  .map((color) => DropdownMenuItem(
+                                        value: color,
+                                        child: Text(color),
+                                      ))
+                                  .toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedColorPrincipal = value;
+                                });
+                              },
+                            ),
+                            const SizedBox(height: 10),
+                          ],
+                        ),
+                      ]
+                    ),
+                  )
+                ),
+                
                 const SizedBox(height: 10),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Información básica',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        offset: const Offset(0, 2),
+                        blurRadius: 6,
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: ExpansionTile(
+                      leading: IconButton(
+                        onPressed: (){}, 
+                        icon: const Icon( Icons.info )),
+                      title: const Text(
+                        'Información técnica',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      maintainState: true,
+                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
+                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
+                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      children: [
+                        const Divider(),
+                        CustomTextFormField(
+                          controller: _numeroDeSerieController,
+                          icon: Icons.qr_code_2,
+                          placeholder: 'Número de serie',
+                          inputType: TextInputType.name,
+                        ),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Tipo',
+                            prefixIcon: const Icon(Icons.category, color: Colors.grey),
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          value: selectedTipo,
+                          items: tipo
+                              .map((option) => DropdownMenuItem(
+                                    value: option,
+                                    child: Text(option),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            selectedTipo = value; // Si necesitas actualizar un valor, hazlo aquí
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Aro',
+                            prefixIcon: const Icon(Icons.height, color: Colors.grey),
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          value: selectedAro,
+                          items: aro
+                              .map((option) => DropdownMenuItem(
+                                    value: option,
+                                    child: Text(option),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            selectedAro = value;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Modelo de cuadro',
+                            prefixIcon: Icon(
+                              selectedModeloCuadro == 'Femenino'
+                                  ? Icons.female
+                                  : selectedModeloCuadro == 'Masculino'
+                                      ? Icons.male
+                                      : Icons.transgender,
+                              color: Colors.grey,
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          value: selectedModeloCuadro,
+                          items: modeloCuadro
+                              .map((option) => DropdownMenuItem(
+                                    value: option,
+                                    child: Text(option),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            selectedModeloCuadro = value;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                        DropdownButtonFormField<String>(
+                          decoration: InputDecoration(
+                            labelText: 'Talla',
+                            prefixIcon: const Icon(Icons.straighten, color: Colors.grey),
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          value: selectedTalla,
+                          items: talla
+                              .map((option) => DropdownMenuItem(
+                                    value: option,
+                                    child: Text(option),
+                                  ))
+                              .toList(),
+                          onChanged: (value) {
+                            selectedTalla = value;
+                          },
+                        ),
+                        const SizedBox(height: 10),
+                      ],
                     ),
                   ),
                 ),
-                const Divider(),
-                CustomTextFormField(
-                  controller: _etiquetaController,
-                  icon: Icons.edit,
-                  placeholder: 'Etiqueta',
-                  inputType: TextInputType.emailAddress,
-                ),
+
                 const SizedBox(height: 10),
-                CustomTextFormField(
-                  controller: _marcaController,
-                  icon: Icons.directions_bike,
-                  placeholder: 'Marca',
-                  inputType: TextInputType.name,
-                ),
-                const SizedBox(height: 10),
-                CustomTextFormField(
-                  controller: _modeloController,
-                  icon: Icons.build,
-                  placeholder: 'Modelo',
-                  inputType: TextInputType.name,
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Color principal',
-                    prefixIcon: const Icon(Icons.colorize_sharp, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  value: selectedColorPrincipal,
-                  items: colores
-                      .map((color) => DropdownMenuItem(
-                            value: color,
-                            child: Text(color),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedColorPrincipal = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 10),
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Información técnica',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const Divider(),
-                CustomTextFormField(
-                  controller: _numeroDeSerieController,
-                  icon: Icons.colorize_sharp,
-                  placeholder: 'Número de serie',
-                  inputType: TextInputType.name,
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Tipo',
-                    prefixIcon: const Icon(Icons.category, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  value: selectedTipo,
-                  items: tipo
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedTipo = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Aro',
-                    prefixIcon: const Icon(Icons.height, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  value: selectedAro,
-                  items: aro
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedAro = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Modelo de cuadro',
-                    prefixIcon: Icon(
-                      selectedModeloCuadro == 'Femenino'
-                          ? Icons.female
-                          : selectedModeloCuadro == 'Masculino'
-                              ? Icons.male
-                              : Icons.transgender,
-                      color: Colors.grey,
-                    ),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  value: selectedModeloCuadro,
-                  items: modeloCuadro
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedModeloCuadro = value;
-                    });
-                  },
-                ),
-                const SizedBox(height: 10),
-                DropdownButtonFormField<String>(
-                  decoration: InputDecoration(
-                    labelText: 'Talla',
-                    prefixIcon: const Icon(Icons.straighten, color: Colors.grey),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
-                    ),
-                  ),
-                  value: selectedTalla,
-                  items: talla
-                      .map((option) => DropdownMenuItem(
-                            value: option,
-                            child: Text(option),
-                          ))
-                      .toList(),
-                  onChanged: (value) {
-                    setState(() {
-                      selectedTalla = value;
-                    });
-                  },
-                ),
               ],
             ),
           ),

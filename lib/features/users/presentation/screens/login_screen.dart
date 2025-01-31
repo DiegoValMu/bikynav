@@ -121,7 +121,7 @@ class _LoginFormViewState extends State<_LoginFormView> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 10),
       child: SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
@@ -135,19 +135,51 @@ class _LoginFormViewState extends State<_LoginFormView> {
 
             const SizedBox(height: 20),
 
-            CustomTextFormField(
-              icon: Icons.email,
-              placeholder: 'Correo electronico',
-              inputType: TextInputType.emailAddress,
-              controller: emailController, // Asocia el controlador
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2), 
+                    offset: const Offset(0, 2), 
+                    blurRadius: 6
+                  )
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric( horizontal: 10 ),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 20),
+                    const Text(
+                      'Ingrese credenciales',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Divider(),
+                    const SizedBox(height: 10),
+                    CustomTextFormField(
+                      icon: Icons.email,
+                      placeholder: 'Correo electronico',
+                      inputType: TextInputType.emailAddress,
+                      controller: emailController, // Asocia el controlador
+                    ),
+                    const SizedBox(height: 10),
+                    CustomTextFormField(
+                      icon: Icons.lock,
+                      placeholder: 'Contraseña',
+                      isPassword: true,
+                      controller: passwordController, // Asocia el controlador
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
             ),
-            const SizedBox(height: 10),
-            CustomTextFormField(
-              icon: Icons.lock,
-              placeholder: 'Contraseña',
-              isPassword: true,
-              controller: passwordController, // Asocia el controlador
-            ),
+
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),

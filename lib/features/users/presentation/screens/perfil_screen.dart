@@ -77,36 +77,48 @@ class PerfilScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Text(
-                        'Información básica',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18,
-                        ),
-                      ),
-                      const Spacer(),
-                      IconButton(
+                    ExpansionTile(
+                      leading: IconButton(
                         onPressed: () {
                           context.push('/update_perfil');
                           // Lógica para editar perfil
                         },
                         icon: const Icon(Icons.edit),
                       ),
-                    ],
-                  ),
-                  const Divider(),
-                  const SizedBox(height: 10),
-                  SizedBox(
-                    height: 100, // Ajusta este valor según la cantidad de contenido
-                    child: ListView(
-                      children: [
-                        _buildInfoRow('Comuna', '${userServices.usuario.comuna}'),
-                        _buildInfoRow('Región', '${userServices.usuario.region}'),
-                      ],
+                      title: const Text(
+                        'Información basica',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      initiallyExpanded: true,
+                      maintainState: true,
+                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
+                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
+                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
+                      backgroundColor: Colors.white,
+                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
+                      children: [ 
+                        Column(
+                          children: [
+                            const Divider(),
+                            const SizedBox(height: 10),
+                            SizedBox(
+                              height: 70, // Ajusta este valor según la cantidad de contenido
+                              child: ListView(
+                                children: [
+                                  _buildInfoRow('Comuna', '${userServices.usuario.comuna}'),
+                                  _buildInfoRow('Región', '${userServices.usuario.region}'),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 15),
+                          ],
+                        ),
+                      ]
                     ),
-                  ),
                 ],
               ),
             ),
