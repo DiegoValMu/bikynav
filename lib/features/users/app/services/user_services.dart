@@ -9,7 +9,6 @@ class UserServices with ChangeNotifier {
 
   Usuario usuario = Usuario();
   bool? exists;
-
   UserServices() {
     // Inicialmente, no hay usuario y no hay datos existentes
     exists = false;
@@ -21,18 +20,15 @@ class UserServices with ChangeNotifier {
     if (response.statusCode == 200) {
       exists = true;
       var data = json.decode(response.body);
-      print('data: $data');
-
-      print("id: ${data['_id']}");
+      //print('data: $data');
+      //print("id: ${data['_id']}");
       usuario.id = data['_id'];
       usuario.nombre = data['nombre'];
       usuario.apellidos = data['apellidos'];
       usuario.email = data['email'];
       usuario.region = data['region'];
       usuario.comuna = data['comuna'];
-
-
-      print("nombre2: ${usuario.nombre}");  // Guarda los datos en la variable interna
+      //print("nombre2: ${usuario.nombre}");   Guarda los datos en la variable interna
       notifyListeners();  // Notifica a los consumidores
     } else {
       throw Exception('Error en el backend: ${response.body}');
@@ -83,8 +79,6 @@ class UserServices with ChangeNotifier {
         body: json.encode(formData),
       );
 
-
-
       if (response.statusCode == 200) {
         User? user = FirebaseAuth.instance.currentUser;
 
@@ -114,8 +108,6 @@ class UserServices with ChangeNotifier {
           await user?.updatePassword( password );
         }
         
-        
-
         notifyListeners(); 
  // Actualiza los datos locales
       } else {

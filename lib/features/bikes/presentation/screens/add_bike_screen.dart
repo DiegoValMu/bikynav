@@ -1,5 +1,8 @@
+import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
+import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class AddBikeScreen extends StatelessWidget {
   const AddBikeScreen({super.key});
@@ -32,14 +35,7 @@ class AddBikeScreen extends StatelessWidget {
       title: const Text('Registrar bicicleta'),
       elevation: 0,
       actions: [
-        IconButton(
-          icon: const Icon(Icons.save),
-          color: Colors.deepPurple,
-          onPressed: () {
-            // TODO: Save bike data
-            Navigator.pop(context);
-          },
-        ),
+        
       ],
       backgroundColor: Colors.transparent,
       centerTitle: true,
@@ -54,15 +50,15 @@ class _RegisterBikeForm extends StatefulWidget {
   State<_RegisterBikeForm> createState() => _RegisterBikeFormState();
 }
 
-class _RegisterBikeFormState extends State<_RegisterBikeForm> {
-  final _etiquetaController = TextEditingController();
-  final _marcaController = TextEditingController();
-  final _modeloController = TextEditingController();
-  final _numeroDeSerieController = TextEditingController();
+class _RegisterBikeFormState extends State<_RegisterBikeForm> with WidgetsBindingObserver {
+  final etiquetaController = TextEditingController();
+  final marcaController = TextEditingController();
+  final modeloController = TextEditingController();
+  final numeroDeSerieController = TextEditingController();
 
-  List<String> aro = ['650C (26")', '27,5"', '700C (28")', '29"'];
+  List<String> aro = ['650C (26)', '27,5', '700C (28)', '29'];
   List<String> tipo = ['MTB', 'Ruta', 'Gravel'];
-  List<String> modeloCuadro = ['Masculino', 'Femenino'];
+  List<String> modeloCuadro = ['Femenino', 'Masculino','Unisex'];
   List<String> talla = ['S', 'M', 'M/L', 'L', 'XL'];
 
   List<String> colores = [
@@ -75,8 +71,33 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> {
   String? selectedTalla;
   String? selectedColorPrincipal;
 
+  bool _isKeyboardVisible = false; 
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+ 
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeMetrics() {
+    final bottomInset = WidgetsBinding.instance.platformDispatcher.views.first.viewInsets.bottom;
+    setState(() {
+      _isKeyboardVisible = bottomInset > 0;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final userServices = Provider.of<UserServices>(context, listen: false);
     return Stack(
       children: [
         Padding(
@@ -122,21 +143,21 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> {
                           children: [
                             const Divider(),
                             CustomTextFormField(
-                              controller: _etiquetaController,
+                              controller: etiquetaController,
                               icon: Icons.edit,
                               placeholder: 'Etiqueta',
                               inputType: TextInputType.emailAddress,
                             ),
                             const SizedBox(height: 10),
                             CustomTextFormField(
-                              controller: _marcaController,
+                              controller: marcaController,
                               icon: Icons.directions_bike,
                               placeholder: 'Marca',
                               inputType: TextInputType.name,
                             ),
                             const SizedBox(height: 10),
                             CustomTextFormField(
-                              controller: _modeloController,
+                              controller: modeloController,
                               icon: Icons.build,
                               placeholder: 'Modelo',
                               inputType: TextInputType.name,
@@ -210,7 +231,7 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> {
                       children: [
                         const Divider(),
                         CustomTextFormField(
-                          controller: _numeroDeSerieController,
+                          controller: numeroDeSerieController,
                           icon: Icons.qr_code_2,
                           placeholder: 'Número de serie',
                           inputType: TextInputType.name,
@@ -321,6 +342,51 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> {
                 ),
 
                 const SizedBox(height: 10),
+
+                (_isKeyboardVisible)
+                ? Text('')
+                : Align(
+                  alignment: Alignment.bottomCenter,
+                  child: FilledButton(
+                    child: const Text('Registrar'),
+                    onPressed: () async {
+                      // TODO: Save bike data
+
+                      final etiqueta = etiquetaController.text.trim();
+                      final marca = marcaController.text.trim();
+                      final modelo = modeloController.text.trim();
+                      final codigoSerie = numeroDeSerieController.text.trim();
+
+                      final bike = <String, dynamic>{
+                        'etiqueta': etiqueta,
+                        'marca': marca,
+                        'modelo': modelo,
+                        'codigo_serie': codigoSerie,
+                        'color_principal': selectedColorPrincipal,
+                        'tipo': selectedTipo,
+                        'aro': selectedAro,
+                        'modelo_cuadro': selectedModeloCuadro,
+                        'talla': selectedTalla,
+                        'usuario': userServices.usuario.id
+                      };
+
+                      try {
+                        final bikeServices = Provider.of<BikeServices>(context, listen: false);
+                        await bikeServices.bikeRegister(bike);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Problemas con el servicio $e")),
+                        );
+                        Navigator.of(context).pop();
+                        return;
+                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Bicicleta registrada correctamente")),
+                      );
+                      Navigator.pop(context);
+                    },
+                  ),
+                )
               ],
             ),
           ),
