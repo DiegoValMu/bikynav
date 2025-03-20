@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 class BikeServices with ChangeNotifier {
 
+  List<dynamic> bikes = [];
+
   bool? exists;
 
   BikeServices() {
@@ -24,6 +26,20 @@ class BikeServices with ChangeNotifier {
     } else {
       // Error en el backend
       throw Exception('Error en el backend: ${response.body}');
+    }
+  }
+
+  Future getBikes( String id ) async {
+
+    final response = await http.post(Uri.parse('https://serverbikynav-production.up.railway.app/api/bicicletasUsuario'),
+    headers: {
+      'Authorization': id,
+    });
+    if (response.statusCode == 200) {
+      bikes = json.decode(response.body);
+      notifyListeners();  // Notifica a los consumidores
+    } else {
+      throw Exception('Error al cargar los datos');
     }
   }
 

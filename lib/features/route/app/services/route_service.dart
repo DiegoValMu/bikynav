@@ -53,9 +53,6 @@ class RouteServices with ChangeNotifier {
     });
     if (response.statusCode == 200) {
       rutas = json.decode(response.body);
-      //var data = json.decode(response.body);
-      print('data: $rutas');
-      print("nombre2: ${myRoute.etiqueta}");  // Guarda los datos en la variable interna
       notifyListeners();  // Notifica a los consumidores
     } else {
       throw Exception('Error al cargar los datos');

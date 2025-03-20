@@ -34,9 +34,6 @@ class AddBikeScreen extends StatelessWidget {
     return AppBar(
       title: const Text('Registrar bicicleta'),
       elevation: 0,
-      actions: [
-        
-      ],
       backgroundColor: Colors.transparent,
       centerTitle: true,
     );
@@ -56,8 +53,8 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> with WidgetsBindin
   final modeloController = TextEditingController();
   final numeroDeSerieController = TextEditingController();
 
-  List<String> aro = ['650C (26)', '27,5', '700C (28)', '29'];
-  List<String> tipo = ['MTB', 'Ruta', 'Gravel'];
+  List<String> aro = ['650C (26")', '27,5"', '700C (28")', '29"'];
+  List<String> tipo = ['MTB', 'Ruta', 'Urbana'];
   List<String> modeloCuadro = ['Femenino', 'Masculino','Unisex'];
   List<String> talla = ['S', 'M', 'M/L', 'L', 'XL'];
 
@@ -381,9 +378,9 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> with WidgetsBindin
                         return;
                       }
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Bicicleta registrada correctamente")),
+                        const SnackBar(content: Text("Bicicleta registrada correctamente")),
                       );
-                      Navigator.pop(context);
+                      Navigator.pushNamed(context, '/');
                     },
                   ),
                 )

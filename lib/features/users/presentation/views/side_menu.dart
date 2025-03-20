@@ -1,3 +1,4 @@
+import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/shared/services/socket_service.dart';
@@ -89,7 +90,21 @@ class SideMenu extends StatelessWidget {
                     ListTile(
                       leading: const Icon(Icons.directions_bike),
                       title: const Text('Bicicletas'),
-                      onTap: () {
+                      onTap: () async {
+                        showLoadingMessage(context);
+
+                        final bikeServices = Provider.of<BikeServices>(context, listen: false);
+                        final userServices = Provider.of<UserServices>(context, listen: false);
+
+                        // Realizar la operación de carga (por ejemplo, obtener las rutas)
+                        await bikeServices.getBikes(userServices.usuario.id!);
+
+                        // Ocultar el mensaje de carga después de la operación
+     //                   Navigator.pop(context); // Esto oculta el mensaje de carga si fue implementado con un `showDialog`
+                        hideLoadingMessage(context);
+                        // Redirigir a la pantalla de recorridos
+
+
                         context.push('/bikes');
                       },
                     ),

@@ -72,8 +72,6 @@ class PerfilScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-            
             const SizedBox(height: 10),
             Container(
               width: double.infinity,
@@ -117,9 +115,9 @@ class PerfilScreen extends StatelessWidget {
                               height: 100, // Ajusta este valor según la cantidad de contenido
                               child: ListView(
                                 children: [
-                                  _buildInfoRow('Correo', '${userServices.usuario.email}'),
-                                  _buildInfoRow('Comuna', '${userServices.usuario.comuna}'),
-                                  _buildInfoRow('Región', '${userServices.usuario.region}'),
+                                  buildInfoRow('Correo', '${userServices.usuario.email}'),
+                                  buildInfoRow('Comuna', '${userServices.usuario.comuna}'),
+                                  buildInfoRow('Región', '${userServices.usuario.region}'),
                                 ],
                               ),
                             ),
@@ -131,9 +129,6 @@ class PerfilScreen extends StatelessWidget {
                 ],
               ),
             ),
-
-
-
             // Botón eliminar cuenta
           ],
         ),
@@ -141,7 +136,7 @@ class PerfilScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String title, String value) {
+  Widget buildInfoRow(String title, String value) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
