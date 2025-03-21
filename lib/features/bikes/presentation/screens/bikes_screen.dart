@@ -3,6 +3,7 @@ import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:animate_do/animate_do.dart';
 
 class BikesScreen extends StatelessWidget {
   const BikesScreen({super.key});
@@ -52,11 +53,11 @@ class BikesScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 20),
+                      padding: const EdgeInsets.symmetric( horizontal: 20),
                       child: Text(
                         entry.key,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white
                         ),
@@ -64,7 +65,7 @@ class BikesScreen extends StatelessWidget {
                     ),
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
-                    child: _buildBikeRow(entry.value, entry.key),
+                    child: _buildBikeRow(entry.value, entry.key, context),
                   ),
                 ],
               ),
@@ -76,11 +77,11 @@ class BikesScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBikeRow(List<Bikes> bikes, String bikeType) {
+  Widget _buildBikeRow(List<Bikes> bikes, String bikeType, BuildContext context) {
     return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: bikes.map((bike) => _bikesList(bike)).toList(),
+          children: bikes.map((bike) => _bikesList(bike, context)).toList(),
         ),
     );
   }
@@ -166,30 +167,109 @@ Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCall
     return groupedBikes;
   }
 
-  Card _bikesList(Bikes bike) {
-    return Card(
-      shadowColor: Colors.black,
-      color: Colors.white,
-      margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-      child: Padding(
-        padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.asset(
-              'assets/images/noimage.jpg',
-              width: 100,
-              height: 140,
+  GestureDetector _bikesList(Bikes bike, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        _showBikeDetails(context, bike); // Mostramos el Dialog con los detalles
+      },
+      child: SlideInRight(
+        child: Card(
+          shadowColor: Colors.black,
+          color: Colors.white,
+          margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Image.asset(
+                  'assets/images/noimage.jpg',
+                  width: 100,
+                  height: 140,
+                ),
+                Text(
+                  bike.etiqueta ?? 'Sin etiqueta',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Text('Marca: ${bike.marca ?? 'Desconocida'}'),
+                Text('Aro: ${bike.aro ?? 'Desconocido'}'),
+              ],
             ),
-            Text(
-              bike.etiqueta ?? 'Sin etiqueta',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Text('Marca: ${bike.marca ?? 'Desconocida'}'),
-            Text('Aro: ${bike.aro ?? 'Desconocido'}'),
-          ],
+          ),
         ),
+      ),
+    );
+  }
+
+  void _showBikeDetails(BuildContext context, Bikes bike) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ZoomIn(
+          child: AlertDialog(
+            shadowColor: Colors.black,
+            backgroundColor: Colors.white,
+            title: null,
+            content: Stack(
+              children: [
+                SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Image.asset(
+                        'assets/images/noimage.jpg',
+                        width: 250,
+                        height: 300,
+                      ),
+                      _buildInfoRow('Marca', '${bike.marca}'),
+                      _buildInfoRow('Modelo', '${bike.modelo}'),
+                      _buildInfoRow('Aro', '${bike.aro}'),
+                      _buildInfoRow('Tipo', '${bike.tipo}'),
+                      _buildInfoRow('Talla', '${bike.talla}'),
+                      _buildInfoRow('color', '${bike.colorPrincipal}'),
+                      _buildInfoRow('Modelo del cuadro', '${bike.modeloCuadro}'),
+                      _buildInfoRow('Codigo de serie', '${bike.codigoSerie}'),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  right: 0,
+                  top: 0,
+                  child: FilledButton(
+                    onPressed: () {
+                      context.push('/update_bike_data');
+                    },
+                    child: Icon( Icons.edit, size: 20, ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildInfoRow(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5 ),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(value),
+          ),
+        ],
       ),
     );
   }
