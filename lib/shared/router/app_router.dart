@@ -80,9 +80,5 @@ final appRouter = GoRouter(
       path: '/add_bike',
       builder: (context, state) => const AddBikeScreen(),
     ),
-    GoRoute(
-      path: '/update_bike_data',
-      builder: (context, state) => const UpdateBikeDataScreen(),
-    ),
   ],
 );

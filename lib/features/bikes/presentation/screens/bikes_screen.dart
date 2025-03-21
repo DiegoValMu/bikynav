@@ -1,5 +1,6 @@
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
+import 'package:bikynav/features/bikes/presentation/screens/update_bike_data.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -240,7 +241,14 @@ Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCall
                   top: 0,
                   child: FilledButton(
                     onPressed: () {
-                      context.push('/update_bike_data');
+                      //final bikeSelect = bike.toJson();
+                      Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UpdateBikeDataScreen(bike: bike), // Pasa el objeto Bikes aquí
+                      ),
+                    );
+                      //context.push('/update_bike_data', extra: bikeSelect);
                     },
                     child: Icon( Icons.edit, size: 20, ),
                   ),
