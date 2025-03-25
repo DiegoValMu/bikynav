@@ -1,7 +1,9 @@
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
+import 'package:bikynav/features/bikes/presentation/screens/bikes_screen.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -261,7 +263,7 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> with WidgetsBindin
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Bicicleta registrada correctamente")),
                   );
-                  Navigator.pushNamed(context, '/');
+                  context.go('/bikes');
                 },
               ),
             ),

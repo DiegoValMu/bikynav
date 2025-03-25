@@ -43,5 +43,14 @@ class BikeServices with ChangeNotifier {
     }
   }
 
+    Future deleteBike( String id ) async {
+      final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/bicicletas/$id'));
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        throw Exception('Error al eliminar: ${response.body}');
+      }
+  }
+
 
 }

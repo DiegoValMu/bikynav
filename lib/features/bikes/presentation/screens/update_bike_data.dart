@@ -2,8 +2,11 @@ import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
+
+import '../../../nav/app/helpers/helpers.dart';
 
 class UpdateBikeDataScreen extends StatelessWidget {
   final bike; // Recibe un objeto Bikes
@@ -38,7 +41,9 @@ class UpdateBikeDataScreen extends StatelessWidget {
     return AppBar(
       actions: [
         IconButton(
-        onPressed: (){}, 
+        onPressed: (){
+          _confirmDeleteBike(context, bike);
+        }, 
         icon: Icon( Icons.delete, color: Colors.red,) ),
       ],
       title: const Text('Editar Información'),
@@ -47,6 +52,74 @@ class UpdateBikeDataScreen extends StatelessWidget {
       centerTitle: true,
     );
   }
+
+  void _confirmDeleteBike(BuildContext context, bike) {
+    final bikeServices = Provider.of<BikeServices>(context, listen: false);
+  
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar bicicleta'),
+          content: const Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '¿Estás seguro de que deseas eliminar tu bicicleta? Esta acción no se puede deshacer.',
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                try {
+                  showLoadingMessage(context);
+                  await bikeServices.deleteBike( bike.id! );
+                  hideLoadingMessage(context);
+  
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Bicicleta eliminado',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  context.push('/');
+                } catch (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error al eliminar la cuenta: $error',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  
+                } finally {
+                  Navigator.of(context).pop(); 
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
 
 class _RegisterBikeForm extends StatefulWidget {
@@ -461,4 +534,5 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> with WidgetsBindin
       ],
     );
   }
+
 }

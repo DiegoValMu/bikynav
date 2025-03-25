@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:bikynav/features/bikes/presentation/screens/add_bike_screen.dart';
 import 'package:bikynav/features/bikes/presentation/screens/bikes_screen.dart';
 import 'package:bikynav/features/bikes/presentation/screens/update_bike_data.dart';
+import 'package:bikynav/features/bikes/presentation/views/custom_scanner_qr.dart';
 import 'package:bikynav/features/route/presentation/screens/route_screen.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/features/users/presentation/screens/perfil_screen.dart';
@@ -79,6 +80,10 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/add_bike',
       builder: (context, state) => const AddBikeScreen(),
+    ),
+    GoRoute(
+      path: '/scanner_qr',
+      builder: (context, state) => const ScannerQr(),
     ),
   ],
 );

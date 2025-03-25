@@ -1,10 +1,14 @@
+
+import 'package:bikynav/features/bikes/app/helpers/generate_qr_code.dart';
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:bikynav/features/bikes/presentation/screens/update_bike_data.dart';
+import 'package:bikynav/features/bikes/presentation/views/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class BikesScreen extends StatelessWidget {
   const BikesScreen({super.key});
@@ -74,7 +78,7 @@ class BikesScreen extends StatelessWidget {
           }).toList(),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(context),
+      bottomNavigationBar: const BuildBottomNavigationBar(),
     );
   }
 
@@ -95,58 +99,6 @@ class BikesScreen extends StatelessWidget {
       centerTitle: true,
     );
   }
-
-  Widget _buildBottomNavigationBar(BuildContext context) {
-  return Container(
-    decoration: BoxDecoration(
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.1),
-          spreadRadius: 0,
-          blurRadius: 4,
-          offset: Offset(0, -2),
-        ),
-      ],
-    ),
-    child: BottomAppBar(
-      shadowColor: Colors.black,
-      height: 65,
-      color: Colors.white,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildNavItem(
-            context,
-            Icons.search,
-            'Buscar',
-            () => context.push('/search'),
-          ),
-          VerticalDivider(width: 20, thickness: 1),
-          _buildNavItem(
-            context,
-            Icons.add_circle,
-            'Agregar',
-            () => context.push('/add_bike'),
-            color: Colors.deepPurple,
-          ),
-        ],
-      ),
-    ),
-  );
-}
-
-Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCallback onPressed, {Color? color}) {
-  return InkWell(
-    onTap: onPressed,
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, color: color),
-        Text(label),
-      ],
-    ),
-  );
-}
 
   List<Bikes> _getBikes(List<dynamic> bikesData) {
     return bikesData.map<Bikes>((bike) {
@@ -212,6 +164,16 @@ Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCall
             shadowColor: Colors.black,
             backgroundColor: Colors.white,
             title: null,
+            actionsAlignment: MainAxisAlignment.center,
+            actions: [
+              FilledButton.icon(
+                onPressed: () {
+                  generateQRCode(context, bike);
+                },
+                label: const Text('Generar QR'),
+                icon: const Icon( Icons.qr_code ),
+              ),
+            ],
             content: Stack(
               children: [
                 SingleChildScrollView(
@@ -236,6 +198,7 @@ Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCall
                     ],
                   ),
                 ),
+                
                 Positioned(
                   right: 0,
                   top: 0,
@@ -243,14 +206,13 @@ Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCall
                     onPressed: () {
                       //final bikeSelect = bike.toJson();
                       Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UpdateBikeDataScreen(bike: bike), // Pasa el objeto Bikes aquí
-                      ),
-                    );
-                      //context.push('/update_bike_data', extra: bikeSelect);
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UpdateBikeDataScreen(bike: bike), // Pasa el objeto Bikes aquí
+                        ),
+                      );
                     },
-                    child: Icon( Icons.edit, size: 20, ),
+                    child: const Icon( Icons.edit, size: 20, ),
                   ),
                 )
               ],
@@ -281,4 +243,9 @@ Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCall
       ),
     );
   }
+
+  
+
+
+
 }
