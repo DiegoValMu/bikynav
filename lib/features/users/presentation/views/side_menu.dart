@@ -27,16 +27,20 @@ class SideMenu extends StatelessWidget {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeInOut,
-      transform: Matrix4.translationValues(isMenuOpen ? 0 : -MediaQuery.of(context).size.width, 0, 0),
+      transform: Matrix4.translationValues(
+          isMenuOpen ? 0 : -MediaQuery.of(context).size.width, 0, 0),
       color: Colors.white.withOpacity(0.9),
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
             automaticallyImplyLeading: false,
-            leading: Container(
-              child: (socketService.serverStatus == ServerStatus.Online)
-                  ? const Icon(Icons.check_circle, color: Colors.green)
-                  : const Icon(Icons.offline_bolt, color: Colors.red),
+            leading: Icon(
+              socketService.serverStatus == ServerStatus.Online
+                  ? Icons.check_circle
+                  : Icons.offline_bolt,
+              color: socketService.serverStatus == ServerStatus.Online
+                  ? Colors.green
+                  : Colors.red,
             ),
             actions: [
               IconButton(
@@ -44,7 +48,7 @@ class SideMenu extends StatelessWidget {
                 onPressed: onClose,
               ),
             ],
-            backgroundColor: Colors.transparent,
+            backgroundColor: Colors.white,
             elevation: 0,
           ),
           body: Column(
@@ -52,87 +56,59 @@ class SideMenu extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    Row(
-                      children: [
-                        const Padding(
-                          padding: EdgeInsets.only(left: 10),
-                          child: Image(
-                            image: AssetImage('assets/images/login.png'),
-                            height: 100,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(left: 10),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('¡Hola, ${userServices.usuario.nombre}!', style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 24.0
-                              )),
-                              FilledButton(
-                                onPressed: () async {
-                                  context.push('/perfil');
-                                  // Redirige a la pantalla de perfil
-                                },
-                                child: const Text('Ver perfil'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Divider(),
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.directions_bike),
-                      title: const Text('Bicicletas'),
-                      onTap: () async {
-                        showLoadingMessage(context);
-
-                        final bikeServices = Provider.of<BikeServices>(context, listen: false);
-                        final userServices = Provider.of<UserServices>(context, listen: false);
-
-                        // Realizar la operación de carga (por ejemplo, obtener las rutas)
-                        await bikeServices.getBikes(userServices.usuario.id!);
-
-                        // Ocultar el mensaje de carga después de la operación
-     //                   Navigator.pop(context); // Esto oculta el mensaje de carga si fue implementado con un `showDialog`
-                        hideLoadingMessage(context);
-                        // Redirigir a la pantalla de recorridos
-
-
-                        context.push('/bikes');
+                    _buildUserProfile(context, userServices),
+                    _buildMenuItem(
+                      context,
+                      'Bicicletas',
+                      Icons.directions_bike,
+                      '/bikes',
+                      'assets/images/1.png',
+                      () async {
+                        final bikeServices =
+                            Provider.of<BikeServices>(context, listen: false);
+                        await _loadAndNavigate(
+                            context, bikeServices.getBikes(userServices.usuario.id!), '/bikes');
                       },
                     ),
-                    ListTile(
-                      leading: const Icon(Icons.route),
-                      title: const Text('Recorridos'),
-                      onTap: () async {
-                        // Mostrar el mensaje de carga
-                        showLoadingMessage(context);
-
-                        final routeServices = Provider.of<RouteServices>(context, listen: false);
-                        final userServices = Provider.of<UserServices>(context, listen: false);
-
-                        // Realizar la operación de carga (por ejemplo, obtener las rutas)
-                        await routeServices.getRoutes(userServices.usuario.id!);
-
-                        // Ocultar el mensaje de carga después de la operación
-     //                   Navigator.pop(context); // Esto oculta el mensaje de carga si fue implementado con un `showDialog`
-                        hideLoadingMessage(context);
-                        // Redirigir a la pantalla de recorridos
-                        context.push('/route');
+                    _buildMenuItem(
+                      context,
+                      'Recorridos',
+                      Icons.route,
+                      '/route',
+                      'assets/images/2.png',
+                      () async {
+                        final routeServices =
+                            Provider.of<RouteServices>(context, listen: false);
+                        await _loadAndNavigate(
+                            context, routeServices.getRoutes(userServices.usuario.id!), '/route');
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      'Normativa',
+                      Icons.account_balance_rounded,
+                      '/normative',
+                      'assets/images/3.png',
+                      () async {
+                        await _loadAndNavigate(context, Future.value(), '/normative');
+                      },
+                    ),
+                    _buildMenuItem(
+                      context,
+                      'Tutoriales',
+                      Icons.play_arrow_rounded,
+                      '/tutorials',
+                      'assets/images/4.png',
+                      () async {
+                        await _loadAndNavigate(context, Future.value(), '/tutorials');
                       },
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
                 child: SizedBox(
                   width: double.infinity,
                   child: FilledButton(
@@ -140,12 +116,7 @@ class SideMenu extends StatelessWidget {
                       onClose();
                       await FirebaseAuth.instance.signOut();
                       await FirebaseAuth.instance.currentUser?.reload();
-
-        
-
-                      // ignore: use_build_context_synchronously
-                      context.push('/'); // Redirige a la pantalla de inicio de sesión
-                      onClose();
+                      context.push('/');
                     },
                     child: const Text('Cerrar Sesión'),
                   ),
@@ -156,5 +127,95 @@ class SideMenu extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildUserProfile(BuildContext context, UserServices userServices) {
+    return Container(
+      margin: const EdgeInsets.only( bottom: 10 ),
+      padding: const EdgeInsets.only( bottom: 15 ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2.0,
+            offset: const Offset(0.0, 5.0),
+          )
+        ]
+      ),
+      child: Row(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(left: 10),
+            child: Image(
+              image: AssetImage('assets/images/login.png'),
+              height: 100,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('¡Hola, ${userServices.usuario.nombre}!',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 24.0)),
+                FilledButton(
+                  onPressed: () => context.push('/perfil'),
+                  child: const Text('Ver perfil'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(
+    BuildContext context,
+    String title,
+    IconData icon,
+    String route,
+    String imagePath,
+    VoidCallback onTap,
+  ) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      alignment: Alignment.center,
+      height: 70,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            offset: const Offset(0, 0),
+            blurRadius: 6,
+          ),
+        ],
+        image: DecorationImage(
+          image: AssetImage(imagePath),
+          fit: BoxFit.cover,
+        ),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: Colors.black),
+        title: Text(
+          title,
+          style: const TextStyle(
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Future<void> _loadAndNavigate(
+      BuildContext context, Future<void> loadAction, String route) async {
+    showLoadingMessage(context);
+    await loadAction;
+    hideLoadingMessage(context);
+    context.push(route);
   }
 }

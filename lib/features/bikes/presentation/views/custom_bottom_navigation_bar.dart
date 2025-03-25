@@ -1,4 +1,5 @@
 
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,7 +12,7 @@ class BuildBottomNavigationBar extends StatelessWidget {
       decoration: BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withOpacity(0.2),
             spreadRadius: 0,
             blurRadius: 4,
             offset: const Offset(0, -2),
@@ -45,7 +46,12 @@ class BuildBottomNavigationBar extends StatelessWidget {
               context,
               Icons.add_circle,
               'Agregar',
-              () => context.push('/add_bike'),
+              () async { 
+                showLoadingMessage(context);
+                await Future.delayed(Duration(milliseconds: 500)); 
+                await context.push('/add_bike');
+                hideLoadingMessage(context);
+              },
             ),
           ],
         ),

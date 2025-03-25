@@ -10,75 +10,110 @@ import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class BikesScreen extends StatelessWidget {
+class BikesScreen extends StatefulWidget {
   const BikesScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final bikeServices = Provider.of<BikeServices>(context);
-    List<Bikes> bikes = _getBikes(bikeServices.bikes);
-    Map<String, List<Bikes>> groupedBikes = _groupBikesByType(bikes);
+  State<BikesScreen> createState() => _BikesScreenState();
+}
 
-    return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                offset: const Offset(0, 4),
-                blurRadius: 6,
+class _BikesScreenState extends State<BikesScreen> {
+  late Future<void> _imagePrecacheFuture;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _imagePrecacheFuture = _precacheImages(context);
+  }
+
+  Future<void> _precacheImages(BuildContext context) async {
+    List<String> imageAssets = [
+      'assets/images/ruta.png',
+      'assets/images/mtb.png',
+      'assets/images/urbana.png',
+      'assets/images/noimage.jpg',
+    ];
+
+    for (String asset in imageAssets) {
+      await precacheImage(AssetImage(asset), context);
+    }
+  }
+
+@override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _imagePrecacheFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          final bikeServices = Provider.of<BikeServices>(context);
+          List<Bikes> bikes = _getBikes(bikeServices.bikes);
+          Map<String, List<Bikes>> groupedBikes = _groupBikesByType(bikes);
+
+          return Scaffold(
+            appBar: PreferredSize(
+              preferredSize: const Size.fromHeight(kToolbarHeight),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      offset: const Offset(0, 4),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: _buildAppBar(),
               ),
-            ],
-          ),
-          child: _buildAppBar(),
-        ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.zero,
-        child: ListView(
-          children: groupedBikes.entries.map((entry) {
-            Map<String, String> bikeTypeBackgrounds = {
-              'Ruta': 'assets/images/ruta.png', // Imágenes específicas para Ruta
-              'MTB': 'assets/images/mtb.png', // Imágenes específicas para MTB
-              'Urbana': 'assets/images/urbana.png', // Imágenes específicas para Gravel
-            };
-            String backgroundImage = bikeTypeBackgrounds[entry.key] ?? 'assets/images/noimage.jpg';
-            return Container(
-              width: double.infinity,
+            ),
+            body: Padding(
+              padding: EdgeInsets.zero,
+              child: ListView(
+                children: groupedBikes.entries.map((entry) {
+                  Map<String, String> bikeTypeBackgrounds = {
+                    'Ruta': 'assets/images/ruta.png',
+                    'MTB': 'assets/images/mtb.png',
+                    'Urbana': 'assets/images/urbana.png',
+                  };
+                  String backgroundImage = bikeTypeBackgrounds[entry.key] ?? 'assets/images/noimage.jpg';
+                  return Container(
+                    width: double.infinity,
                     decoration: BoxDecoration(
                       image: DecorationImage(
                         image: AssetImage(backgroundImage),
                         fit: BoxFit.cover,
                       ),
                     ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                      padding: const EdgeInsets.symmetric( horizontal: 20),
-                      child: Text(
-                        entry.key,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: Text(
+                            entry.key,
+                            style: const TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
-                      ),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: _buildBikeRow(entry.value, entry.key, context),
+                        ),
+                      ],
                     ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: _buildBikeRow(entry.value, entry.key, context),
-                  ),
-                ],
+                  );
+                }).toList(),
               ),
-            );
-          }).toList(),
-        ),
-      ),
-      bottomNavigationBar: const BuildBottomNavigationBar(),
+            ),
+            bottomNavigationBar: const BuildBottomNavigationBar(),
+          );
+        } else {
+          return const Center(child: CircularProgressIndicator( backgroundColor: Colors.white,));
+        }
+      },
     );
   }
 
@@ -243,9 +278,4 @@ class BikesScreen extends StatelessWidget {
       ),
     );
   }
-
-  
-
-
-
 }

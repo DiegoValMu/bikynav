@@ -1,5 +1,6 @@
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/presentation/screens/bikes_screen.dart';
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:flutter/material.dart';
@@ -260,10 +261,18 @@ class _RegisterBikeFormState extends State<_RegisterBikeForm> with WidgetsBindin
                     Navigator.of(context).pop();
                     return;
                   }
+                  showLoadingMessage(context);
+
+                  final bikeServices = Provider.of<BikeServices>(context, listen: false);
+                  // Realizar la operación de carga (por ejemplo, obtener las rutas)
+                  await bikeServices.getBikes(userServices.usuario.id!);
+                  hideLoadingMessage(context);
+                  // Redirigir a la pantalla de recorridos
+                  
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text("Bicicleta registrada correctamente")),
+                    const SnackBar(content: Text("Bicicleta registrada correctamente", selectionColor: Colors.white ), backgroundColor: Colors.green, ),
                   );
-                  context.go('/bikes');
+                  context.pop(context);
                 },
               ),
             ),

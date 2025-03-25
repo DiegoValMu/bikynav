@@ -39,7 +39,9 @@ class _ScannerQrState extends State<ScannerQr> {
           icon: Icon( 
             _isTorchOn 
             ? Icons.flashlight_on
-            : Icons.flashlight_off, color: Colors.white),
+            : Icons.flashlight_off
+            , color: Colors.white
+          ),
           onPressed: () {
             setState(() {
               _isTorchOn = !_isTorchOn;
@@ -51,7 +53,7 @@ class _ScannerQrState extends State<ScannerQr> {
     }
 
     return Text(
-      value.displayValue ?? 'No display value.',
+      value.displayValue ?? 'No hay datos relacionados',
       overflow: TextOverflow.fade,
       style: const TextStyle(color: Colors.white),
     );

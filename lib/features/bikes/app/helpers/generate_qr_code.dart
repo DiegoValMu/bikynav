@@ -1,4 +1,5 @@
 
+import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -16,33 +17,35 @@ Future<void> generateQRCode(BuildContext context, Bikes bike) async {
       showDialog(
         context: context,
         builder: (BuildContext context) {
-          return AlertDialog(
-            title: const Text('Codigo QR', textAlign: TextAlign.center,),
-            actionsAlignment: MainAxisAlignment.center,
-            actions: [
-              FilledButton.icon(
-                onPressed: (){
-                  
-                }, 
-                label: const Text('Compartir'),
-                icon: const Icon( Icons.share ),
-              ),
-              FilledButton.icon(
-                onPressed: (){
-                  
-                }, 
-                label: const Text('Guardar'),
-                icon: const Icon( Icons.save ),
-              )
-            ],
-            contentPadding: const EdgeInsets.all(15),
-            content:  SizedBox(
-                width: 300,
-                height: 300,
-                child: Center(
-                  child: qrWidget
+          return ZoomIn(
+            child: AlertDialog(
+              title: const Text('Codigo QR', textAlign: TextAlign.center,),
+              actionsAlignment: MainAxisAlignment.center,
+              actions: [
+                FilledButton.icon(
+                  onPressed: (){
+                    
+                  }, 
+                  label: const Text('Compartir'),
+                  icon: const Icon( Icons.share ),
+                ),
+                FilledButton.icon(
+                  onPressed: (){
+                    
+                  }, 
+                  label: const Text('Guardar'),
+                  icon: const Icon( Icons.save ),
                 )
-              ),
+              ],
+              contentPadding: const EdgeInsets.all(15),
+              content:  SizedBox(
+                  width: 300,
+                  height: 300,
+                  child: Center(
+                    child: qrWidget
+                  )
+                ),
+            ),
           );
         },
       );
