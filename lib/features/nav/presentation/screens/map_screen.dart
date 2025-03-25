@@ -1,5 +1,5 @@
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
-import 'package:bikynav/features/users/presentation/views/side_menu.dart';
+import 'package:bikynav/features/users/presentation/ui/side_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

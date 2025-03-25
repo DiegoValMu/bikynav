@@ -1,16 +1,10 @@
-// ignore_for_file: use_build_context_synchronously
-
-import 'dart:convert';
-
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
-import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
+import 'package:bikynav/features/users/presentation/views/sensitive_info_section.dart';
+import 'package:bikynav/features/users/presentation/views/user_form.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart' show rootBundle;
-
-import '../../config/models/country.dart'; // Para manejo de estado global
 
 class UpdateUserDataScreen extends StatefulWidget {
   const UpdateUserDataScreen({super.key});
@@ -22,14 +16,9 @@ class UpdateUserDataScreen extends StatefulWidget {
 class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
   late TextEditingController nameController;
   late TextEditingController apellidoController;
-  late TextEditingController comunaController;
-  late TextEditingController regionController;
   late TextEditingController passwordController;
   late TextEditingController confirmPasswordController;
-  
 
-  List<Region> regiones = [];
-  List<String> comunas = [];
   String? selectedRegion;
   String? selectedComuna;
 
@@ -42,7 +31,6 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
   void initState() {
     super.initState();
     _initializeControllers();
-    _loadRegionsAndComunas();
   }
 
   void _initializeControllers() {
@@ -51,477 +39,277 @@ class _UpdateUserDataScreenState extends State<UpdateUserDataScreen> {
 
     nameController = TextEditingController(text: userData.nombre);
     apellidoController = TextEditingController(text: userData.apellidos);
-    comunaController = TextEditingController(text: userData.comuna);
     passwordController = TextEditingController(text: '');
     confirmPasswordController = TextEditingController(text: '');
-
-    regionController = TextEditingController(text: userData.region);
-    _updateComunas(regionController.text);
+    selectedRegion = userData.region;
+    selectedComuna = userData.comuna;
   }
-
-  Future<void> _loadRegionsAndComunas() async {
-    final String response = await rootBundle.loadString('assets/data/regiones_comunas.json');
-    final data = json.decode(response) as Map<String, dynamic>;
-
-    final countryData = CountryData.fromMap(data);
-
-    setState(() {
-      selectedComuna = comunaController.text;
-      selectedRegion = regionController.text;
-      regiones = countryData.regions;
-    });
-  }
-
-  void _updateComunas(String regionName) async {
-      // Cargar el archivo JSON
-      final String response = await rootBundle.loadString('assets/data/regiones_comunas.json');
-  
-      // Decodificar el JSON
-      final data = json.decode(response) as Map<String, dynamic>;
-  
-      // Crear la instancia de CountryData a partir del JSON
-      final countryData = CountryData.fromMap(data);
-  
-      // Encontrar la región correspondiente por su nombre
-      final selectedRegion = countryData.regions.firstWhere(
-        (region) => region.name == regionName
-      );
-
-      selectedComuna = null;
-  
-      // Si la región es válida, actualizar las comunas
-      setState(() {
-        
-        // Asignar las comunas de la región seleccionada
-        comunas = selectedRegion.communes.map((commune) => commune.name).toList();
-      });
-        }
-
-    
 
   @override
   void dispose() {
     nameController.dispose();
     apellidoController.dispose();
-    comunaController.dispose();
-    regionController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    appBar: PreferredSize(
-      preferredSize: const Size.fromHeight(kToolbarHeight),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              offset: const Offset(0, 4),
-              blurRadius: 6,
-            ),
-          ],
-        ),
-        child: AppBar(
-          title: const Text('Actualizar información'),
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          centerTitle: true,
-          actions: [
-            IconButton(
-              onPressed: () async {   
-                _confirmDeleteAccount(context);
-              },
-              // ignore: prefer_const_constructors
-              icon: Icon( 
-                Icons.delete, 
-                color: Colors.red,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.2),
+                offset: const Offset(0, 4),
+                blurRadius: 6,
+              ),
+            ],
+          ),
+          child: AppBar(
+            title: const Text('Actualizar información'),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            centerTitle: true,
+            actions: [
+              IconButton(
+                onPressed: () async {
+                  _confirmDeleteAccount(context);
+                },
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.red,
                 ),
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-    body: Stack(
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 16.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        offset: const Offset(0, 2),
-                        blurRadius: 6,
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric( horizontal:  16.0),
-                    child: ExpansionTile(
-                      leading: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: (){}, 
-                        icon: const Icon( Icons.info )),
-                      title: const Text(
-                        'Información básica',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      initiallyExpanded: true,
-                      maintainState: true,
-                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
-                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
-                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
-                      backgroundColor: Colors.white,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-                      children: [ 
-                        Column(
-                          children: [
-                            const Divider(),
-                            const SizedBox(height: 10),
-                            CustomTextFormField(
-                              controller: nameController,
-                              placeholder: '    Nombre',
-                              icon: Icons.person,
-                              inputType: TextInputType.name,
-                            ),
-                            const SizedBox(height: 10),
-                            CustomTextFormField(
-                              controller: apellidoController,
-                              placeholder: '    Apellidos',
-                              icon: Icons.person,
-                              inputType: TextInputType.name,
-                            ),
-                            const SizedBox(height: 10),
-                            DropdownButtonFormField<String>(
-                              value: selectedRegion,
-                              items: regiones
-                                  .map((region) => DropdownMenuItem<String>(
-                                        value: region.name,
-                                        child: Text(region.name),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedRegion = value!;
-                                  selectedComuna = null;
-                                  comunas.clear();
-                                  _updateComunas(value);
-                                                    });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Región',
-                                prefixIcon: const Icon(Icons.home, color: Colors.grey),
-                                filled: true,
-                                fillColor: Colors.grey[200],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 10),
-                            DropdownButtonFormField<String>(
-                              value: selectedComuna,
-                              items: comunas
-                                  .map((comuna) => DropdownMenuItem<String>(
-                                        value: comuna,
-                                        child: Text(comuna),
-                                      ))
-                                  .toList(),
-                              onChanged: (value) {
-                                setState(() {
-                                  selectedComuna = value!;
-                                });
-                              },
-                              decoration: InputDecoration(
-                                labelText: 'Comuna',
-                                prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
-                                filled: true,
-                                fillColor: Colors.grey[200],
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
-                      ]
-                    ),
-                  )
-                ),
-                const SizedBox(height: 10),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        offset: const Offset(0, 2),
-                        blurRadius: 6,
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric( horizontal:  16.0),
-                    child: ExpansionTile(
-                      leading: IconButton(
-                        padding: EdgeInsets.zero,
-                        onPressed: (){}, 
-                        icon: const Icon( Icons.info )),
-                      title: const Text(
-                        'Información sensible',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      maintainState: true,
-                      tilePadding: EdgeInsets.zero, // Quita el padding del encabezado
-                      childrenPadding: EdgeInsets.zero, // Elimina el padding extra de los hijos
-                      collapsedBackgroundColor: Colors.white, // Asegura el fondo blanco cerrado
-                      backgroundColor: Colors.white,
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-                      collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-                      children: [ 
-                        Column(
-                          children: [
-                            const Divider(),
-                            const SizedBox(height: 10),
-                            CustomTextFormField(
-                              controller: passwordController,
-                              icon: Icons.lock,
-                              placeholder: 'Contraseña',
-                              isPassword: true,
-                            ),
-                            const SizedBox(height: 10),
-                            CustomTextFormField(
-                              controller: confirmPasswordController,
-                              icon: Icons.lock,
-                              placeholder: 'Repetir Contraseña',
-                              isPassword: true,
-                            ),
-                            const SizedBox(height: 15),
-                          ],
-                        ),
-                      ]
-                    ),
-                  )
-                ),
-                const SizedBox(height: 80), // Espacio para el botón
-              ],
-            ),
-          ),
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () async {
-                  final currentPasswordController = TextEditingController();
-
-                  await showDialog(
-                    context: context,
-                    builder: (context) {
-                      return AlertDialog(
-                        title: const Text('Confirmar actualización'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Text('Ingrese su contraseña actual para confirmar los cambios.'),
-                            const SizedBox(height: 10),
-                            TextField(
-                              controller: currentPasswordController,
-                              obscureText: true,
-                              decoration: const InputDecoration(
-                                labelText: 'Contraseña actual',
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop(); // Cerrar el diálogo sin realizar acción
-                            },
-                            child: const Text('Cancelar'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () async {
-                              if (currentPasswordController.text.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Por favor, ingrese su contraseña actual.')),
-                                );
-                                return;
-                              }
-                              Navigator.of(context).pop(currentPasswordController.text); // Devolver la contraseña ingresada
-                            },
-                            child: const Text('Confirmar'),
-                          ),
-                        ],
-                      );
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 16.0),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  UserFormSection(
+                    nombreController: nameController,
+                    apellidoController: apellidoController,
+                    initialRegion: selectedRegion,
+                    initialComuna: selectedComuna,
+                    onBasicInfoChanged: (data) {
+                      setState(() {
+                        selectedRegion = data['region'];
+                        selectedComuna = data['comuna'];
+                      });
                     },
-                  ).then((currentPassword) async {
-                    if (currentPassword == null) return; // Si no se ingresó contraseña, no continuar
+                  ),
+                  const SizedBox(height: 10),
+                  SensitiveInfoSection(
+                    passwordController: passwordController,
+                    confirmPasswordController: confirmPasswordController,
+                  ),
+                  const SizedBox(height: 80), // Espacio para el botón
+                ],
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () async {
+                    final currentPasswordController = TextEditingController();
 
-                    showLoadingMessage(context);
-
-                    final userServices = Provider.of<UserServices>(context, listen: false);
-                    final userData = userServices.usuario;
-
-                    final formData = {
-                      'nombre': capitalize(nameController.text),
-                      'apellidos': capitalize(apellidoController.text),
-                      'comuna': selectedComuna,
-                      'region': selectedRegion,
-                    };
-
-                    if (passwordController.text == confirmPasswordController.text) {
-                      try {
-                        await userServices.updateUser(
-                          userData.id!,
-                          formData,
-                          passwordController.text,
-                          currentPassword, // Contraseña actual ingresada
+                    await showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text('Confirmar actualización'),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              const Text('Ingrese su contraseña actual para confirmar los cambios.'),
+                              const SizedBox(height: 10),
+                              TextField(
+                                controller: currentPasswordController,
+                                obscureText: true,
+                                decoration: const InputDecoration(
+                                  labelText: 'Contraseña actual',
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Cerrar el diálogo sin realizar acción
+                              },
+                              child: const Text('Cancelar'),
+                            ),
+                            ElevatedButton(
+                              onPressed: () async {
+                                if (currentPasswordController.text.isEmpty) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Por favor, ingrese su contraseña actual.')),
+                                  );
+                                  return;
+                                }
+                                Navigator.of(context).pop(currentPasswordController.text); // Devolver la contraseña ingresada
+                              },
+                              child: const Text('Confirmar'),
+                            ),
+                          ],
                         );
+                      },
+                    ).then((currentPassword) async {
+                      if (currentPassword == null) return; // Si no se ingresó contraseña, no continuar
+
+                      showLoadingMessage(context);
+
+                      final userServices = Provider.of<UserServices>(context, listen: false);
+                      final userData = userServices.usuario;
+
+                      final formData = {
+                        'nombre': capitalize(nameController.text),
+                        'apellidos': capitalize(apellidoController.text),
+                        'comuna': selectedComuna,
+                        'region': selectedRegion,
+                      };
+
+                      if (passwordController.text == confirmPasswordController.text) {
+                        try {
+                          await userServices.updateUser(
+                            userData.id!,
+                            formData,
+                            passwordController.text,
+                            currentPassword, // Contraseña actual ingresada
+                          );
+                          hideLoadingMessage(context);
+                          Navigator.of(context).pop();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Información actualizada correctamente')),
+                          );
+                        } catch (e) {
+                          hideLoadingMessage(context);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text('Error al actualizar: $e')),
+                          );
+                        }
+                      } else {
                         hideLoadingMessage(context);
-                        Navigator.of(context).pop();
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Información actualizada correctamente')),
+                          const SnackBar(content: Text('Las contraseñas no coinciden.')),
                         );
-                      } catch (e) {
-                      hideLoadingMessage(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error al actualizar: $e')),
-                      );
-                    }
-                  } else {
-                    hideLoadingMessage(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Las contraseñas no coinciden.')),
-                    );
-                  }
-                });
-              },
-
-                child: const Text('Guardar'),
+                      }
+                    });
+                  },
+                  child: const Text('Guardar'),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
-void _confirmDeleteAccount(BuildContext context) {
-  final userServices = Provider.of<UserServices>(context, listen: false);
-  final TextEditingController passwordController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (context) {
-      return AlertDialog(
-        title: const Text('Eliminar cuenta'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: 'Contraseña',
-                border: OutlineInputBorder(),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(); // Cerrar el diálogo
-            },
-            child: const Text('Cancelar'),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              final password = passwordController.text.trim();
-
-              if (password.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Por favor, ingresa tu contraseña.'),
-                    backgroundColor: Colors.orange,
-                  ),
-                );
-                return;
-              }
-
-              try {
-                await userServices.deleteUser(
-                  userServices.usuario.id!,
-                  password,
-                );
-
-                showLoadingMessage(context);
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      'Usuario eliminado',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-                context.push('/');
-              } catch (error) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Error al eliminar la cuenta: $error',
-                      style: const TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-
-                Navigator.of(context).pop(); // Cerrar el diálogo
-                
-              } finally {
-                hideLoadingMessage(context);
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Eliminar', style: TextStyle(color: Colors.white)),
           ),
         ],
-      );
-    },
-  );
-}
+      ),
+    );
+  }
 
+  void _confirmDeleteAccount(BuildContext context) {
+    final userServices = Provider.of<UserServices>(context, listen: false);
+    final TextEditingController passwordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Eliminar cuenta'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                '¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.',
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: passwordController,
+                obscureText: true,
+                decoration: const InputDecoration(
+                  labelText: 'Contraseña',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Cerrar el diálogo
+              },
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final password = passwordController.text.trim();
+
+                if (password.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Por favor, ingresa tu contraseña.'),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                  return;
+                }
+
+                try {
+                  await userServices.deleteUser(
+                    userServices.usuario.id!,
+                    password,
+                  );
+
+                  showLoadingMessage(context);
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Usuario eliminado',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                  context.push('/');
+                } catch (error) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        'Error al eliminar la cuenta: $error',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+
+                  Navigator.of(context).pop(); // Cerrar el diálogo
+                } finally {
+                  hideLoadingMessage(context);
+                }
+              },
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

@@ -3,12 +3,10 @@ import 'package:bikynav/features/bikes/app/helpers/generate_qr_code.dart';
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:bikynav/features/bikes/presentation/screens/update_bike_data.dart';
-import 'package:bikynav/features/bikes/presentation/views/custom_bottom_navigation_bar.dart';
+import 'package:bikynav/shared/ui/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 class BikesScreen extends StatefulWidget {
   const BikesScreen({super.key});

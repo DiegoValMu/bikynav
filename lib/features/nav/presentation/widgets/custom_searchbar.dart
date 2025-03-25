@@ -1,9 +1,11 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/bikes/presentation/screens/update_bike_data.dart';
 import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/app/delegates/delegates.dart';
@@ -173,12 +175,39 @@ class _CustomSearchBarBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                const Expanded(
+                Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Divider(),
-                        BtnToggleUserRoute(),
+                        const Divider(),
+                        SizedBox(
+                          height: 70,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const BtnToggleUserRoute(),
+                              const VerticalDivider(width: 20, thickness: 1),
+                              InkWell(
+                                onTap: () {
+                                  context.push('/scanner_qr');
+                                },
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric( vertical: 10, horizontal: 20 ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon( Icons.qr_code_scanner ),
+                                      Text('Escanear QR'),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Divider(),
+                        
                       ],
                     ),
                   ),

@@ -1,9 +1,8 @@
 
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
-import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
-import 'package:bikynav/features/route/config/models/routesById.dart';
+import 'package:bikynav/shared/ui/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -32,7 +31,7 @@ class RouteScreen extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.2), // Color de la sombra
-                offset: Offset(0, 4), // Sombra hacia abajo
+                offset: const Offset(0, 4), // Sombra hacia abajo
                 blurRadius: 6, // Difusión de la sombra
               ),
             ],
@@ -50,6 +49,7 @@ class RouteScreen extends StatelessWidget {
           },
         ),
       ),
+      bottomNavigationBar: const BuildBottomNavigationBar(),
     );
   }
 
@@ -71,13 +71,6 @@ class RouteScreen extends StatelessWidget {
       elevation: 0,
       backgroundColor: Colors.transparent,
       centerTitle: true,
-      actions: [
-        IconButton(
-          onPressed: () => _inputRoute(context),
-          icon: const Icon(Icons.link),
-          color: Colors.deepPurple,
-        ),
-      ],
     );
   }
 
@@ -90,6 +83,7 @@ class RouteScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
+          margin: EdgeInsets.only( top: 10),
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,
@@ -97,36 +91,36 @@ class RouteScreen extends StatelessWidget {
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+                blurRadius: 15,
+                offset: const Offset(0, 1),
               ),
             ],
           ),
           child: ListTile(
             trailing: IconButton(
-              onPressed: () {
-                _deleteRoute(context, route.id!, routeServices);
-              },
-              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () => _shareRoute(context, route),
+              icon: const Icon(Icons.share, color: Colors.green),
             ),
+            contentPadding: EdgeInsets.only( top: 10 ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Divider(),
-                Text('Duración: ${tripDuration} minutos'),
-                Text('Distancia: ${distance} kms'),
+                Text('Duración: $tripDuration minutos'),
+                Text('Distancia: $distance kms'),
                 const SizedBox(height: 10),
               ],
             ),
             title: Text(route.etiqueta ?? 'Ruta sin nombre', style: const TextStyle(fontWeight: FontWeight.bold)),
             leading: IconButton(
-              onPressed: () => _shareRoute(context, route),
-              icon: const Icon(Icons.share, color: Colors.green),
+              onPressed: () {
+                _deleteRoute(context, route.id!, routeServices);
+              },
+              icon: const Icon(Icons.delete, color: Colors.red),
             ),
             onTap: () => _onRouteTap(context, route, mapBloc, routeServices),
           ),
         ),
-        const Divider(),
       ],
     );
   }
@@ -181,99 +175,5 @@ class RouteScreen extends StatelessWidget {
     context.push('/nav');
   }
 
-  Future<void> _inputRoute(BuildContext context) {
-    final routeServices = Provider.of<RouteServices>(context, listen: false);
-    final TextEditingController idController = TextEditingController();
-    final mapBloc = BlocProvider.of<MapBloc>(context);
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Ingresar ruta'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Ingrese el código para acceder a la ruta.'),
-              const SizedBox(height: 16),
-              TextField(
-                controller: idController,
-                decoration: const InputDecoration(
-                  labelText: 'Código',
-                  border: OutlineInputBorder(),
-                ),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Cancelar'),
-            ),
-            FilledButton(
-              onPressed: () async {
-                final idEncode = idController.text.trim();
-
-                if (idEncode.isEmpty) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Por favor, ingresa un código.')));
-                  return;
-                }
-
-                try {
-                  final idRoute = decodificarID(idController.text);
-                  Ruta routeById = await routeServices.getRouteById(idRoute);
-
-                  final startMarker = Marker(
-                    markerId: const MarkerId('start'),
-                    position: routeById.ubicacionInicial,
-                    infoWindow: const InfoWindow(title: 'Ubicación inicial'),
-                  );
-
-                  final endMarker = Marker(
-                    markerId: const MarkerId('end'),
-                    position: routeById.ubicacionFinal,
-                    infoWindow: InfoWindow(title: 'Destino', snippet: routeById.etiqueta),
-                  );
-
-                  final currentPolylines = Map<String, Polyline>.from(mapBloc.state.polylines);
-                  final points = routeById.rutaDetalles.points;
-                  final myRoute = Polyline(
-                    polylineId: const PolylineId('route'),
-                    color: Colors.black,
-                    width: 5,
-                    points: points,
-                    startCap: Cap.roundCap,
-                    endCap: Cap.roundCap,
-                  );
-
-                  final currentMarkers = Map<String, Marker>.from(mapBloc.state.markers);
-                  currentMarkers['start'] = startMarker;
-                  currentMarkers['end'] = endMarker;
-                  currentPolylines['route'] = myRoute;
-
-                  mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
-                  mapBloc.add(OnInitRoute());
-
-                  routeServices.myRoute.etiqueta = routeById.etiqueta;
-                  routeServices.myRoute.distancia = routeById.calcularDistancia();
-                  routeServices.myRoute.tiempoUtilizado = routeById.tiempo;
-
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccionaste ${routeById.etiqueta}')));
-                  context.push('/nav');
-                } catch (error) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al ingresar la ruta: $error')));
-                  Navigator.of(context).pop();
-                } finally {
-                  hideLoadingMessage(context);
-                }
-              },
-              child: const Text('Confirmar', style: TextStyle(color: Colors.white)),
-            ),
-          ],
-        );
-      },
-    );
-  }
+  
 }

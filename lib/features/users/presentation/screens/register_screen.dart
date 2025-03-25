@@ -1,16 +1,15 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:convert';
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
-import 'package:bikynav/features/users/config/models/country.dart';
+import 'package:bikynav/features/users/presentation/views/sensitive_info_section.dart';
+import 'package:bikynav/features/users/presentation/views/user_form.dart';
+import 'package:bikynav/features/users/presentation/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:go_router/go_router.dart';
-import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class RegisterScreen extends StatelessWidget {
   const RegisterScreen({super.key});
@@ -54,25 +53,23 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  List<Region> regiones = [];
-  List<String> comunas = [];
-  String? selectedRegion;
-  String? selectedComuna;
-
-  bool _isKeyboardVisible = false; 
+  bool _isKeyboardVisible = false;
+  Map<String, String> _basicInfo = {};
 
   @override
   void initState() {
     super.initState();
-    _loadRegionsAndComunas();
-
     WidgetsBinding.instance.addObserver(this);
   }
 
- 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _emailController.dispose();
+    _nombreController.dispose();
+    _apellidoController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -82,19 +79,6 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
     setState(() {
       _isKeyboardVisible = bottomInset > 0;
     });
-  }
-
-  Future<void> _loadRegionsAndComunas() async {
-    final response = await rootBundle.loadString('assets/data/regiones_comunas.json');
-    final countryData = CountryData.fromMap(json.decode(response));
-    setState(() => regiones = countryData.regions);
-  }
-
-  void _updateComunas(String regionName) async {
-    final response = await rootBundle.loadString('assets/data/regiones_comunas.json');
-    final countryData = CountryData.fromMap(json.decode(response));
-    final selectedRegion = countryData.regions.firstWhere((region) => region.name == regionName);
-    setState(() => comunas = selectedRegion.communes.map((commune) => commune.name).toList());
   }
 
   String capitalize(String text) => text.isEmpty ? text : text[0].toUpperCase() + text.substring(1);
@@ -109,130 +93,101 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildSection(
+                _buildSection( // Usando el _buildSection original
                   title: 'Información básica',
                   children: [
                     const Divider(),
-                    const SizedBox(height: 10,),
+                    const SizedBox(height: 10),
                     CustomTextFormField(controller: _emailController, icon: Icons.email, placeholder: 'Correo electronico', inputType: TextInputType.emailAddress),
-                    const SizedBox(height: 10,),
-                    CustomTextFormField(controller: _nombreController, icon: Icons.person, placeholder: 'Nombre', inputType: TextInputType.name),
-                    const SizedBox(height: 10,),
-                    CustomTextFormField(controller: _apellidoController, icon: Icons.person, placeholder: 'Apellido', inputType: TextInputType.name),
-                    const SizedBox(height: 10,),
-                    _buildDropdown(
-                      value: selectedRegion,
-                      label: 'Región',
-                      items: regiones.map((region) => region.name).toList(),
-                      onChanged: (value) {
-                        setState(() {
-                          selectedRegion = value;
-                          selectedComuna = null;
-                          comunas.clear();
-                          if (value != null) _updateComunas(value);
-                        });
+                    const SizedBox(height: 10),
+                    UserFormSection(
+                      nombreController: _nombreController,
+                      apellidoController: _apellidoController,
+                      onBasicInfoChanged: (data) {
+                        _basicInfo = data;
                       },
                     ),
-                    const SizedBox(height: 10,),
-                    _buildDropdown(
-                      value: selectedComuna,
-                      label: 'Comuna',
-                      items: comunas,
-                      onChanged: (value) => setState(() => selectedComuna = value),
-                    ),
-                    const SizedBox(height: 10,),
                   ],
                 ),
                 const SizedBox(height: 10),
-                _buildSection(
-                  title: 'Información sensible',
-                  children: [
-                    const Divider(),
-                    const SizedBox(height: 10,),
-                    CustomTextFormField(controller: _passwordController, icon: Icons.lock, placeholder: 'Contraseña', isPassword: true),
-                    const SizedBox(height: 10,),
-                    CustomTextFormField(controller: _confirmPasswordController, icon: Icons.lock, placeholder: 'Repetir Contraseña', isPassword: true),
-                    const SizedBox(height: 10,),
-                  ],
+                SensitiveInfoSection(
+                  passwordController: _passwordController,
+                  confirmPasswordController: _confirmPasswordController,
                 ),
               ],
             ),
           ),
         ),
-        (_isKeyboardVisible)
-        ? Text('')
-        : Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
-            child: SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: () async {
-                  showLoadingMessage(context);
-                  final email = _emailController.text.trim();
-                  final password = _passwordController.text.trim();
-                  final confirmPassword = _confirmPasswordController.text.trim();
+        if (!_isKeyboardVisible)
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: () async {
+                    showLoadingMessage(context);
+                    final email = _emailController.text.trim();
+                    final password = _passwordController.text.trim();
+                    final confirmPassword = _confirmPasswordController.text.trim();
 
-                  if (password != confirmPassword) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Las contraseñas no coinciden")),
-                    );
-                    Navigator.of(context).pop();
-                    return;
-                  }
-
-                  try {
-                    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-                      email: email,
-                      password: password,
-                    );
-
-                    final user = <String, dynamic>{
-                      'email': email,
-                      'nombre': capitalize(_nombreController.text.trim()),
-                      'apellidos': capitalize(_apellidoController.text.trim()),
-                      'comuna': selectedComuna,
-                      'region': selectedRegion,
-                    };
-
-                    try {
-                      final userServices = Provider.of<UserServices>(context, listen: false);
-                      await userServices.userRegister(user);
-
-                      await FirebaseFirestore.instance.collection("users").add(user);
-
-                    } catch (e) {
+                    if (password != confirmPassword) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Problemas con el servicio")),
+                        const SnackBar(content: Text("Las contraseñas no coinciden")),
                       );
                       Navigator.of(context).pop();
                       return;
                     }
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Usuario registrado correctamente'),
-                        backgroundColor: Colors.green,
-                      ),
-                    );
+                    try {
+                      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+                        email: email,
+                        password: password,
+                      );
 
-                    context.go('/login');
+                      final user = <String, dynamic>{
+                        'email': email,
+                        'nombre': capitalize(_nombreController.text.trim()),
+                        'apellidos': capitalize(_apellidoController.text.trim()),
+                        'comuna': _basicInfo['comuna'],
+                        'region': _basicInfo['region'],
+                      };
 
-                  } on FirebaseAuthException catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? "Error desconocido")));
-                    Navigator.of(context).pop();
-                  } finally {
-                    if (Navigator.of(context).canPop()) {
-                      Navigator.of(context).pop(); 
+                      try {
+                        final userServices = Provider.of<UserServices>(context, listen: false);
+                        await userServices.userRegister(user);
+                        await FirebaseFirestore.instance.collection("users").add(user);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("Problemas con el servicio")),
+                        );
+                        Navigator.of(context).pop();
+                        return;
+                      }
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Usuario registrado correctamente'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+
+                      context.go('/login');
+                    } on FirebaseAuthException catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message ?? "Error desconocido")));
+                      Navigator.of(context).pop();
+                    } finally {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
                     }
-                  }
-                },
-                child: const Text('Registrar'),
+                  },
+                  child: const Text('Registrar'),
+                ),
               ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -243,10 +198,11 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2), 
-            offset: const Offset(0, 2), 
-            blurRadius: 6)
-          ],
+            color: Colors.black.withOpacity(0.2),
+            offset: const Offset(0, 2),
+            blurRadius: 6,
+          )
+        ],
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -263,29 +219,6 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
           collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
           children: children,
         ),
-      ),
-    );
-  }
-
-  Widget _buildDropdown({
-    required String? value,
-    required String label,
-    required List<String> items,
-    required void Function(String?) onChanged,
-  }) {
-    return DropdownButtonFormField<String>(
-      value: value,
-      items: items.map((item) => DropdownMenuItem<String>(value: item, child: Text(item))).toList(),
-      onChanged: onChanged,
-      decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
-        filled: true,
-        fillColor: Colors.grey[200],
-        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Theme.of(context).primaryColor)),
       ),
     );
   }

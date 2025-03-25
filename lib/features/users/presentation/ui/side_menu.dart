@@ -25,7 +25,7 @@ class SideMenu extends StatelessWidget {
     final userServices = Provider.of<UserServices>(context);
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
       transform: Matrix4.translationValues(
           isMenuOpen ? 0 : -MediaQuery.of(context).size.width, 0, 0),
@@ -211,8 +211,7 @@ class SideMenu extends StatelessWidget {
     );
   }
 
-  Future<void> _loadAndNavigate(
-      BuildContext context, Future<void> loadAction, String route) async {
+  Future<void> _loadAndNavigate(BuildContext context, Future<void> loadAction, String route) async {
     showLoadingMessage(context);
     await loadAction;
     hideLoadingMessage(context);

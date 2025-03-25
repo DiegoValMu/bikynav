@@ -19,37 +19,34 @@ class BtnToggleUserRoute extends StatelessWidget {
 
     final LatLng? position = locationBloc.state.lastKnowlocation;
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      child: ListTile(
-        leading: const Icon(Icons.route), // Icono que representa la acción
-        title: const Text('Trazar ruta'), // Título
-        onTap: () {
-
-          stopwatchProvider.resetTimer();
-
-
-
-          final startMarker = Marker(
-            markerId: const MarkerId('start'),
-            position: position!,
-            infoWindow: const InfoWindow(
-              title: 'Ubicación inicial',
-            )
-          );
-
-          final currentMarkers = Map<String, Marker>.from( mapBloc.state.markers );
-          currentMarkers['start'] = startMarker;
-
-          mapBloc.add( DisplayMarkerEvent( currentMarkers ) );
-        //como hago para agregar este marcador al state
-          
-          mapBloc.add(OnToggleUserRoute());
-          locationBloc.add( OnNewRouteEvent(position));
-          mapBloc.add(OnInitRoute());
-
-        },
+    return InkWell(
+      child: const Padding(
+        padding: EdgeInsets.symmetric( vertical: 10, horizontal: 20 ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.route),
+            Text('Trazar ruta'),
+          ],
+        ),
       ),
+      onTap: () {
+        stopwatchProvider.resetTimer();
+        final startMarker = Marker(
+          markerId: const MarkerId('start'),
+          position: position!,
+          infoWindow: const InfoWindow(
+            title: 'Ubicación inicial',
+          )
+        );
+        final currentMarkers = Map<String, Marker>.from( mapBloc.state.markers );
+        currentMarkers['start'] = startMarker;
+        mapBloc.add( DisplayMarkerEvent( currentMarkers ) );
+        
+        mapBloc.add(OnToggleUserRoute());
+        locationBloc.add( OnNewRouteEvent(position));
+        mapBloc.add(OnInitRoute());
+      },
     );
   }
 }
