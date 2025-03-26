@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
-import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/features/bikes/presentation/views/basic_bike_form_fields.dart';
 import 'package:bikynav/features/bikes/presentation/views/technical_bike_form_fields.dart';
@@ -212,7 +211,6 @@ class _BikeFormState extends State<BikeForm> with WidgetsBindingObserver {
 
   Widget _buildBottomButton(BuildContext context) {
     final userServices = Provider.of<UserServices>(context, listen: false);
-    final bikeServices = Provider.of<BikeServices>(context, listen: false);
 
     return Align(
       alignment: Alignment.bottomCenter,

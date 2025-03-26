@@ -1,6 +1,5 @@
-import 'dart:convert';
+
 import 'package:bikynav/features/bikes/app/helpers/blinking_cornes.dart';
-import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
