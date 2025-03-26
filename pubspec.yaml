@@ -43,6 +43,7 @@ flutter:
   assets:
     - assets/images/
     - assets/data/
+    - assets/markers/
 
 flutter_icons:
   android: true

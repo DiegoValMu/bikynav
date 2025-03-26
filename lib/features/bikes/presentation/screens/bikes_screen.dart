@@ -1,8 +1,6 @@
-
-import 'package:bikynav/features/bikes/app/helpers/generate_qr_code.dart';
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
-import 'package:bikynav/features/bikes/presentation/screens/update_bike_data.dart';
+import 'package:bikynav/features/bikes/presentation/views/show_bike_details.dart';
 import 'package:bikynav/shared/ui/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,48 +62,7 @@ class _BikesScreenState extends State<BikesScreen> {
                 child: _buildAppBar(),
               ),
             ),
-            body: Padding(
-              padding: EdgeInsets.zero,
-              child: ListView(
-                children: groupedBikes.entries.map((entry) {
-                  Map<String, String> bikeTypeBackgrounds = {
-                    'Ruta': 'assets/images/ruta.png',
-                    'MTB': 'assets/images/mtb.png',
-                    'Urbana': 'assets/images/urbana.png',
-                  };
-                  String backgroundImage = bikeTypeBackgrounds[entry.key] ?? 'assets/images/noimage.jpg';
-                  return Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage(backgroundImage),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Text(
-                            entry.key,
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: _buildBikeRow(entry.value, entry.key, context),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
+            body: _bodyBikeScreen(groupedBikes, context),
             bottomNavigationBar: const BuildBottomNavigationBar(),
           );
         } else {
@@ -114,6 +71,51 @@ class _BikesScreenState extends State<BikesScreen> {
       },
     );
   }
+
+Padding _bodyBikeScreen(Map<String, List<Bikes>> groupedBikes, BuildContext context) {
+  return Padding(
+            padding: EdgeInsets.zero,
+            child: ListView(
+              children: groupedBikes.entries.map((entry) {
+                Map<String, String> bikeTypeBackgrounds = {
+                  'Ruta': 'assets/images/ruta.png',
+                  'MTB': 'assets/images/mtb.png',
+                  'Urbana': 'assets/images/urbana.png',
+                };
+                String backgroundImage = bikeTypeBackgrounds[entry.key] ?? 'assets/images/noimage.jpg';
+                return Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(backgroundImage),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(
+                          entry.key,
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: _buildBikeRow(entry.value, entry.key, context),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          );
+}
 
   Widget _buildBikeRow(List<Bikes> bikes, String bikeType, BuildContext context) {
     return SingleChildScrollView(
@@ -156,7 +158,7 @@ class _BikesScreenState extends State<BikesScreen> {
   GestureDetector _bikesList(Bikes bike, BuildContext context) {
     return GestureDetector(
       onTap: () {
-        _showBikeDetails(context, bike); // Mostramos el Dialog con los detalles
+        showBikeDetails(context, bike); // Mostramos el Dialog con los detalles
       },
       child: SlideInRight(
         child: Card(
@@ -188,92 +190,5 @@ class _BikesScreenState extends State<BikesScreen> {
     );
   }
 
-  void _showBikeDetails(BuildContext context, Bikes bike) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return ZoomIn(
-          child: AlertDialog(
-            shadowColor: Colors.black,
-            backgroundColor: Colors.white,
-            title: null,
-            actionsAlignment: MainAxisAlignment.center,
-            actions: [
-              FilledButton.icon(
-                onPressed: () {
-                  generateQRCode(context, bike);
-                },
-                label: const Text('Generar QR'),
-                icon: const Icon( Icons.qr_code ),
-              ),
-            ],
-            content: Stack(
-              children: [
-                SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        'assets/images/noimage.jpg',
-                        width: 250,
-                        height: 300,
-                      ),
-                      _buildInfoRow('Marca', '${bike.marca}'),
-                      _buildInfoRow('Modelo', '${bike.modelo}'),
-                      _buildInfoRow('Aro', '${bike.aro}'),
-                      _buildInfoRow('Tipo', '${bike.tipo}'),
-                      _buildInfoRow('Talla', '${bike.talla}'),
-                      _buildInfoRow('color', '${bike.colorPrincipal}'),
-                      _buildInfoRow('Modelo del cuadro', '${bike.modeloCuadro}'),
-                      _buildInfoRow('Codigo de serie', '${bike.codigoSerie}'),
-                    ],
-                  ),
-                ),
-                
-                Positioned(
-                  right: 0,
-                  top: 0,
-                  child: FilledButton(
-                    onPressed: () {
-                      //final bikeSelect = bike.toJson();
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UpdateBikeDataScreen(bike: bike), // Pasa el objeto Bikes aquí
-                        ),
-                      );
-                    },
-                    child: const Icon( Icons.edit, size: 20, ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildInfoRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 1, horizontal: 5 ),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 3,
-            child: Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(value),
-          ),
-        ],
-      ),
-    );
-  }
+  
 }

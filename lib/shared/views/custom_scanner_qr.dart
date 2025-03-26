@@ -1,5 +1,6 @@
 
 import 'package:bikynav/features/bikes/app/helpers/blinking_cornes.dart';
+import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
@@ -14,6 +15,7 @@ class _ScannerQrState extends State<ScannerQr> {
   Barcode? _barcode;
   bool _isTorchOn = false;
   MobileScannerController cameraController = MobileScannerController();
+  Bikes? bike;
 
   @override
   void initState() {
@@ -51,7 +53,9 @@ class _ScannerQrState extends State<ScannerQr> {
       );
     }
 
-    return Text(
+    return 
+    
+    Text(
       value.displayValue ?? 'No hay datos relacionados',
       overflow: TextOverflow.fade,
       style: const TextStyle(color: Colors.white),

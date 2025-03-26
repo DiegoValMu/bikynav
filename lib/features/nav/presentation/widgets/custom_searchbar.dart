@@ -1,9 +1,8 @@
 
 import 'package:animate_do/animate_do.dart';
-import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
+import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/app/delegates/delegates.dart';
@@ -132,16 +131,7 @@ class _CustomSearchBarBody extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Barra decorativa (similar a Waze)
-                Container(
-                  height: 5, // Altura de la barra decorativa
-                  width: 40, // Anchura de la barra
-                  margin: const EdgeInsets.only(top: 8, bottom: 10), // Margen para separación
-                  decoration: BoxDecoration(
-                    color: Colors.grey[400], // Color de la barra decorativa
-                    borderRadius: BorderRadius.circular(10), // Esquinas redondeadas
-                  ),
-                ),
+                const DecorativeBar(),
                 GestureDetector(
                   onTap: () async {
                     final result = await showSearch(
@@ -168,39 +158,13 @@ class _CustomSearchBarBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                Expanded(
+                const Expanded(
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        const Divider(),
-                        SizedBox(
-                          height: 70,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const BtnToggleUserRoute(),
-                              const VerticalDivider(width: 20, thickness: 1),
-                              InkWell(
-                                onTap: () {
-                                  context.push('/scanner_qr');
-                                },
-                                child: const Padding(
-                                  padding: EdgeInsets.symmetric( vertical: 10, horizontal: 20 ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon( Icons.qr_code_scanner ),
-                                      Text('Escanear QR'),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Divider(),
-                        
+                        Divider(),
+                        NavOptions(),
+                        Divider(),
                       ],
                     ),
                   ),
@@ -214,3 +178,7 @@ class _CustomSearchBarBody extends StatelessWidget {
     );
   }
 }
+
+
+
+
