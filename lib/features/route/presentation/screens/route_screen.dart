@@ -2,6 +2,7 @@
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
+import 'package:bikynav/features/route/presentation/ui/set_route.dart';
 import 'package:bikynav/shared/ui/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,7 +50,23 @@ class RouteScreen extends StatelessWidget {
           },
         ),
       ),
-      bottomNavigationBar: const BuildBottomNavigationBar(),
+      bottomNavigationBar: BuildBottomNavigationBar(items: [
+        BottomNavigationBarItemData(
+          icon: Icons.search,
+          label: 'Buscar',
+          onPressed: () => context.push('/search_route'),
+        ),
+        BottomNavigationBarItemData(
+          icon: Icons.qr_code_scanner,
+          label: 'Escanear QR',
+          onPressed: () => context.push('/scanner_qr'),
+        ),
+        BottomNavigationBarItemData(
+          icon: Icons.ios_share_outlined,
+          label: 'Codigo Ruta',
+          onPressed: () => inputRoute(context), // Asegúrate de que _inputRoute esté accesible o pásala si es necesario
+        ),
+      ],),
     );
   }
 

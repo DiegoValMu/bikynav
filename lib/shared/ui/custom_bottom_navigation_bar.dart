@@ -1,24 +1,27 @@
-
-import 'package:animate_do/animate_do.dart';
-import 'package:bikynav/features/nav/app/blocs/map/map_bloc.dart';
-import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
-import 'package:bikynav/features/route/app/services/route_service.dart';
-import 'package:bikynav/features/route/app/utils/id_utils.dart';
-import 'package:bikynav/features/route/config/models/routesById.dart';
+import 'package:bikynav/shared/views/nav_items.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:provider/provider.dart';
+
+class BottomNavigationBarItemData {
+  final IconData icon;
+  final String label;
+  final VoidCallback onPressed;
+  final Color? color;
+
+  BottomNavigationBarItemData({
+    required this.icon,
+    required this.label,
+    required this.onPressed,
+    this.color,
+  });
+}
 
 class BuildBottomNavigationBar extends StatelessWidget {
-  const BuildBottomNavigationBar({super.key});
+  final List<BottomNavigationBarItemData> items;
+
+  const BuildBottomNavigationBar({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
-
-    final String currentRoute = GoRouter.of(context).routeInformationProvider.value.uri.toString();
-
     return Container(
       decoration: BoxDecoration(
         boxShadow: [
@@ -36,165 +39,13 @@ class BuildBottomNavigationBar extends StatelessWidget {
         color: Colors.white,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildNavItem(
-              context,
-              Icons.search,
-              'Buscar',
-              () => context.push('/search_route'),
-            ),
-            const VerticalDivider(width: 20, thickness: 1),
-            _buildNavItem(
-              context,
-              Icons.qr_code_scanner,
-              'Escanear QR',
-              (){
-                context.push('/scanner_qr');
-              },
-            ),
-            const VerticalDivider(width: 20, thickness: 1),
-            ( currentRoute == '/route' )
-            ? _buildNavItem(
-              context,
-              Icons.ios_share_outlined,
-              'Codigo Ruta',
-              () { 
-                _inputRoute(context);
-              },
-            )
-            : ( currentRoute == '/bikes' )
-              ? Text('')
-              : _buildNavItem(
-                context,
-                Icons.add_circle,
-                'Agregar',
-                () async { 
-                  showLoadingMessage(context);
-                  await Future.delayed(Duration(milliseconds: 500)); 
-                  await context.push('/add_bike');
-                  hideLoadingMessage(context);
-                },
-              ),
-          ],
+          children: buildNavItems(context, items),
         ),
       ),
     );
   }
 
+  
 
-  Widget _buildNavItem(BuildContext context, IconData icon, String label, VoidCallback onPressed, {Color? color}) {
-    return InkWell(
-      onTap: onPressed,
-      child: Padding(
-        padding: const EdgeInsets.symmetric( horizontal: 10 ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: color),
-            Text(label),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _inputRoute(BuildContext context) {
-    final routeServices = Provider.of<RouteServices>(context, listen: false);
-    final TextEditingController idController = TextEditingController();
-    final mapBloc = BlocProvider.of<MapBloc>(context);
-
-    return showDialog(
-      context: context,
-      builder: (context) {
-        return ZoomIn(
-          child: AlertDialog(
-            backgroundColor: Colors.white,
-            title: const Text('Ingresar ruta'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Text('Ingrese el código para acceder a la ruta.'),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: idController,
-                  decoration: const InputDecoration(
-                    labelText: 'Código',
-                    border: OutlineInputBorder(),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('Cancelar'),
-              ),
-              FilledButton(
-                onPressed: () async {
-                  final idEncode = idController.text.trim();
-          
-                  if (idEncode.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Por favor, ingresa un código.')));
-                    return;
-                  }
-          
-                  try {
-                    final idRoute = decodificarID(idController.text);
-                    Ruta routeById = await routeServices.getRouteById(idRoute);
-          
-                    final startMarker = Marker(
-                      markerId: const MarkerId('start'),
-                      position: routeById.ubicacionInicial,
-                      infoWindow: const InfoWindow(title: 'Ubicación inicial'),
-                    );
-          
-                    final endMarker = Marker(
-                      markerId: const MarkerId('end'),
-                      position: routeById.ubicacionFinal,
-                      infoWindow: InfoWindow(title: 'Destino', snippet: routeById.etiqueta),
-                    );
-          
-                    final currentPolylines = Map<String, Polyline>.from(mapBloc.state.polylines);
-                    final points = routeById.rutaDetalles.points;
-                    final myRoute = Polyline(
-                      polylineId: const PolylineId('route'),
-                      color: Colors.black,
-                      width: 5,
-                      points: points,
-                      startCap: Cap.roundCap,
-                      endCap: Cap.roundCap,
-                    );
-          
-                    final currentMarkers = Map<String, Marker>.from(mapBloc.state.markers);
-                    currentMarkers['start'] = startMarker;
-                    currentMarkers['end'] = endMarker;
-                    currentPolylines['route'] = myRoute;
-          
-                    mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
-                    mapBloc.add(OnInitRoute());
-          
-                    routeServices.myRoute.etiqueta = routeById.etiqueta;
-                    routeServices.myRoute.distancia = routeById.calcularDistancia();
-                    routeServices.myRoute.tiempoUtilizado = routeById.tiempo;
-          
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccionaste ${routeById.etiqueta}')));
-                    context.push('/nav');
-                  } catch (error) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al ingresar la ruta: $error')));
-                    Navigator.of(context).pop();
-                  } finally {
-                    hideLoadingMessage(context);
-                  }
-                },
-                child: const Text('Confirmar', style: TextStyle(color: Colors.white)),
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
+  
 }

@@ -1,8 +1,10 @@
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:bikynav/features/bikes/presentation/views/show_bike_details.dart';
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/shared/ui/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:animate_do/animate_do.dart';
 
@@ -63,7 +65,29 @@ class _BikesScreenState extends State<BikesScreen> {
               ),
             ),
             body: _bodyBikeScreen(groupedBikes, context),
-            bottomNavigationBar: const BuildBottomNavigationBar(),
+            bottomNavigationBar: BuildBottomNavigationBar(
+              items: [
+                BottomNavigationBarItemData(
+                  icon: Icons.search,
+                  label: 'Buscar',
+                  onPressed: () => context.push('/search_route'),
+                ),
+                BottomNavigationBarItemData(
+                  icon: Icons.qr_code_scanner,
+                  label: 'Escanear QR',
+                  onPressed: () => context.push('/scanner_qr'),
+                ),
+                BottomNavigationBarItemData(
+                  icon: Icons.add_circle,
+                  label: 'Agregar',
+                  onPressed: () async {
+                    showLoadingMessage(context);
+                    await Future.delayed(Duration(milliseconds: 500));
+                    await context.push('/add_bike');
+                    hideLoadingMessage(context);
+                  },
+                ),
+              ],),
           );
         } else {
           return const Center(child: CircularProgressIndicator( backgroundColor: Colors.white,));

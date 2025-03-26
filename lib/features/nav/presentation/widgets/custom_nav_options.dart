@@ -1,4 +1,5 @@
 import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
+import 'package:bikynav/shared/views/nav_items.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -17,36 +18,22 @@ class NavOptions extends StatelessWidget {
         children: [
           const BtnToggleUserRoute(),
           const VerticalDivider(width: 20, thickness: 1),
-          InkWell(
-            onTap: () {
+          buildNavItem(
+            context, 
+            Icons.qr_code_scanner, 
+            'Escanear QR', 
+            () {
               context.push('/scanner_qr');
-            },
-            child: const Padding(
-              padding: EdgeInsets.symmetric( vertical: 10, horizontal: 10 ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon( Icons.qr_code_scanner ),
-                  Text('Escanear QR'),
-                ],
-              ),
-            ),
+            }
           ),
           const VerticalDivider(width: 20, thickness: 1),
-          InkWell(
-            onTap: () {
-              
-            },
-            child: const Padding(
-              padding: EdgeInsets.symmetric( vertical: 10, horizontal: 10 ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon( Icons.push_pin ),
-                  Text('Poner marcador'),
-                ],
-              ),
-            ),
+          buildNavItem(
+            context, 
+            Icons.push_pin, 
+            'Poner marcador', 
+            () {
+              context.push('/scanner_qr');
+            }
           ),
         ],
       ),
