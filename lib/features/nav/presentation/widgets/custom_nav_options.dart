@@ -30,7 +30,7 @@ class NavOptions extends StatelessWidget {
           buildNavItem(
             context, 
             Icons.push_pin, 
-            'Poner marcador', 
+            'Colocar pin', 
             () {
               context.push('/scanner_qr');
             }

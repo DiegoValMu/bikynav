@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
@@ -8,9 +10,9 @@ Future<void> generateQRCode(BuildContext context, dynamic data, String type) asy
   try {
     String qrValidationData = '';
     if (type == 'bike' && data is Bikes) {
-      qrValidationData = 'bike:${data.toJson().toString()}';
-    } else if (type == 'route' && data is BikeRoute) {
-      qrValidationData = 'route:${ data.toJson().toString() }';
+      qrValidationData = 'bike:${jsonEncode(data.toJson())}';
+    } else if (type == 'route' && data is String) {
+      qrValidationData = 'route:${ jsonEncode(data) }';
     } else {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Tipo de datos no válido para generar QR")));
       return;

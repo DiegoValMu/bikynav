@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../app/services/user_services.dart';
+import '../../features/users/app/services/user_services.dart';
 
 class SideMenu extends StatelessWidget {
   final bool isMenuOpen;
@@ -55,6 +55,7 @@ class SideMenu extends StatelessWidget {
             children: [
               Expanded(
                 child: ListView(
+                  physics: const NeverScrollableScrollPhysics(),
                   children: [
                     _buildUserProfile(context, userServices),
                     _buildMenuItem(
@@ -64,10 +65,8 @@ class SideMenu extends StatelessWidget {
                       '/bikes',
                       'assets/images/1.png',
                       () async {
-                        final bikeServices =
-                            Provider.of<BikeServices>(context, listen: false);
-                        await _loadAndNavigate(
-                            context, bikeServices.getBikes(userServices.usuario.id!), '/bikes');
+                        final bikeServices = Provider.of<BikeServices>(context, listen: false);
+                        await _loadAndNavigate(context, bikeServices.getBikes(userServices.usuario.id!), '/bikes');
                       },
                     ),
                     _buildMenuItem(
@@ -77,10 +76,8 @@ class SideMenu extends StatelessWidget {
                       '/route',
                       'assets/images/2.png',
                       () async {
-                        final routeServices =
-                            Provider.of<RouteServices>(context, listen: false);
-                        await _loadAndNavigate(
-                            context, routeServices.getRoutes(userServices.usuario.id!), '/route');
+                        final routeServices = Provider.of<RouteServices>(context, listen: false);
+                        await _loadAndNavigate(  context, routeServices.getRoutes(userServices.usuario.id!), '/route');
                       },
                     ),
                     _buildMenuItem(
