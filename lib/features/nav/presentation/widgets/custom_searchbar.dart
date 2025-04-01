@@ -113,15 +113,14 @@ class _CustomSearchBarBody extends StatelessWidget {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200), // Duración de la animación
           height: height, // Ajusta la altura según el valor pasado
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white, // Color de fondo de la barra de búsqueda
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)), // Esquinas redondeadas (opcional)
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Esquinas redondeadas (opcional)
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2), // Color de la sombra
-                spreadRadius: 2, // Expansión de la sombra
-                blurRadius: 8, // Desenfoque de la sombra
-                offset: const Offset(0, -2), // Sombra hacia arriba
+                color: Colors.black, // Color de la sombra
+                blurRadius: 2, // Desenfoque de la sombra
+                offset: Offset(0, 0), // Sombra hacia arriba
               ),
             ],
           ),

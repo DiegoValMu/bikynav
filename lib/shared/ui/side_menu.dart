@@ -29,7 +29,7 @@ class SideMenu extends StatelessWidget {
       curve: Curves.easeInOut,
       transform: Matrix4.translationValues(
           isMenuOpen ? 0 : -MediaQuery.of(context).size.width, 0, 0),
-      color: Colors.white.withOpacity(0.9),
+      color: Colors.white,
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(
@@ -130,14 +130,13 @@ class SideMenu extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only( bottom: 10 ),
       padding: const EdgeInsets.only( bottom: 15 ),
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            spreadRadius: 2.0,
-            offset: const Offset(0.0, 5.0),
+            color: Colors.black,
+            blurRadius: 5,
+            offset: Offset(0.0, 0.0),
           )
         ]
       ),
@@ -184,10 +183,10 @@ class SideMenu extends StatelessWidget {
       height: 70,
       decoration: BoxDecoration(
         color: Colors.white,
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 0),
+            color: Colors.black,
+            offset: Offset(0, 0),
             blurRadius: 6,
           ),
         ],

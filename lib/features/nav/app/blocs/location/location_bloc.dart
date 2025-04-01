@@ -11,7 +11,7 @@ part 'location_state.dart';
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
   StreamSubscription? positionStream;
 
-  LocationBloc() : super(LocationState()) {
+  LocationBloc() : super(const LocationState()) {
     on<OnStartFollowingUser>((event, emit) => emit(state.copyWith(followingUser: true)));
     on<OnStopFollowingUser>((event, emit) => emit(state.copyWith(followingUser: false)));
     on<OnNewRouteEvent>((event, emit) {

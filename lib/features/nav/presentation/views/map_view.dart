@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:bikynav/features/nav/config/themes/wmc2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -41,6 +44,7 @@ class MapView extends StatelessWidget {
                 zoomControlsEnabled: false,
                 polylines: polylines,
                 markers: markers,
+                style: jsonEncode(wmc2MapTheme),
                 onMapCreated: (controller) => mapBloc.add( OnMapInitializedEvent(controller) ),
                 onCameraMove: ( position ) => mapBloc.mapCenter = position.target,
               //TODO: Markers

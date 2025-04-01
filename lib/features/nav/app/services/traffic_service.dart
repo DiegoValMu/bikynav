@@ -35,7 +35,7 @@ class TrafficService {
 
     if( query.isEmpty ) return [];
 
-    final url = 'https://api.mapbox.com/search/geocode/v6/forward?country=cl&language=es';
+    const url = 'https://api.mapbox.com/search/geocode/v6/forward?country=cl&language=es';
 
     //final url = '$_basePlacesUrl?q=$query&proximity=${ proximity.longitude},${ proximity.latitude }';
 
@@ -51,7 +51,7 @@ class TrafficService {
   }
 
   Future<Feature> getInformationByCoors( LatLng coors ) async {
-    final url = 'https://api.mapbox.com/search/geocode/v6/reverse?country=cl&language=es&continue_straight=true';
+    const url = 'https://api.mapbox.com/search/geocode/v6/reverse?country=cl&language=es&continue_straight=true';
 
     final resp = await _dioPlaces.get( url, queryParameters: {
       'longitude': coors.longitude,

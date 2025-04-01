@@ -79,7 +79,7 @@ class _MapScreenState extends State<MapScreen> {
                             child: BtnCancelRoute(),
                           ),
                         Positioned(
-                          bottom: 0,
+                          bottom: -25,
                           left: 0,
                           right: 0,
                           child: Column(

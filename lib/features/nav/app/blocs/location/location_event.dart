@@ -11,14 +11,14 @@ sealed class LocationEvent extends Equatable {
 class OnNewUserLocationEvent extends LocationEvent {
   final LatLng newLocation;
 
-  OnNewUserLocationEvent(this.newLocation);
+  const OnNewUserLocationEvent(this.newLocation);
   
 }
 
 class OnNewRouteEvent extends LocationEvent {
   final LatLng newLocation;
 
-  OnNewRouteEvent(this.newLocation);
+  const OnNewRouteEvent(this.newLocation);
   
 }
 

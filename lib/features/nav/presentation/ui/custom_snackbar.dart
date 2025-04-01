@@ -4,15 +4,13 @@ class CustomSnackbar extends SnackBar {
 
 
   CustomSnackbar({
-    Key? key,
+    super.key,
     required String message,
     String btnLabel = 'ok',
-    Duration duration = const Duration( seconds: 2 ),
+    super.duration = const Duration( seconds: 2 ),
     VoidCallback? onOk
   }) : super(
-    key: key,
     content: Text(message),
-    duration: duration,
     action: SnackBarAction(
       label: btnLabel, 
       onPressed: () {

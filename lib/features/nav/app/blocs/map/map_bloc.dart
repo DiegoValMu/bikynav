@@ -60,7 +60,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     _mapController = event.controller;
     //_mapController?.animateCamera();
 
-    _mapController!.setMapStyle( jsonEncode( wmc2MapTheme )  );
     emit( state.copyWith( isMapInitialized: true ) );
 
   }
