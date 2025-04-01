@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bikynav/features/bikes/app/helpers/blinking_cornes.dart';
+import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:bikynav/features/bikes/presentation/views/show_bike_details.dart';
 import 'package:bikynav/features/nav/app/blocs/map/map_bloc.dart';
@@ -24,9 +25,9 @@ class _ScannerQrState extends State<ScannerQr> {
   Barcode? _barcode;
   bool _isTorchOn = false;
   MobileScannerController cameraController = MobileScannerController();
-  Bikes? bike;
-  String? idRoute; // Para almacenar el id de la ruta escaneada
-  bool _hasScanned = false; // Variable para controlar si ya se ha escaneado un QR
+  String? idBike;
+  String? idRoute;
+  bool _hasScanned = false;
 
   @override
   void initState() {
@@ -62,7 +63,7 @@ class _ScannerQrState extends State<ScannerQr> {
   }
 
   void _handleBarcode(BarcodeCapture barcodes) async {
-    if (_hasScanned) return; // Si ya se ha escaneado, no hacer nada
+    if (_hasScanned) return;
 
     if (mounted) {
       final barcode = barcodes.barcodes.firstOrNull;
@@ -70,22 +71,31 @@ class _ScannerQrState extends State<ScannerQr> {
         final String rawValue = barcode.rawValue!;
         if (rawValue.startsWith('bike:')) {
           final String jsonData = rawValue.substring('bike:'.length);
-          try {
-            final decodedData = jsonDecode(jsonData) as Map<String, dynamic>;
-            final newBike = Bikes.fromJson(decodedData);
-            // Mostrar detalles de la bicicleta
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              context.pop('/nav');
-              showBikeDetails(context, newBike);
-            });
-            setState(() {
-              _barcode = null;
-              bike = newBike;
-              idRoute = null;
-              _hasScanned = true; // Marcar como escaneado
-            });
-          } catch (e) {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Error al leer la información de la bicicleta')));
+          final bikeId = (jsonDecode(jsonData));
+          final bikeServices = Provider.of<BikeServices>(context, listen: false);
+          Bikes bike = await bikeServices.getBikeById(bikeId);
+          if (mounted) {
+            try {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) {
+                  context.pop('/nav');
+                  showBikeDetails(context, bike);
+                }
+              });
+              if (mounted) {
+                setState(() {
+                  _barcode = null;
+                  idBike = bike.id;
+                  idRoute = null;
+                  _hasScanned = true;
+                });
+              }
+            } catch (e) {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error al leer la información de la bicicleta, $e')));
+                _hasScanned = true;
+              }
+            }
           }
         } else if (rawValue.startsWith('route:')) {
           final String jsonData = rawValue.substring('route:'.length);
@@ -94,78 +104,87 @@ class _ScannerQrState extends State<ScannerQr> {
           final routeServices = Provider.of<RouteServices>(context, listen: false);
           final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
           Ruta routeById = await routeServices.getRouteById(routeId as String);
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            final startMarker = Marker(
-              markerId: const MarkerId('start'),
-              position: routeById.ubicacionInicial,
-              infoWindow: const InfoWindow(title: 'Ubicación inicial'),
-            );
+          if (mounted) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                final startMarker = Marker(
+                  markerId: const MarkerId('start'),
+                  position: routeById.ubicacionInicial,
+                  infoWindow: const InfoWindow(title: 'Ubicación inicial'),
+                );
 
-            final endMarker = Marker(
-              markerId: const MarkerId('end'),
-              position: routeById.ubicacionFinal,
-              infoWindow: InfoWindow(title: 'Destino', snippet: routeById.etiqueta),
-            );
+                final endMarker = Marker(
+                  markerId: const MarkerId('end'),
+                  position: routeById.ubicacionFinal,
+                  infoWindow: InfoWindow(title: 'Destino', snippet: routeById.etiqueta),
+                );
 
-            final currentPolylines = Map<String, Polyline>.from(mapBloc.state.polylines);
-            final points = routeById.rutaDetalles.points;
-            final myRoute = Polyline(
-              polylineId: const PolylineId('route'),
-              color: Colors.black,
-              width: 5,
-              points: points,
-              startCap: Cap.roundCap,
-              endCap: Cap.roundCap,
-            );
+                final currentPolylines = Map<String, Polyline>.from(mapBloc.state.polylines);
+                final points = routeById.rutaDetalles.points;
+                final myRoute = Polyline(
+                  polylineId: const PolylineId('route'),
+                  color: Colors.black,
+                  width: 5,
+                  points: points,
+                  startCap: Cap.roundCap,
+                  endCap: Cap.roundCap,
+                );
 
-            final currentMarkers = Map<String, Marker>.from(mapBloc.state.markers);
-            currentMarkers['start'] = startMarker;
-            currentMarkers['end'] = endMarker;
-            currentPolylines['route'] = myRoute;
+                final currentMarkers = Map<String, Marker>.from(mapBloc.state.markers);
+                currentMarkers['start'] = startMarker;
+                currentMarkers['end'] = endMarker;
+                currentPolylines['route'] = myRoute;
 
-            mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
-            mapBloc.add(OnInitRoute());
+                mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
+                mapBloc.add(OnInitRoute());
 
-            routeServices.myRoute.etiqueta = routeById.etiqueta;
-            routeServices.myRoute.distancia = routeById.calcularDistancia();
-            routeServices.myRoute.tiempoUtilizado = routeById.tiempo;
+                routeServices.myRoute.etiqueta = routeById.etiqueta;
+                routeServices.myRoute.distancia = routeById.calcularDistancia();
+                routeServices.myRoute.tiempoUtilizado = routeById.tiempo;
 
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccionaste ${routeById.etiqueta}')));
-            
-            
-          });
-          context.pop('/nav');
-          _hasScanned = true;
-          setState(() {
-            idRoute = routeId;
-            bike = null;
-            _barcode = null;
-            _hasScanned = true; // Marcar como escaneado
-          });
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccionaste ${routeById.etiqueta}')));
+              }
+            });
+            context.pop('/nav');
+            _hasScanned = true;
+            if (mounted) {
+              setState(() {
+                idRoute = routeId;
+                idBike = null;
+                _barcode = null;
+                _hasScanned = true;
+              });
+            }
+          }
         } else {
-          setState(() {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Código QR no reconocido')));
-            bike = null;
-            idRoute = null;
-            _barcode = null;
-            _hasScanned = true; // Marcar como escaneado aunque no sea un QR válido
-          });
+          if (mounted) {
+            setState(() {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Código QR no reconocido')));
+              idBike = null;
+              idRoute = null;
+              _barcode = null;
+              _hasScanned = true;
+            });
+          }
         }
       } else {
-        setState(() {
-          bike = null;
-          idRoute = null;
-          _barcode = null;
-        });
+        if (mounted) {
+          setState(() {
+            idBike = null;
+            idRoute = null;
+            _barcode = null;
+          });
+        }
       }
     }
   }
 
-  // Método para reiniciar el escáner
   void _resetScanner() {
-    setState(() {
-      _hasScanned = false; // Permitir escanear de nuevo
-    });
+    if (mounted) {
+      setState(() {
+        _hasScanned = false;
+      });
+    }
   }
 
   @override
@@ -191,7 +210,6 @@ class _ScannerQrState extends State<ScannerQr> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(child: Center(child: _buildBarcode(_barcode))),
-                  // Botón para reiniciar el escáner
                 ],
               ),
             ),

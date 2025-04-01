@@ -40,19 +40,23 @@ class Bikes {
     });
 
     factory Bikes.fromJson(Map<String, dynamic> json) => Bikes(
-        id: json["_id"],
-        etiqueta: json["etiqueta"],
-        marca: json["marca"],
-        modelo: json["modelo"],
-        codigoSerie: json["codigo_serie"],
-        colorPrincipal: json["color_principal"],
-        tipo: json["tipo"],
-        aro: json["aro"],
-        modeloCuadro: json["modelo_cuadro"],
-        talla: json["talla"],
-        imagen: List<String>.from(json["imagen"].map((x) => x)),
-        usuario: Usuario.fromJson(json["usuario"]),
-        v: json["__v"],
+      id: json["_id"],
+      etiqueta: json["etiqueta"],
+      marca: json["marca"],
+      modelo: json["modelo"],
+      codigoSerie: json["codigo_serie"],
+      colorPrincipal: json["color_principal"],
+      tipo: json["tipo"],
+      aro: json["aro"],
+      modeloCuadro: json["modelo_cuadro"],
+      talla: json["talla"],
+      imagen: json["imagen"] != null ? List<String>.from(json["imagen"].map((x) => x.toString())) : [],
+      usuario: json["usuario"] != null
+          ? (json["usuario"] is Map<String, dynamic>
+              ? Usuario.fromJson(json["usuario"])
+              : (json["usuario"] is String ? Usuario(id: json["usuario"]) : null)) // Manejo de string y map
+          : null,
+      v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -100,17 +104,17 @@ class Usuario {
     });
 
     factory Usuario.fromJson(Map<String, dynamic> json) => Usuario(
-        id: json["_id"],
-        nombre: json["nombre"],
-        apellidos: json["apellidos"],
-        email: json["email"],
-        region: json["region"],
-        comuna: json["comuna"],
-        rol: json["rol"],
-        imagen: List<String>.from(json["imagen"].map((x) => x)),
-        bicicletas: List<dynamic>.from(json["bicicletas"].map((x) => x)),
-        recorridos: List<dynamic>.from(json["recorridos"].map((x) => x)),
-        v: json["__v"],
+      id: json["_id"],
+      nombre: json["nombre"],
+      apellidos: json["apellidos"],
+      email: json["email"],
+      region: json["region"],
+      comuna: json["comuna"],
+      rol: json["rol"],
+      imagen: json["imagen"] != null ? List<String>.from(json["imagen"].map((x) => x.toString())) : [],
+      bicicletas: json["bicicletas"] != null ? List<dynamic>.from(json["bicicletas"].map((x) => x)) : [],
+      recorridos: json["recorridos"] != null ? List<dynamic>.from(json["recorridos"].map((x) => x)) : [],
+      v: json["__v"],
     );
 
     Map<String, dynamic> toJson() => {

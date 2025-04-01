@@ -1,3 +1,4 @@
+import 'package:bikynav/features/bikes/config/models/bike_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -43,13 +44,27 @@ class BikeServices with ChangeNotifier {
     }
   }
 
-    Future deleteBike( String id ) async {
-      final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/bicicletas/$id'));
-      if (response.statusCode == 200) {
-        return true;
-      } else {
-        throw Exception('Error al eliminar: ${response.body}');
-      }
+  Future deleteBike( String id ) async {
+    final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/bicicletas/$id'));
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      throw Exception('Error al eliminar: ${response.body}');
+    }
+  }
+
+  Future getBikeById( String id ) async {
+
+    final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/bicicletas/$id'));
+    if (response.statusCode == 200) {
+      
+      Map<String, dynamic> jsonMap = jsonDecode(response.body); 
+      Bikes bike = Bikes.fromJson(jsonMap);
+      
+      return bike;
+    } else {
+      throw Exception('Error en el backend: ${response.body}');
+    }
   }
 
 

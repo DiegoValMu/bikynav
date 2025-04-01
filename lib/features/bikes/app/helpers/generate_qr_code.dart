@@ -2,15 +2,13 @@
 import 'dart:convert';
 
 import 'package:animate_do/animate_do.dart';
-import 'package:bikynav/features/bikes/config/models/bike_model.dart';
-import 'package:bikynav/features/route/config/models/routes.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 Future<void> generateQRCode(BuildContext context, dynamic data, String type) async {
   try {
     String qrValidationData = '';
-    if (type == 'bike' && data is Bikes) {
-      qrValidationData = 'bike:${jsonEncode(data.toJson())}';
+    if (type == 'bike' && data is String) {
+      qrValidationData = 'bike:${jsonEncode(data)}';
     } else if (type == 'route' && data is String) {
       qrValidationData = 'route:${ jsonEncode(data) }';
     } else {

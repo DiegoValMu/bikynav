@@ -17,7 +17,7 @@ void showBikeDetails(BuildContext context, Bikes bike) {
           actions: [
             FilledButton.icon(
               onPressed: () {
-                generateQRCode(context, bike, 'bike');
+                generateQRCode(context, bike.id, 'bike');
               },
               label: const Text('Generar QR'),
               icon: const Icon( Icons.qr_code ),
