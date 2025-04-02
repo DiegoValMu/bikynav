@@ -44,7 +44,7 @@ class CustomTextFormField extends StatelessWidget {
             labelText: placeholder,
             prefixIcon: Icon(icon, color: isFilled ? Colors.green : Colors.grey),
             prefixText: prefix,
-            prefixStyle: TextStyle(color: Colors.black),
+            prefixStyle: const TextStyle(color: Colors.black),
             hintText: placeholder,
             filled: true,
             fillColor: Colors.grey[200],

@@ -98,12 +98,12 @@ class _BikeFormState extends State<BikeForm> with WidgetsBindingObserver {
 
   Widget _buildBasicInfoExpansionTile() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 2),
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            offset: Offset(0, 2),
             blurRadius: 6,
           ),
         ],
@@ -153,12 +153,12 @@ class _BikeFormState extends State<BikeForm> with WidgetsBindingObserver {
 
   Widget _buildTechnicalInfoExpansionTile() {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 2),
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            offset: Offset(0, 2),
             blurRadius: 6,
           ),
         ],

@@ -28,12 +28,12 @@ class SensitiveInfoSection extends StatelessWidget {
 
   Widget _buildSection({required String title, required List<Widget> children}) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 2),
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            offset: Offset(0, 2),
             blurRadius: 6,
           ),
         ],

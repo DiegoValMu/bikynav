@@ -51,13 +51,13 @@ class _BikesScreenState extends State<BikesScreen> {
             appBar: PreferredSize(
               preferredSize: const Size.fromHeight(kToolbarHeight),
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      offset: const Offset(0, 4),
-                      blurRadius: 6,
+                      color: Color.fromRGBO(0, 0, 0, 0.2),
+                      offset: Offset(0, 0),
+                      blurRadius: 5,
                     ),
                   ],
                 ),
@@ -82,7 +82,7 @@ class _BikesScreenState extends State<BikesScreen> {
                   label: 'Agregar',
                   onPressed: () async {
                     showLoadingMessage(context);
-                    await Future.delayed(Duration(milliseconds: 500));
+                    await Future.delayed(const Duration(milliseconds: 500));
                     await context.push('/add_bike');
                     hideLoadingMessage(context);
                   },
@@ -190,10 +190,10 @@ Padding _bodyBikeScreen(Map<String, List<Bikes>> groupedBikes, BuildContext cont
           color: Colors.white,
           margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
           child: Padding(
-            padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10),
+            padding: const EdgeInsets.only(bottom: 10, right: 10, left: 10, top: 0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Image.asset(
                   'assets/images/noimage.jpg',
@@ -204,8 +204,8 @@ Padding _bodyBikeScreen(Map<String, List<Bikes>> groupedBikes, BuildContext cont
                   bike.etiqueta ?? 'Sin etiqueta',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                Text('Marca: ${bike.marca ?? 'Desconocida'}'),
-                Text('Aro: ${bike.aro ?? 'Desconocido'}'),
+                Text('Marca: ${bike.marca ?? 'Desconocida'}', style: const TextStyle(fontSize: 12),),
+                Text('Aro: ${bike.aro ?? 'Desconocido'}', style: const TextStyle(fontSize: 12),),
               ],
             ),
           ),

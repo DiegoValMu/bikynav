@@ -134,9 +134,9 @@ class SideMenu extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black,
+            color: Color.fromRGBO(0, 0, 0, 0.2),
             blurRadius: 5,
-            offset: Offset(0.0, 0.0),
+            offset: Offset(-2, 0.0),
           )
         ]
       ),
@@ -178,16 +178,16 @@ class SideMenu extends StatelessWidget {
     VoidCallback onTap,
   ) {
     return Container(
-      margin: const EdgeInsets.only(top: 10),
+      margin: const EdgeInsets.only(top: 15),
       alignment: Alignment.center,
       height: 70,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: const [
           BoxShadow(
-            color: Colors.black,
-            offset: Offset(0, 0),
-            blurRadius: 6,
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            offset: Offset(-2, 0),
+            blurRadius: 5,
           ),
         ],
         image: DecorationImage(
@@ -200,7 +200,7 @@ class SideMenu extends StatelessWidget {
         title: Text(
           title,
           style: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 20),
+              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         onTap: onTap,
       ),

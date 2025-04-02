@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 import '../../app/utils/id_utils.dart';
@@ -29,13 +28,14 @@ class RouteScreen extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white, // Fondo blanco para el AppBar
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2), // Color de la sombra
-                offset: const Offset(0, 4), // Sombra hacia abajo
-                blurRadius: 6, // Difusión de la sombra
+                color: Color.fromRGBO(0, 0, 0, 0.2), // Color de la sombra
+                offset: Offset(0, 0), // Sombra hacia abajo
+                blurRadius: 1, // Difusión de la sombra
+                blurStyle: BlurStyle.normal
               ),
             ],
           ),
@@ -102,16 +102,16 @@ class RouteScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
-          margin: EdgeInsets.only( top: 10),
+          margin: const EdgeInsets.only( top: 15),
           width: double.infinity,
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
+            borderRadius: BorderRadius.circular(5),
+            boxShadow: const [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 15,
-                offset: const Offset(0, 1),
+                color: Color.fromRGBO(0, 0, 0, 0.2),
+                blurRadius: 1,
+                offset: Offset(0, 0),
               ),
             ],
           ),
@@ -120,7 +120,7 @@ class RouteScreen extends StatelessWidget {
               onPressed: () => _shareRoute(context, route),
               icon: const Icon(Icons.share, color: Colors.green),
             ),
-            contentPadding: EdgeInsets.only( top: 10 ),
+            contentPadding: const EdgeInsets.only( top: 10 ),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -161,7 +161,7 @@ class RouteScreen extends StatelessWidget {
               onPressed: (){
                 generateQRCode(context, route.id, 'route');
               }, 
-              label: Text('Generar QR'),
+              label: const Text('Generar QR'),
             ),
             FilledButton.icon(
               onPressed: () async {
@@ -178,7 +178,7 @@ class RouteScreen extends StatelessWidget {
                   )
                 );
               }, 
-              label: Text('Generar codigo'),
+              label: const Text('Generar codigo'),
             )
           ],
         );

@@ -131,12 +131,12 @@ class _LoginFormViewState extends State<_LoginFormView> {
             const SizedBox(height: 20),
 
             Container(
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2), 
-                    offset: const Offset(0, 2), 
+                    color: Color.fromRGBO(0, 0, 0, 0.2),
+                    offset: Offset(0, 2), 
                     blurRadius: 6
                   )
                 ],
@@ -154,7 +154,7 @@ class _LoginFormViewState extends State<_LoginFormView> {
                       ),
                     ),
                     const SizedBox(height: 10),
-                    Divider(),
+                    const Divider(),
                     const SizedBox(height: 10),
                     CustomTextFormField(
                       icon: Icons.email,

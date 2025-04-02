@@ -15,12 +15,12 @@ class PerfilScreen extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight), // Altura estándar del AppBar
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white, // Fondo blanco para el AppBar
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2), // Color de la sombra
-                offset: const Offset(0, 4), // Sombra hacia abajo
+                color: Color.fromRGBO(0, 0, 0, 0.2), // Color de la sombra
+                offset: Offset(0, 4), // Sombra hacia abajo
                 blurRadius: 6, // Difusión de la sombra
               ),
             ],
@@ -75,11 +75,11 @@ class PerfilScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 color: Colors.white, // Fondo blanco
                 borderRadius: BorderRadius.circular(10), // Bordes redondeados opcionales
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1), // Color de la sombra
-                    blurRadius: 10, // Difuminado de la sombra
-                    offset: const Offset(0, 5), // Desplazamiento de la sombra
+                    color: Color.fromRGBO(0, 0, 0, 0.2), // Color de la sombra
+                    blurRadius: 8, // Difuminado de la sombra
+                    offset: Offset(0, 2), // Desplazamiento de la sombra
                   ),
                 ],
               ),

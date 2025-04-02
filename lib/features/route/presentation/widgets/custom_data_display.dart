@@ -52,7 +52,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
       final time = (dataPlace.properties.duracion);
       tripDuration = (time! / 60).floorToDouble();
 
-    }else if ( routeServices.rutas.length > 0 ){
+    }else if ( routeServices.rutas.isNotEmpty ){
       name = routeServices.myRoute.etiqueta!;
       kms = routeServices.myRoute.distancia!;
       distance = (kms * 10).roundToDouble() / 10;
@@ -65,17 +65,16 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
       bottom: true,
       child: Container(
         height: 110, // Altura fija
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white, // Color de fondo
-          borderRadius: const BorderRadius.vertical(
+          borderRadius: BorderRadius.vertical(
             top: Radius.circular(20), // Bordes redondeados en la parte superior
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2), // Color de sombra
-              spreadRadius: 2, // Expansión de la sombra
-              blurRadius: 8, // Desenfoque de la sombra
-              offset: const Offset(0, -2), // Sombra hacia arriba
+              color: Color.fromRGBO(0, 0, 0, 0.4), // Color de sombra
+              blurRadius: 4, // Desenfoque de la sombra
+              offset: Offset(0, 0), // Sombra hacia arriba
             ),
           ],
         ),
@@ -100,7 +99,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                     children: [
                       const Icon( Icons.timelapse ),
                       (mapBloc.state.showMyRoute)
-                      ? Text('$minutes:$displaySeconds', style: TextStyle( fontSize: 20 ),)
+                      ? Text('$minutes:$displaySeconds', style: const TextStyle( fontSize: 20 ),)
                       : Text(
                         '$tripDuration min', 
                         style: const TextStyle( fontSize: 20 ),
@@ -108,7 +107,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                     ],
                   ),
                   title: (mapBloc.state.showMyRoute)
-                  ? BtnSaveRoute()
+                  ? const BtnSaveRoute()
                   : Column(
                     children: [
                       const Text(

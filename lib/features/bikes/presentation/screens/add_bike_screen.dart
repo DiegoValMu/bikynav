@@ -16,13 +16,13 @@ class AddBikeScreen extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: Container(
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.2),
-                offset: const Offset(0, 4),
-                blurRadius: 6,
+                color: Color.fromRGBO(0, 0, 0, 0.2),
+                offset: Offset(0, 4),
+                blurRadius: 5,
               ),
             ],
           ),

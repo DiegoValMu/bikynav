@@ -26,10 +26,9 @@ class BuildBottomNavigationBar extends StatelessWidget {
       decoration: const BoxDecoration(
         boxShadow: [
           BoxShadow(
-            color: Colors.black,
-            spreadRadius: 0,
-            blurRadius: 4,
-            offset: Offset(0, -2),
+            color: Color.fromRGBO(0, 0, 0, 0.2),
+            blurRadius: 1,
+            offset: Offset(0, 0),
           ),
         ],
       ),

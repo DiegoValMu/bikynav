@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:bikynav/features/users/presentation/widgets/custom_build_section.dart';
 import 'package:bikynav/features/users/presentation/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,7 +19,7 @@ mixin RegionComunaMixin<T extends StatefulWidget> on State<T> {
     }
   }
 
-  void updateComunas(String regionName) async {
+  Future<void> updateComunas(String regionName) async {
     final response = await rootBundle.loadString('assets/data/regiones_comunas.json');
     final countryData = CountryData.fromMap(json.decode(response));
     final selectedRegionData = countryData.regions.firstWhere((region) => region.name == regionName);
@@ -33,17 +34,18 @@ mixin RegionComunaMixin<T extends StatefulWidget> on State<T> {
   Widget buildRegionDropdown({required void Function(String?) onRegionChanged}) {
     return DropdownButtonFormField<String>(
       value: selectedRegion,
+      iconSize: 0,
       items: regiones.map((region) => DropdownMenuItem<String>(value: region.name, child: Text(region.name))).toList(),
       onChanged: onRegionChanged,
       decoration: InputDecoration(
         labelText: 'Región',
-        prefixIcon: Icon(Icons.home, color: Colors.grey),
+        prefixIcon: const Icon(Icons.home, color: Colors.grey),
         filled: true,
         fillColor: Colors.grey[200],
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.blue)), // Use your theme color
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8)), // Use your theme color
       ),
     );
   }
@@ -55,19 +57,20 @@ mixin RegionComunaMixin<T extends StatefulWidget> on State<T> {
       onChanged: onComunaChanged,
       decoration: InputDecoration(
         labelText: 'Comuna',
-        prefixIcon: Icon(Icons.location_on, color: Colors.grey),
+        prefixIcon: const Icon(Icons.location_on, color: Colors.grey),
         filled: true,
         fillColor: Colors.grey[200],
-        contentPadding: EdgeInsets.symmetric(vertical: 12.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
         enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide.none),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8), borderSide: BorderSide(color: Colors.blue)), // Use your theme color
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(8),), // Use your theme color
       ),
     );
   }
 }
 
 class UserFormSection extends StatefulWidget {
+  final TextEditingController emailController;
   final TextEditingController nombreController;
   final TextEditingController apellidoController;
   final String? initialRegion;
@@ -80,7 +83,8 @@ class UserFormSection extends StatefulWidget {
     required this.apellidoController,
     this.initialRegion,
     this.initialComuna,
-    required this.onBasicInfoChanged,
+    required this.onBasicInfoChanged, 
+    required this.emailController,
   });
 
   @override
@@ -91,22 +95,29 @@ class _UserFormSectionState extends State<UserFormSection> with RegionComunaMixi
   @override
   void initState() {
     super.initState();
-    loadRegionsAndComunas();
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await loadRegionsAndComunas();
     selectedRegion = widget.initialRegion;
     if (widget.initialRegion != null) {
-      updateComunas(widget.initialRegion!);
+      await updateComunas(widget.initialRegion!);
       selectedComuna = widget.initialComuna;
+    }
+    if(mounted){
+      setState(() {});
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildSection(
+    return buildSection(
       title: 'Información básica',
       children: [
         const Divider(),
         const SizedBox(height: 10),
-        CustomTextFormField(controller: widget.nombreController, icon: Icons.person, placeholder: 'Correo electronico', inputType: TextInputType.emailAddress), // Manteniendo el placeholder original
+        CustomTextFormField(controller: widget.emailController, icon: Icons.person, placeholder: 'Correo electronico', inputType: TextInputType.emailAddress), // Manteniendo el placeholder original
         const SizedBox(height: 10),
         CustomTextFormField(controller: widget.nombreController, icon: Icons.person, placeholder: 'Nombre', inputType: TextInputType.name),
         const SizedBox(height: 10),
@@ -119,12 +130,16 @@ class _UserFormSectionState extends State<UserFormSection> with RegionComunaMixi
               selectedComuna = null;
               comunas.clear();
               if (value != null) updateComunas(value);
-              widget.onBasicInfoChanged({
-                'region': selectedRegion ?? '',
-                'comuna': selectedComuna ?? '',
-                'nombre': widget.nombreController.text.trim(),
-                'apellido': widget.apellidoController.text.trim(),
+              if(mounted){
+              setState(() {
+                widget.onBasicInfoChanged({
+                  'region': selectedRegion ?? '',
+                  'comuna': selectedComuna ?? '',
+                  'nombre': widget.nombreController.text.trim(),
+                  'apellido': widget.apellidoController.text.trim(),
+                });
               });
+            }
             });
           },
         ),
@@ -147,34 +162,4 @@ class _UserFormSectionState extends State<UserFormSection> with RegionComunaMixi
     );
   }
 
-  Widget _buildSection({required String title, required List<Widget> children}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 2),
-            blurRadius: 6,
-          ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ExpansionTile(
-          leading: IconButton(padding: EdgeInsets.zero, onPressed: () {}, icon: const Icon(Icons.info)), // Manteniendo el IconButton original
-          title: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          initiallyExpanded: true,
-          maintainState: true,
-          tilePadding: EdgeInsets.zero,
-          childrenPadding: EdgeInsets.zero,
-          collapsedBackgroundColor: Colors.white,
-          backgroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-          collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-          children: children,
-        ),
-      ),
-    );
-  }
 }

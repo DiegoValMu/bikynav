@@ -4,7 +4,6 @@ import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/features/users/presentation/views/sensitive_info_section.dart';
 import 'package:bikynav/features/users/presentation/views/user_form.dart';
-import 'package:bikynav/features/users/presentation/widgets/custom_text_form_field.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -53,8 +52,11 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
+  String? selectedRegion;
+  String? selectedComuna;
+
   bool _isKeyboardVisible = false;
-  Map<String, String> _basicInfo = {};
+  final Map<String, String> _basicInfo = {};
 
   @override
   void initState() {
@@ -93,27 +95,25 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                _buildSection( // Usando el _buildSection original
-                  title: 'Información básica',
-                  children: [
-                    const Divider(),
-                    const SizedBox(height: 10),
-                    CustomTextFormField(controller: _emailController, icon: Icons.email, placeholder: 'Correo electronico', inputType: TextInputType.emailAddress),
-                    const SizedBox(height: 10),
-                    UserFormSection(
-                      nombreController: _nombreController,
-                      apellidoController: _apellidoController,
-                      onBasicInfoChanged: (data) {
-                        _basicInfo = data;
-                      },
-                    ),
-                  ],
+                UserFormSection(
+                  emailController: _emailController,
+                  nombreController: _nombreController,
+                  apellidoController: _apellidoController,
+                  initialRegion: selectedRegion,
+                  initialComuna: selectedComuna,
+                  onBasicInfoChanged: (data) {
+                    setState(() {
+                      selectedRegion = data['region'];
+                      selectedComuna = data['comuna'];
+                    });
+                  },
                 ),
                 const SizedBox(height: 10),
                 SensitiveInfoSection(
                   passwordController: _passwordController,
                   confirmPasswordController: _confirmPasswordController,
                 ),
+                const SizedBox(height: 80), // Espacio para el botón
               ],
             ),
           ),
@@ -189,37 +189,6 @@ class _RegisterFormState extends State<_RegisterForm> with WidgetsBindingObserve
             ),
           ),
       ],
-    );
-  }
-
-  Widget _buildSection({required String title, required List<Widget> children}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            offset: const Offset(0, 2),
-            blurRadius: 6,
-          )
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: ExpansionTile(
-          leading: IconButton(padding: EdgeInsets.zero, onPressed: () {}, icon: const Icon(Icons.info)),
-          title: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          initiallyExpanded: true,
-          maintainState: true,
-          tilePadding: EdgeInsets.zero,
-          childrenPadding: EdgeInsets.zero,
-          collapsedBackgroundColor: Colors.white,
-          backgroundColor: Colors.white,
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-          collapsedShape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero, side: BorderSide.none),
-          children: children,
-        ),
-      ),
     );
   }
 }
