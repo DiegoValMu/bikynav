@@ -7,9 +7,11 @@ import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_gallery_saver/flutter_image_gallery_saver.dart';
+import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:share_plus/share_plus.dart';
 
 Future<void> generateQRCode(BuildContext context, dynamic data, String type) async {
   try {
@@ -40,7 +42,10 @@ Future<void> generateQRCode(BuildContext context, dynamic data, String type) asy
             backgroundColor: Colors.white,
             actions: [
               FilledButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final imagePath = await generateImageQr(qrKey);
+                  await Share.shareXFiles([XFile(imagePath)], text: 'Aquí está el QR generado!');
+                },
                 label: const Text('Compartir'),
                 icon: const Icon(Icons.share),
               ),
@@ -55,6 +60,7 @@ Future<void> generateQRCode(BuildContext context, dynamic data, String type) asy
                       backgroundColor: Colors.green,
                     )
                   );
+                  context.pop();
                 },
                 label: const Text('Guardar'),
                 icon: const Icon(Icons.save),
