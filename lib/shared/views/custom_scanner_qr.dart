@@ -179,13 +179,6 @@ class _ScannerQrState extends State<ScannerQr> {
     }
   }
 
-  void _resetScanner() {
-    if (mounted) {
-      setState(() {
-        _hasScanned = false;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
