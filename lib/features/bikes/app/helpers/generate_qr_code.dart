@@ -54,12 +54,7 @@ Future<void> generateQRCode(BuildContext context, dynamic data, String type) asy
                   final image = await generateImageQr(qrKey);
                   await FlutterImageGallerySaver.saveFile( image);
 
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("QR guardado en el dispositivo"),
-                      backgroundColor: Colors.green,
-                    )
-                  );
+                  await checkSaveQr(context);
                   context.pop();
                 },
                 label: const Text('Guardar'),
@@ -87,6 +82,29 @@ Future<void> generateQRCode(BuildContext context, dynamic data, String type) asy
   }
 }
 
+Future<dynamic> checkSaveQr(BuildContext context) {
+  return showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return ZoomIn(
+        child: AlertDialog(
+          content: const SizedBox(
+            height: 100,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.check_circle, color: Colors.green, size: 40),
+                SizedBox(width: 10),
+                Text("QR guardado correctamente"),
+              ],
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
 generateImageQr(GlobalKey qrKey) async {
   final boundary = qrKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
   var image = await boundary.toImage();
@@ -106,6 +124,6 @@ Future<void> requestPermission(BuildContext context) async {
     // El permiso fue concedido, puedes guardar la imagen
   } else {
     // El permiso fue denegado
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Permiso denegado para acceder a la galería')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Permiso denegado para acceder a la galería')));
   }
 }

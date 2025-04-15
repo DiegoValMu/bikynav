@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 Future<void> onRouteTap(BuildContext context, BikeRoute route, MapBloc mapBloc, RouteServices routeServices) async {
+  
     final startMarker = Marker(
       markerId: const MarkerId('start'),
       position: route.ubicacionInicial!,
@@ -36,6 +37,8 @@ Future<void> onRouteTap(BuildContext context, BikeRoute route, MapBloc mapBloc, 
 
     mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
     mapBloc.add(OnInitRoute());
+
+    mapBloc.add(MoveCameraToLocationEvent(route.ubicacionInicial!));
 
     routeServices.myRoute = route;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccionaste ${route.etiqueta ?? "una ruta"}')));

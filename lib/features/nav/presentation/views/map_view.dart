@@ -11,12 +11,14 @@ class MapView extends StatelessWidget {
   final LatLng initialLocation;
   final Set<Polyline> polylines;
   final Set<Marker> markers;
+  final Function(GoogleMapController)? onMapCreated;
 
   const MapView({
     super.key, 
     required this.initialLocation, 
     required this.polylines, 
-    required this.markers
+    required this.markers, 
+    this.onMapCreated
     });
 
   @override
@@ -45,8 +47,9 @@ class MapView extends StatelessWidget {
                 polylines: polylines,
                 markers: markers,
                 style: jsonEncode(wmc2MapTheme),
-                onMapCreated: (controller) => mapBloc.add( OnMapInitializedEvent(controller) ),
+                onMapCreated: onMapCreated,
                 onCameraMove: ( position ) => mapBloc.mapCenter = position.target,
+                
               //TODO: Markers
               //TODO: Polylines
       

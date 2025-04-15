@@ -26,6 +26,14 @@ class OnCancelToggleUserRoute extends MapEvent {}
 class OnCancelRoute extends MapEvent {}
 class OnInitRoute extends MapEvent {}
 
+class MoveCameraToLocationEvent extends MapEvent {
+  final LatLng location;
+  const MoveCameraToLocationEvent(this.location);
+
+  @override
+  List<Object> get props => [location];
+}
+
 class DisplayPolylinesEvent extends MapEvent{
   final Map<String, Polyline> polylines;
   final Map<String, Marker> markers;

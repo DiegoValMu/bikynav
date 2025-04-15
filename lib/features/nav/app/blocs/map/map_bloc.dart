@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -7,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/config/models/models.dart';
-import 'package:bikynav/features/nav/config/themes/themes.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
@@ -40,6 +38,10 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<DisplayPolylinesEvent>((event, emit) => emit( state.copyWith( polylines: event.polylines, markers: event.markers )));
 
     on<OnInitRoute>((event, emit) => emit( state.copyWith( inRoute:  true )));
+
+    on<MoveCameraToLocationEvent>((event, emit) {
+      moveCamera(event.location);
+    });
   
     locationBloc.stream.listen((locationState) { 
 
@@ -50,7 +52,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       if ( !state.isfollowingUser ) return;
       if ( locationState.lastKnowlocation == null ) return;
       
-      moveCamera( locationState.lastKnowlocation! );
+      //moveCamera( locationState.lastKnowlocation! );
 
     });
   }

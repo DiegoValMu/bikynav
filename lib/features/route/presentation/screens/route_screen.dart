@@ -1,10 +1,11 @@
-
-import 'package:bikynav/features/bikes/app/helpers/generate_qr_code.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
+import 'package:bikynav/features/route/app/utils/id_utils.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
 import 'package:bikynav/features/route/presentation/ui/set_route.dart';
 import 'package:bikynav/features/route/presentation/views/build_route.dart';
+import 'package:bikynav/features/route/presentation/widgets/btn_options.dart';
 import 'package:bikynav/shared/ui/custom_bottom_navigation_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-import '../../app/utils/id_utils.dart';
 
 class RouteScreen extends StatelessWidget {
   const RouteScreen({super.key});
@@ -102,6 +102,7 @@ class RouteScreen extends StatelessWidget {
     return Column(
       children: [
         Container(
+          padding: const EdgeInsets.symmetric(horizontal: 13),
           margin: const EdgeInsets.only( top: 15),
           width: double.infinity,
           decoration: BoxDecoration(
@@ -116,9 +117,13 @@ class RouteScreen extends StatelessWidget {
             ],
           ),
           child: ListTile(
-            trailing: IconButton(
-              onPressed: () => _shareRoute(context, route),
-              icon: const Icon(Icons.share, color: Colors.green),
+            trailing: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+              child: VerticalThreeDotsMenu(
+                onShareCode: () => _shareRouteCode(context, route), 
+                routeId: route.id!,
+                onDelete: () => _deleteRoute(context, route.id!, routeServices)
+              ),
             ),
             contentPadding: const EdgeInsets.only( top: 10 ),
             subtitle: Column(
@@ -131,13 +136,12 @@ class RouteScreen extends StatelessWidget {
               ],
             ),
             title: Text(route.etiqueta ?? 'Ruta sin nombre', style: const TextStyle(fontWeight: FontWeight.bold)),
-            leading: IconButton(
-              onPressed: () {
-                _deleteRoute(context, route.id!, routeServices);
-              },
-              icon: const Icon(Icons.delete, color: Colors.red),
-            ),
-            onTap: () => onRouteTap(context, route, mapBloc, routeServices),
+            onTap: () {
+              showLoadingMessage(context);
+              Future.delayed(const Duration(milliseconds: 200), () {
+                onRouteTap(context, route, mapBloc, routeServices);
+              });
+              }
           ),
         ),
       ],
@@ -150,45 +154,22 @@ class RouteScreen extends StatelessWidget {
     context.push('/nav');
   }
 
-  Future<void> _shareRoute(BuildContext context, BikeRoute route) async {
-    showDialog(
-      context: context, 
-      builder: (BuildContext context){
-        return AlertDialog(
-          title: Text('Compartir Ruta ${route.etiqueta}'),
-          actions: [
-            FilledButton.icon(
-              onPressed: (){
-                generateQRCode(context, route.id, 'route');
-              }, 
-              label: const Text('Generar QR'),
-            ),
-            FilledButton.icon(
-              onPressed: () async {
-                String idCamuflado = camuflarID(route.id!);
-                String dynamicLink = generarDynamicLink(idCamuflado);
-                await Clipboard.setData(ClipboardData(text: dynamicLink));
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text(
-                      "Código copiado al portapapeles", 
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    backgroundColor: Colors.green,
-                  )
-                );
-              }, 
-              label: const Text('Generar codigo'),
-            )
-          ],
-        );
-      }
-      );
-
-
-
-    
+  Future _shareRouteCode( BuildContext context, BikeRoute route ) async {
+    String idCamuflado = camuflarID(route.id!);
+    String dynamicLink = generarDynamicLink(idCamuflado);
+    await Clipboard.setData(ClipboardData(text: dynamicLink));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          "Código copiado al portapapeles", 
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: Colors.green,
+      )
+    );
   }
+
+ 
 
   
 }
