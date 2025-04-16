@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/shared/ui/side_menu.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +24,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _isMenuOpen = false;
   GoogleMapController? _mapController;
   bool _initialCameraMoveDone = false;
+  MapType currentMapType = MapType.normal;
 
   @override
   void initState() {
@@ -35,6 +37,14 @@ class _MapScreenState extends State<MapScreen> {
     locationBloc.stopFollowingUser();
     super.dispose();
   }
+
+  void toggleMapType() {
+  setState(() {
+    currentMapType = currentMapType == MapType.normal 
+        ? MapType.satellite 
+        : MapType.normal;
+  });
+}
 
   Future<bool> _onWillPop() async {
     return await showDialog(
@@ -98,7 +108,7 @@ class _MapScreenState extends State<MapScreen> {
                             initialLocation: locationState.lastKnowlocation!,
                             polylines: polylines.values.toSet(),
                             markers: mapState.markers.values.toSet(),
-                            
+                            mapType: currentMapType,
                             onMapCreated: (GoogleMapController controller) {
                               _mapController = controller;
                               context.read<MapBloc>().add(OnMapInitializedEvent(controller));
@@ -119,7 +129,7 @@ class _MapScreenState extends State<MapScreen> {
                               child: BtnCancelRoute(),
                             ),
                           Positioned(
-                            bottom: -25,
+                            bottom: 120,
                             left: 0,
                             right: 0,
                             child: Column(
@@ -147,28 +157,32 @@ class _MapScreenState extends State<MapScreen> {
                                           label: const Text('Iniciar Ruta'),
                                           icon: const Icon(Icons.play_arrow_rounded),
                                           style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(180, 255, 255, 255)),
+                                            backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(200, 255, 255, 255)),
                                           ),
                                         ),
-                                      const Padding(
-                                        padding: EdgeInsets.only( right:  10),
+                                      Padding(
+                                        padding: const EdgeInsets.only( right:  10),
                                         child: Column(
                                           children: [
-                                            BtnFollowUser(), 
-                                            BtnCurrentLocation(),
+                                            CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
+                                            const BtnFollowUser(), 
+                                            const BtnCurrentLocation(),
                                           ],
                                         ),
                                       ),
                                     ]
                                   ),
-                                
-                                (mapState.onInitRoute || mapState.onSelectRoute)
-                                  ? const CustomDataDisplay()
-                                  : const CustomSearchBar(),
                               ],
                             ),
                           ),
-                          
+                          Positioned(
+                            bottom: -25,
+                            right: 0,
+                            left: 0,
+                            child: (mapState.onInitRoute || mapState.onSelectRoute)
+                                  ? const CustomDataDisplay()
+                                  : const CustomSearchBar(),
+                            ),
                           const ManualMarker(),
                         ],
                       ),

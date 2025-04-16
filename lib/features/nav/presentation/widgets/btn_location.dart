@@ -13,9 +13,10 @@ class BtnCurrentLocation extends StatelessWidget {
     final mapBloc = BlocProvider.of<MapBloc>(context);
 
     return CircleAvatar(
+      backgroundColor: Color.fromRGBO(255, 255, 255, 0.8),
       maxRadius: 25,
       child: IconButton(
-        icon: const Icon( Icons.my_location_outlined),
+        icon: const Icon( Icons.my_location_outlined , color: Colors.teal,),
         onPressed: () {
           final userLocation = locationBloc.state.lastKnowlocation;
           if( userLocation == null ){

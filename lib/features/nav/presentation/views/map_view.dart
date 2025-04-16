@@ -12,12 +12,14 @@ class MapView extends StatelessWidget {
   final Set<Polyline> polylines;
   final Set<Marker> markers;
   final Function(GoogleMapController)? onMapCreated;
+  final MapType mapType;
 
   const MapView({
     super.key, 
     required this.initialLocation, 
     required this.polylines, 
-    required this.markers, 
+    required this.markers,
+    this.mapType = MapType.normal, 
     this.onMapCreated
     });
 
@@ -42,14 +44,15 @@ class MapView extends StatelessWidget {
                 initialCameraPosition: initialCameraPosition,
                 compassEnabled: true,
                 myLocationEnabled: true,
+                trafficEnabled: true,
                 myLocationButtonEnabled: false,
-                zoomControlsEnabled: true,
+                zoomControlsEnabled: false,
                 polylines: polylines,
                 markers: markers,
                 style: jsonEncode(wmc2MapTheme),
                 onMapCreated: onMapCreated,
                 onCameraMove: ( position ) => mapBloc.mapCenter = position.target,
-                
+                mapType: mapType,
               //TODO: Markers
               //TODO: Polylines
       
