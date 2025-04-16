@@ -40,10 +40,10 @@ class MapView extends StatelessWidget {
         onPointerMove: ( pointerMoveEvent ) => mapBloc.add( OnStopFollowingUserEvent() ),
         child: GoogleMap(
                 initialCameraPosition: initialCameraPosition,
-                compassEnabled: false,
+                compassEnabled: true,
                 myLocationEnabled: true,
                 myLocationButtonEnabled: false,
-                zoomControlsEnabled: false,
+                zoomControlsEnabled: true,
                 polylines: polylines,
                 markers: markers,
                 style: jsonEncode(wmc2MapTheme),

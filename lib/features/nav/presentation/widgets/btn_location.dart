@@ -18,19 +18,14 @@ class BtnCurrentLocation extends StatelessWidget {
         icon: const Icon( Icons.my_location_outlined),
         onPressed: () {
           final userLocation = locationBloc.state.lastKnowlocation;
-          
-    
           if( userLocation == null ){
             final snack = CustomSnackbar(message: 'no hay ubicacion');
             ScaffoldMessenger.of(context).showSnackBar(snack);
             return;
           } 
-    
           mapBloc.moveCamera(userLocation);
-    
         } 
-        ),
-        
+      ),
     );
   }
 }

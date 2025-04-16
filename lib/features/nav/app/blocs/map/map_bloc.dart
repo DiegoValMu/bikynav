@@ -31,13 +31,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<OnToggleUserRoute>((event, emit) => emit( state.copyWith( showMyRoute:  true )));
     on<OnCancelToggleUserRoute>((event, emit) => emit( state.copyWith( showMyRoute: false )));
 
-    on<OnCancelRoute>((event, emit) => emit( state.copyWith( inRoute:  false )));
+    on<OnCancelRoute>((event, emit) => emit( state.copyWith( onInitRoute:  false, onSelectRoute: false )));
 
     on<DisplayMarkerEvent>((event, emit) => emit( state.copyWith( markers: event.markers )));
 
     on<DisplayPolylinesEvent>((event, emit) => emit( state.copyWith( polylines: event.polylines, markers: event.markers )));
 
-    on<OnInitRoute>((event, emit) => emit( state.copyWith( inRoute:  true )));
+    on<OnInitRoute>((event, emit) => emit( state.copyWith( onInitRoute:  true )));
+
+    on<OnSelectRoute>((event, emit) => emit( state.copyWith( onSelectRoute:  true )));
 
     on<MoveCameraToLocationEvent>((event, emit) {
       moveCamera(event.location);

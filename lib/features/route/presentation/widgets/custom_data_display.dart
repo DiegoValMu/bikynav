@@ -44,7 +44,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
     double kms;
 
     List<Feature> features = place;
-    if (features.isNotEmpty){
+    if (features.isNotEmpty  && !mapBloc.state.onSelectRoute){
       final dataPlace = features.first;
 
       name = dataPlace.properties.name;
@@ -64,7 +64,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
     return SafeArea(
       bottom: true,
       child: Container(
-        height: 110, // Altura fija
+        height: 130, // Altura fija
         decoration: const BoxDecoration(
           color: Colors.white, // Color de fondo
           borderRadius: BorderRadius.vertical(
@@ -99,10 +99,10 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                     children: [
                       const Icon( Icons.timelapse ),
                       (mapBloc.state.showMyRoute)
-                      ? Text('$minutes:$displaySeconds', style: const TextStyle( fontSize: 20 ),)
+                      ? Text('$minutes:$displaySeconds', style: const TextStyle( fontSize: 18 ),)
                       : Text(
                         '$tripDuration min', 
-                        style: const TextStyle( fontSize: 20 ),
+                        style: const TextStyle( fontSize: 16 ),
                         ),
                     ],
                   ),
@@ -110,16 +110,24 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                   ? const BtnSaveRoute()
                   : Column(
                     children: [
-                      const Text(
+                      (mapBloc.state.onSelectRoute)
+                      ? const Text('Ruta',
+                        style: TextStyle( 
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold, 
+                          ),
+                        )
+                      : const Text(
                         'Dirección',
                         style: TextStyle( 
-                          fontSize: 20,
+                          fontSize: 18,
                           fontWeight: FontWeight.bold, 
                           ),
                         ),
                       Text(
                         name, 
-                        style: const TextStyle( fontSize: 20 ),
+                        style: const TextStyle( fontSize: 14 ),
+                        textAlign: TextAlign.center,
                       )
                     ]
                   ),
@@ -131,7 +139,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
                       const Icon( Icons.directions_bike ),
                       Text(
                         '$distance kms',
-                        style: const TextStyle( fontSize: 20 ),
+                        style: const TextStyle( fontSize: 16 ),
                       ),
                     ],
                   ),

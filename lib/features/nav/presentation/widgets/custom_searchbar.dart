@@ -17,8 +17,8 @@ class CustomSearchBar extends StatefulWidget {
 }
 
 class _CustomSearchBarState extends State<CustomSearchBar> {
-  double _height = 110; // Altura inicial del contenedor
-  final double _minHeight = 110; // Altura mínima
+  double _height = 120; // Altura inicial del contenedor
+  final double _minHeight = 120; // Altura mínima
   final double _maxHeight = 400; // Altura máxima
 
   @override
@@ -26,20 +26,21 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
         return state.displayManualMarker
-            ? const SizedBox()
-            : FadeInDown(
-                duration: const Duration(milliseconds: 300),
-                child: _CustomSearchBarBody(
-                  height: _height,
-                  minHeight: _minHeight,
-                  maxHeight: _maxHeight,
-                  onHeightChanged: (double newHeight) {
-                    setState(() {
-                      _height = newHeight.clamp(_minHeight, _maxHeight);
-                    });
-                  },
-                ),
+        ? const SizedBox( )
+        : FadeInDown(
+          duration: const Duration(milliseconds: 300),
+          child: _CustomSearchBarBody(
+            height: _height,
+            minHeight: _minHeight,
+            maxHeight: _maxHeight,
+            onHeightChanged: (double newHeight) {
+              setState( () {
+                _height = newHeight.clamp(_minHeight, _maxHeight);
+                }
               );
+            },
+          ),
+        );
       },
     );
   }
@@ -134,7 +135,7 @@ class _CustomSearchBarBody extends StatelessWidget {
                 GestureDetector(
                   onTap: () async {
                     final result = await showSearch(
-                        context: context, delegate: SearchDestinationDelegate());
+                        context: context, delegate: SearchDestinationDelegate(), maintainState: true);
                     if (result == null) return;
             
                     onSearchResult(context, result);

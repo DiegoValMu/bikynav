@@ -85,8 +85,9 @@ SearchDestinationDelegate():super(
     return ListView(
       children: [
         ListTile(
+          contentPadding: EdgeInsets.only(top: 10, left: 15),
           leading: const Icon( Icons.location_on_outlined),
-          title: const Text('Señalar la ubicación en el mapa'),
+          title: const Text('Señalar la ubicación en el mapa',),
           onTap: (){
             final result = SearchResult(cancel: false, manual: true);
             close(context, result);

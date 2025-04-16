@@ -11,31 +11,31 @@ class BtnCancelRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     final stopwatchProvider = Provider.of<StopwatchProvider>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
-    //final locationBloc = BlocProvider.of<LocationBloc>(context);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       child: CircleAvatar(
-        maxRadius: 25,
+        maxRadius: 30,
+        backgroundColor: Colors.white,
         child: BlocBuilder<MapBloc, MapState>(
           builder: (context, state) {
             return IconButton(
-                icon: const Icon( Icons.clear),
-                onPressed: () {
-                  mapBloc.add( OnCancelRoute() );
-                  if ( mapBloc.state.showMyRoute ){
-                    //locationBloc.state.myLocationHistory = [];
-                    stopwatchProvider.resetTimer();
-                    
-                    mapBloc.add( OnCancelToggleUserRoute() );
-                  }
-                  
-                  if (mapBloc.state.markers.isNotEmpty){
-                    mapBloc.state.polylines.remove('route');
-                    mapBloc.state.markers.remove('start');
-                    mapBloc.state.markers.remove('end');
-                  }
-                });
+              icon: const Icon( Icons.clear, color: Colors.black,),
+              onPressed: () {
+                mapBloc.add( OnCancelRoute() );
+                if ( state.showMyRoute ){
+                  //locationBloc.state.myLocationHistory = [];
+                  stopwatchProvider.resetTimer();
+                  mapBloc.add( OnCancelToggleUserRoute() );
+                }
+                
+                if (state.markers.isNotEmpty){
+                  state.polylines.remove('route');
+                  state.markers.remove('start');
+                  state.markers.remove('end');
+                }
+              }
+            );
           },
         ),
       ),

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/shared/ui/side_menu.dart';
@@ -43,7 +45,7 @@ class _MapScreenState extends State<MapScreen> {
               content: const Text('¿Estás seguro de que quieres salir?', textAlign: TextAlign.center,),
               backgroundColor: Colors.white,
               actions: <Widget>[
-                OutlinedButton(
+                TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
                   child: const Text('No'),
                 ),
@@ -86,9 +88,8 @@ class _MapScreenState extends State<MapScreen> {
                     if (!mapState.showMyRoute) {
                       polylines.removeWhere((key, value) => key == 'myRoute');
                     }
-                    if (!mapState.inRoute) {
-                      polylines.removeWhere((key, value) => key == 'route');
-                    }
+
+                    final searchState = BlocProvider.of<SearchBloc>(context, listen: false);
 
                     return SingleChildScrollView(
                       child: Stack(
@@ -97,11 +98,12 @@ class _MapScreenState extends State<MapScreen> {
                             initialLocation: locationState.lastKnowlocation!,
                             polylines: polylines.values.toSet(),
                             markers: mapState.markers.values.toSet(),
+                            
                             onMapCreated: (GoogleMapController controller) {
                               _mapController = controller;
                               context.read<MapBloc>().add(OnMapInitializedEvent(controller));
                               // Mover la cámara a la ubicación inicial de la ruta si está cargada al inicio
-                              if (mapState.inRoute && mapState.polylines.containsKey('route') && mapState.polylines['route']!.points.isNotEmpty && !_initialCameraMoveDone) {
+                              if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('route') && mapState.polylines['route']!.points.isNotEmpty && !_initialCameraMoveDone) {
                                 final initialRouteLocation = mapState.polylines['route']!.points.first;
                                 _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
                                 setState(() {
@@ -110,7 +112,7 @@ class _MapScreenState extends State<MapScreen> {
                               }
                             },
                           ),
-                          if (mapState.inRoute)
+                          if (mapState.onInitRoute || mapState.onSelectRoute)
                             const Positioned(
                               top: 50,
                               right: 20,
@@ -121,23 +123,52 @@ class _MapScreenState extends State<MapScreen> {
                             left: 0,
                             right: 0,
                             child: Column(
+                              mainAxisSize: MainAxisSize.min,
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: BtnFollowUser(),
-                                ),
-                                const Padding(
-                                  padding: EdgeInsets.only(right: 10),
-                                  child: BtnCurrentLocation(),
-                                ),
-                                (mapState.inRoute)
-                                    ? const CustomDataDisplay()
-                                    : const CustomSearchBar(),
+                                if (!searchState.state.displayManualMarker)
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    spacing: 20,
+                                    children: [
+                                      
+                                      if(mapState.onSelectRoute)  
+                                        FilledButton.icon(
+                                          onPressed: (){}, 
+                                          label: const Text('Como llegar'),
+                                          icon: const Icon(Icons.directions),
+                                        ),
+                                      if(mapState.onSelectRoute)  
+                                        OutlinedButton.icon(
+                                          onPressed: (){}, 
+                                          label: const Text('Iniciar Ruta'),
+                                          icon: const Icon(Icons.play_arrow_rounded),
+                                          style: ButtonStyle(
+                                            backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(180, 255, 255, 255)),
+                                          ),
+                                        ),
+                                      const Padding(
+                                        padding: EdgeInsets.only( right:  10),
+                                        child: Column(
+                                          children: [
+                                            BtnFollowUser(), 
+                                            BtnCurrentLocation(),
+                                          ],
+                                        ),
+                                      ),
+                                    ]
+                                  ),
+                                
+                                (mapState.onInitRoute || mapState.onSelectRoute)
+                                  ? const CustomDataDisplay()
+                                  : const CustomSearchBar(),
                               ],
                             ),
                           ),
+                          
                           const ManualMarker(),
                         ],
                       ),
@@ -188,17 +219,17 @@ class _MapScreenState extends State<MapScreen> {
 
   Center _loader() {
     return const Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,   // Centra verticalmente
-                    crossAxisAlignment: CrossAxisAlignment.center,   // Centra horizontalmente
-                    children: [
-                      Text('Espere por favor...'),
-                      SizedBox(height: 10),   // Añade un espacio entre los textos
-                      CircularProgressIndicator(),
-                      SizedBox(height: 10),   // Añade un espacio entre el progreso y el texto
-                      Text('Estamos calculando su ubicación...'),
-                    ],
-                  ),
-                );
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,   // Centra verticalmente
+        crossAxisAlignment: CrossAxisAlignment.center,   // Centra horizontalmente
+        children: [
+          Text('Espere por favor...'),
+          SizedBox(height: 10),   // Añade un espacio entre los textos
+          CircularProgressIndicator(),
+          SizedBox(height: 10),   // Añade un espacio entre el progreso y el texto
+          Text('Estamos calculando su ubicación...'),
+        ],
+      ),
+    );
   }
 }

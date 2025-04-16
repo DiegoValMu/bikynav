@@ -150,7 +150,7 @@ class RouteScreen extends StatelessWidget {
 
   Future<void> _deleteRoute(BuildContext context, String routeId, RouteServices routeServices) async {
     routeServices.deleteRoute(routeId);
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Eliminado correctamente')));
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Eliminado correctamente'), backgroundColor: Colors.red,));
     context.push('/nav');
   }
 

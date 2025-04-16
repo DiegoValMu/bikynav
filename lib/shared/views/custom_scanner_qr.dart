@@ -136,7 +136,7 @@ class _ScannerQrState extends State<ScannerQr> {
                 currentPolylines['route'] = myRoute;
 
                 mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
-                mapBloc.add(OnInitRoute());
+                mapBloc.add(OnSelectRoute());
 
                 routeServices.myRoute.etiqueta = routeById.etiqueta;
                 routeServices.myRoute.distancia = routeById.calcularDistancia();

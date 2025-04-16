@@ -24,6 +24,7 @@ class UpdateUserPolylineEvent extends MapEvent {
 class OnToggleUserRoute extends MapEvent {}
 class OnCancelToggleUserRoute extends MapEvent {}
 class OnCancelRoute extends MapEvent {}
+class OnSelectRoute extends MapEvent {}
 class OnInitRoute extends MapEvent {}
 
 class MoveCameraToLocationEvent extends MapEvent {

@@ -36,7 +36,7 @@ Future<void> onRouteTap(BuildContext context, BikeRoute route, MapBloc mapBloc, 
     currentPolylines['route'] = myRoute;
 
     mapBloc.add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
-    mapBloc.add(OnInitRoute());
+    mapBloc.add(OnSelectRoute());
 
     mapBloc.add(MoveCameraToLocationEvent(route.ubicacionInicial!));
 
