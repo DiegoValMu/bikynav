@@ -1,12 +1,14 @@
 
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/app/delegates/delegates.dart';
 import 'package:bikynav/features/nav/config/models/models.dart';
+import 'package:provider/provider.dart';
 
 class CustomSearchBar extends StatefulWidget {
   const CustomSearchBar({super.key});
@@ -20,9 +22,11 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
   double _height = 120; // Altura inicial del contenedor
   final double _minHeight = 120; // Altura mínima
   final double _maxHeight = 400; // Altura máxima
+  
 
   @override
   Widget build(BuildContext context) {
+    final routeServices = Provider.of<RouteServices>(context);
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
         return state.displayManualMarker
@@ -33,6 +37,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
             height: _height,
             minHeight: _minHeight,
             maxHeight: _maxHeight,
+            routeServices: routeServices,
             onHeightChanged: (double newHeight) {
               setState( () {
                 _height = newHeight.clamp(_minHeight, _maxHeight);
@@ -51,9 +56,11 @@ class _CustomSearchBarBody extends StatelessWidget {
     required this.height,
     required this.minHeight,
     required this.maxHeight,
-    required this.onHeightChanged,
+    required this.onHeightChanged, 
+    this.routeServices,
   });
 
+  final routeServices;
   final double height; // Altura del contenedor
   final double minHeight; // Altura mínima
   final double maxHeight; // Altura máxima
@@ -64,6 +71,8 @@ class _CustomSearchBarBody extends StatelessWidget {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
+    
+    
 
     // Si es manual
     if (result.manual == true) {
@@ -84,6 +93,9 @@ class _CustomSearchBarBody extends StatelessWidget {
       onHeightChanged(minHeight);
 
       await mapBloc.drawRoutePolyline(destination);
+
+      routeServices.selectNavRoute = result.id;
+
       mapBloc.add( OnInitRoute() );
       
     }
@@ -135,7 +147,7 @@ class _CustomSearchBarBody extends StatelessWidget {
                 GestureDetector(
                   onTap: () async {
                     final result = await showSearch(
-                        context: context, delegate: SearchDestinationDelegate(), maintainState: true);
+                        context: context, delegate: SearchDestinationDelegate());
                     if (result == null) return;
             
                     onSearchResult(context, result);

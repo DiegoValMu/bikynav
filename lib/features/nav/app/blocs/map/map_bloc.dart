@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +36,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     on<DisplayMarkerEvent>((event, emit) => emit( state.copyWith( markers: event.markers )));
 
-    on<DisplayPolylinesEvent>((event, emit) => emit( state.copyWith( polylines: event.polylines, markers: event.markers )));
+    on<DisplayPolylinesEvent>((event, emit) {
+      // Combina los polylines existentes con los nuevos
+      final combinedPolylines = {...state.polylines, ...event.polylines};
+      // Combina los markers existentes con los nuevos
+      final combinedMarkers = {...state.markers, ...event.markers};
+
+      emit(state.copyWith(
+        polylines: combinedPolylines,
+        markers: combinedMarkers
+      ));
+    });
 
     on<OnInitRoute>((event, emit) => emit( state.copyWith( onInitRoute:  true )));
 
@@ -93,52 +104,52 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   }
 
-  Future drawRoutePolyline ( RouteDestination destination ) async {
+  Future drawRoutePolyline(RouteDestination destination) async {
+  final startMarker = await getAssetImageMarker('start_marker.png', 39, 48);
+  final endMarker = await getAssetImageMarker('check_end_marker.png', 48, 48 );
+  // Usamos IDs distintos para la ruta de "Cómo llegar"
+  final navigationRoute = Polyline(
+    polylineId: const PolylineId('navigationRoute'), // ID diferente
+    color: const Color.fromARGB(185, 0, 0, 0), // Color distinto para diferenciar
+    width: 5,
+    points: destination.points,
+    startCap: Cap.roundCap,
+    endCap: Cap.roundCap
+  );
 
-    final myRoute = Polyline(
-      polylineId: const PolylineId('route'),
-      color: Colors.black,
-      width: 5,
-      points: destination.points,
-      startCap: Cap.roundCap,
-      endCap: Cap.roundCap
-      );
+  final navigationStartMarker = Marker(
+    markerId: const MarkerId('navigationStart'), // ID diferente
+    position: destination.points.first,
+    infoWindow: const InfoWindow(title: 'Inicio de navegación'),
+    anchor: const Offset(0.5, 1.0),
+    icon: startMarker
+  );
 
-      double kms = destination.distance / 1000;
-      kms = (kms * 10).roundToDouble() / 10;
+  final navigationEndMarker = Marker(
+    markerId: const MarkerId('navigationEnd'), // ID diferente
+    position: destination.points.last,
+    infoWindow: InfoWindow(
+      title: 'Destino de navegación',
+      snippet: destination.endPlace.properties.name
+    ),
+    icon: endMarker
+  );
 
-      final startMarker = Marker(
-        markerId: const MarkerId('start'),
-        position: destination.points.first,
-        infoWindow: const InfoWindow(
-          title: 'Ubicación inicial',
-        )
-        );
+  // Conservamos TODOS los elementos existentes
+  final currentPolylines = Map<String, Polyline>.from(state.polylines);
+  currentPolylines['navigationRoute'] = navigationRoute;
 
-      final endMarker = Marker(
-        markerId: const MarkerId('end'),
-        position: destination.points.last,
-        infoWindow: InfoWindow(
-          title: 'Destino',
-          snippet: destination.endPlace.properties.name
-        )
-        );  
+  final currentMarkers = Map<String, Marker>.from(state.markers);
+  currentMarkers['navigationStart'] = navigationStartMarker;
+  currentMarkers['navigationEnd'] = navigationEndMarker;
 
-      final currentPolylines = Map<String, Polyline>.from( state.polylines );
-      currentPolylines['route'] = myRoute;
+  add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
 
-      final currentMarkers = Map<String, Marker>.from( state.markers );
-      currentMarkers['start'] = startMarker;
-      currentMarkers['end'] = endMarker;
+  add(MoveCameraToLocationEvent(destination.points.last));
 
-
-      add( DisplayPolylinesEvent( currentPolylines, currentMarkers ) );
-
-      await Future.delayed(const Duration( milliseconds: 300 ) );
-
-      _mapController?.showMarkerInfoWindow( const MarkerId( 'end' ) );
-
-  }
+  await Future.delayed(const Duration(milliseconds: 300));
+  _mapController?.showMarkerInfoWindow(const MarkerId('navigationEnd'));
+}
 
   void moveCamera ( LatLng newLocation) {
     final cameraUpdate = CameraUpdate.newLatLng(newLocation);

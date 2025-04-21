@@ -42,11 +42,13 @@ class MapView extends StatelessWidget {
         onPointerMove: ( pointerMoveEvent ) => mapBloc.add( OnStopFollowingUserEvent() ),
         child: GoogleMap(
                 initialCameraPosition: initialCameraPosition,
-                compassEnabled: true,
+                compassEnabled: false,
                 myLocationEnabled: true,
                 trafficEnabled: true,
                 myLocationButtonEnabled: false,
+                indoorViewEnabled: false,
                 zoomControlsEnabled: false,
+                liteModeEnabled: false,
                 polylines: polylines,
                 markers: markers,
                 style: jsonEncode(wmc2MapTheme),
@@ -54,7 +56,6 @@ class MapView extends StatelessWidget {
                 onCameraMove: ( position ) => mapBloc.mapCenter = position.target,
                 mapType: mapType,
               //TODO: Markers
-              //TODO: Polylines
       
               ),
       ),

@@ -8,6 +8,8 @@ class RouteServices with ChangeNotifier {
 
   List<dynamic> rutas = [];
 
+  String selectNavRoute = '';
+
   BikeRoute myRoute = BikeRoute();
 
   RouteServices();

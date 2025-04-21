@@ -117,6 +117,7 @@ SearchDestinationDelegate():super(
                 //trailing: Text( '${place.properties.distancia}km' ),
                 onTap: () {
                   final result = SearchResult(
+                    id: place.id, // cambiar para que sea dinamico
                     cancel: false, 
                     manual: false,
                     position: LatLng( place.properties.coordinates.longitude, place.properties.coordinates.latitude),

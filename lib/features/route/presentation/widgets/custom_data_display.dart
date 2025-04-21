@@ -10,13 +10,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
 class CustomDataDisplay extends StatefulWidget {
-  const CustomDataDisplay({super.key});
+  final id;
+  const CustomDataDisplay({super.key, this.id});
 
   @override
   State<CustomDataDisplay> createState() => _CustomDataDisplayState();
 }
 
 class _CustomDataDisplayState extends State<CustomDataDisplay> {
+
   @override
   void initState() {
     super.initState();
@@ -45,7 +47,11 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
 
     List<Feature> features = place;
     if (features.isNotEmpty  && !mapBloc.state.onSelectRoute){
-      final dataPlace = features.first;
+      routeServices.selectNavRoute;
+      final dataPlace = features.firstWhere(
+        (feature) => feature.id == routeServices.selectNavRoute,
+        orElse: () => features.first, // Fallback si no encuentra coincidencia
+      );
 
       name = dataPlace.properties.name;
       distance = dataPlace.properties.distancia!;

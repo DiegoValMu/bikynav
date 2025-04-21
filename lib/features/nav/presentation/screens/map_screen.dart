@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/shared/ui/side_menu.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +12,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/presentation/views/views.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
+import 'package:provider/provider.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -120,6 +122,13 @@ class _MapScreenState extends State<MapScreen> {
                                   _initialCameraMoveDone = true;
                                 });
                               }
+                              if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('myRoute') && mapState.polylines['myRoute']!.points.isNotEmpty && !_initialCameraMoveDone) {
+                                final initialRouteLocation = mapState.polylines['myRoute']!.points.first;
+                                _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
+                                setState(() {
+                                  _initialCameraMoveDone = true;
+                                });
+                              }
                             },
                           ),
                           if (mapState.onInitRoute || mapState.onSelectRoute)
@@ -142,24 +151,43 @@ class _MapScreenState extends State<MapScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     crossAxisAlignment: CrossAxisAlignment.end,
-                                    spacing: 20,
+                                    spacing: 5,
                                     children: [
                                       
                                       if(mapState.onSelectRoute)  
                                         FilledButton.icon(
-                                          onPressed: (){}, 
+                                          onPressed: () async {
+                                            final routeServices = Provider.of<RouteServices>(context, listen: false);
+                                            final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+                                            final currentLocation = locationState.lastKnowlocation!;
+                                            final routeStart = routeServices.myRoute.ubicacionInicial!;
+                                            final navigationPath = await searchState.getCoorsStartToEnd(
+                                              currentLocation, 
+                                              routeStart
+                                            );
+                                            
+                                            // 4. Dibujamos la ruta de navegación (con IDs distintos)
+                                            await mapBloc.drawRoutePolyline(navigationPath);
+                                          }, 
+
                                           label: const Text('Como llegar'),
                                           icon: const Icon(Icons.directions),
+                                          style: ButtonStyle(
+                                            minimumSize: WidgetStatePropertyAll(Size(155, 45)),
+                                          ),
                                         ),
                                       if(mapState.onSelectRoute)  
                                         OutlinedButton.icon(
+
                                           onPressed: (){}, 
                                           label: const Text('Iniciar Ruta'),
                                           icon: const Icon(Icons.play_arrow_rounded),
                                           style: ButtonStyle(
                                             backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(200, 255, 255, 255)),
+                                            minimumSize: WidgetStatePropertyAll(Size(155, 45)),
                                           ),
                                         ),
+                                        
                                       Padding(
                                         padding: const EdgeInsets.only( right:  10),
                                         child: Column(
@@ -216,12 +244,13 @@ class _MapScreenState extends State<MapScreen> {
                 child: Column(
                   children: [
                     FloatingActionButton(
+                      backgroundColor: Color.fromARGB(200, 255, 255, 255),
                       onPressed: () {
                         setState(() {
                           _isMenuOpen = true; // Abre el menú
                         });
                       },
-                      child: const Icon(Icons.menu),
+                      child: const Icon(Icons.menu, color: Colors.deepPurple,),
                     ),
                     const SizedBox(height: 15),
                   ],

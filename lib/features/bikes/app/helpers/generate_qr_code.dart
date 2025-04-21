@@ -36,40 +36,43 @@ Future<void> generateQRCode(BuildContext context, dynamic data, String type) asy
       context: context,
       builder: (BuildContext context) {
         return ZoomIn(
-          child: AlertDialog(
-            title: Text('Codigo QR (${type == 'bike' ? 'Bicicleta' : 'Ruta'})', textAlign: TextAlign.center),
-            actionsAlignment: MainAxisAlignment.center,
-            backgroundColor: Colors.white,
-            actions: [
-              FilledButton.icon(
-                onPressed: () async {
-                  final imagePath = await generateImageQr(qrKey);
-                  await Share.shareXFiles([XFile(imagePath)], text: 'Aquí está el QR generado!');
-                },
-                label: const Text('Compartir'),
-                icon: const Icon(Icons.share),
-              ),
-              FilledButton.icon(
-                onPressed: () async {
-                  final image = await generateImageQr(qrKey);
-                  await FlutterImageGallerySaver.saveFile( image);
-
-                  await checkSaveQr(context);
-                  context.pop();
-                },
-                label: const Text('Guardar'),
-                icon: const Icon(Icons.save),
-              ),
-            ],
-            contentPadding: const EdgeInsets.all(15),
-            content: SizedBox(
-              width: 300,
-              height: 300,
-              child: Center(
-                child: RepaintBoundary(
-                  key: qrKey,
-                  child: qrWidget
-                )
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+            child: AlertDialog(
+              title: Text('Codigo QR (${type == 'bike' ? 'Bicicleta' : 'Ruta'})', textAlign: TextAlign.center),
+              actionsAlignment: MainAxisAlignment.center,
+              backgroundColor: Colors.white,
+              actions: [
+                FilledButton.icon(
+                  onPressed: () async {
+                    final imagePath = await generateImageQr(qrKey);
+                    await Share.shareXFiles([XFile(imagePath)], text: 'Aquí está el QR generado!');
+                  },
+                  label: const Text('Compartir'),
+                  icon: const Icon(Icons.share),
+                ),
+                FilledButton.icon(
+                  onPressed: () async {
+                    final image = await generateImageQr(qrKey);
+                    await FlutterImageGallerySaver.saveFile( image);
+            
+                    await checkSaveQr(context);
+                    context.pop();
+                  },
+                  label: const Text('Guardar'),
+                  icon: const Icon(Icons.save),
+                ),
+              ],
+              contentPadding: const EdgeInsets.all(15),
+              content: SizedBox(
+                width: 300,
+                height: 300,
+                child: Center(
+                  child: RepaintBoundary(
+                    key: qrKey,
+                    child: qrWidget
+                  )
+                ),
               ),
             ),
           ),
@@ -87,8 +90,8 @@ Future<dynamic> checkSaveQr(BuildContext context) {
     context: context,
     builder: (BuildContext context) {
       return ZoomIn(
-        child: AlertDialog(
-          content: const SizedBox(
+        child: const AlertDialog(
+          content: SizedBox(
             height: 100,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

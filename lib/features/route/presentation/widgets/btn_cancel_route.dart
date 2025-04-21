@@ -33,6 +33,9 @@ class BtnCancelRoute extends StatelessWidget {
                   state.polylines.remove('route');
                   state.markers.remove('start');
                   state.markers.remove('end');
+                  state.polylines.remove('navigationRoute');
+                  state.markers.remove('navigationStart');
+                  state.markers.remove('navigationEnd');
                 }
               }
             );

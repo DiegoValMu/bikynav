@@ -39,6 +39,9 @@ class DisplayPolylinesEvent extends MapEvent{
   final Map<String, Polyline> polylines;
   final Map<String, Marker> markers;
   const DisplayPolylinesEvent(this.polylines, this.markers);
+
+  @override
+  List<Object> get props => [polylines, markers];
 }
 
 class DisplayMarkerEvent extends MapEvent{
