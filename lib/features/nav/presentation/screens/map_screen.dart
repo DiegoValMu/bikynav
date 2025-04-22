@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/config/models/route_destination.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
@@ -24,6 +25,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late LocationBloc locationBloc;
   bool _isMenuOpen = false;
+  bool isRouteStart = false;
   GoogleMapController? _mapController;
   bool _initialCameraMoveDone = false;
   MapType currentMapType = MapType.normal;
@@ -31,7 +33,10 @@ class _MapScreenState extends State<MapScreen> {
   @override
   void initState() {
     super.initState();
-    locationBloc = BlocProvider.of<LocationBloc>(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      locationBloc = BlocProvider.of<LocationBloc>(context);
+      locationBloc.startFollowingUser(); // Mover aquí la llamada
+    });
   }
 
   @override
@@ -74,7 +79,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
-    locationBloc.startFollowingUser();
+    
     return PopScope(
       canPop: false, // Inicialmente no permitimos el pop por defecto
       onPopInvoked: (didPop) async {
@@ -111,6 +116,7 @@ class _MapScreenState extends State<MapScreen> {
                             polylines: polylines.values.toSet(),
                             markers: mapState.markers.values.toSet(),
                             mapType: currentMapType,
+                            
                             onMapCreated: (GoogleMapController controller) {
                               _mapController = controller;
                               context.read<MapBloc>().add(OnMapInitializedEvent(controller));
@@ -176,24 +182,14 @@ class _MapScreenState extends State<MapScreen> {
                                             minimumSize: WidgetStatePropertyAll(Size(155, 45)),
                                           ),
                                         ),
-                                      if(mapState.onSelectRoute)  
-                                        OutlinedButton.icon(
-
-                                          onPressed: (){}, 
-                                          label: const Text('Iniciar Ruta'),
-                                          icon: const Icon(Icons.play_arrow_rounded),
-                                          style: ButtonStyle(
-                                            backgroundColor: WidgetStateProperty.all<Color>(const Color.fromARGB(200, 255, 255, 255)),
-                                            minimumSize: WidgetStatePropertyAll(Size(155, 45)),
-                                          ),
-                                        ),
-                                        
+                                      if(mapState.onInitRoute)
+                                        const BtnFollowUser(), 
                                       Padding(
                                         padding: const EdgeInsets.only( right:  10),
                                         child: Column(
                                           children: [
                                             CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
-                                            const BtnFollowUser(), 
+                                            
                                             const BtnCurrentLocation(),
                                           ],
                                         ),

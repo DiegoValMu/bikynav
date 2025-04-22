@@ -32,13 +32,17 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     //informacion del destino
     final endPlace = await trafficService.getInformationByCoors(end);
 
-    final distance = trafficResponse.routes[0].distance;
-    final duration = trafficResponse.routes[0].duration;
-    final geometry= trafficResponse.routes[0].geometry;
+    final route = trafficResponse.routes[0];
+    final distance = route.distance;
+    final duration = route.duration;
+    final geometry = route.geometry;
 
     final points = decodePolyline( geometry, accuracyExponent: 6);
 
     final latLngList = points.map( (coor) => LatLng( coor[0].toDouble(), coor[1].toDouble() ) ).toList();
+
+    final initialBearing = route.legs[0].steps[0].maneuver.bearingAfter;
+    final legs = route.legs[0].steps;
 
     //por ver duplicados
     double kms = distance / 1000;
@@ -47,19 +51,22 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     endPlace.properties.distancia = kms;
     endPlace.properties.duracion = duration;
 
-
     if ( !state.history.contains( endPlace) ){
       add( AddToHistoryEvent( endPlace ) );
     }
-    
-    
-    
-    return RouteDestination(
+
+    final destination = RouteDestination(
       points: latLngList, 
       duration: duration, 
       distance: distance,
       endPlace: endPlace, 
+      initialBearing: initialBearing, // Añadir esto
+      intersections: legs,
       );
+    
+    //emit(state.copyWith(currentRoute: destination ));
+
+    return destination;
   }
 
   Future getPlacesByQuery( LatLng proximity, String query ) async {

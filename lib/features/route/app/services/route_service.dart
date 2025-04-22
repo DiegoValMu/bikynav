@@ -7,13 +7,10 @@ import 'dart:convert';
 class RouteServices with ChangeNotifier {
 
   List<dynamic> rutas = [];
-
   String selectNavRoute = '';
-
   BikeRoute myRoute = BikeRoute();
 
   RouteServices();
-
 
   Future<bool> routeRegister( BikeRoute rt ) async {
 
@@ -29,8 +26,6 @@ class RouteServices with ChangeNotifier {
       'fecha': rt.fecha.toString(),
       'usuario': rt.usrId,
     };
-
-
 
     final response = await http.post(
       Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos'),
@@ -48,7 +43,6 @@ class RouteServices with ChangeNotifier {
   }
 
   Future getRoutes( String id) async {
-
     final response = await http.post(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridosUsuario'),
     headers: {
       'Authorization': id,
@@ -62,7 +56,6 @@ class RouteServices with ChangeNotifier {
   }
 
   Future deleteRoute( String id) async {
-
     final response = await http.delete(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$id'));
     if (response.statusCode == 200) {
       return true;
@@ -72,21 +65,15 @@ class RouteServices with ChangeNotifier {
   }
 
   Future getRouteById( String id ) async {
-
     final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$id'));
     if (response.statusCode == 200) {
-      
       Map<String, dynamic> jsonMap = jsonDecode(response.body);
-
-      // Convert to Ruta object
       Ruta ruta = Ruta.fromJson(jsonMap);
-      
       return ruta;
     } else {
       throw Exception('Error en el backend: ${response.body}');
     }
   }
-
 
 }
 

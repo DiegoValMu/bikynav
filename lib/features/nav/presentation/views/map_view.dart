@@ -53,7 +53,13 @@ class MapView extends StatelessWidget {
                 markers: markers,
                 style: jsonEncode(wmc2MapTheme),
                 onMapCreated: onMapCreated,
-                onCameraMove: ( position ) => mapBloc.mapCenter = position.target,
+                onCameraMove: ( position ) {
+                  mapBloc.updateCurrentCameraPosition(position);
+                  mapBloc.mapCenter = position.target;
+                  
+                  //mapBloc.add(OnToggleDegreeView(false, position.bearing));
+                },
+                
                 mapType: mapType,
               //TODO: Markers
       

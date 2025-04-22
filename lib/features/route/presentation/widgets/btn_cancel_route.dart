@@ -22,7 +22,10 @@ class BtnCancelRoute extends StatelessWidget {
             return IconButton(
               icon: const Icon( Icons.clear, color: Colors.black,),
               onPressed: () {
+
+                mapBloc.add(const OnToggleDegreeView(false, 0, 15));
                 mapBloc.add( OnCancelRoute() );
+                mapBloc.add(OnStopFollowingUserEvent());
                 if ( state.showMyRoute ){
                   //locationBloc.state.myLocationHistory = [];
                   stopwatchProvider.resetTimer();
@@ -30,6 +33,7 @@ class BtnCancelRoute extends StatelessWidget {
                 }
                 
                 if (state.markers.isNotEmpty){
+                  
                   state.polylines.remove('route');
                   state.markers.remove('start');
                   state.markers.remove('end');

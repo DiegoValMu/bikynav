@@ -1,5 +1,6 @@
 import 'dart:async';
-
+import 'package:bikynav/features/nav/app/helpers/calculate_bounds.dart';
+import 'package:bikynav/features/nav/app/helpers/calculate_distance.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/config/models/models.dart';
+import 'package:bikynav/features/nav/config/models/traffic_response_cycling.dart' as cycling_models;
 
 part 'map_event.dart';
 part 'map_state.dart';
@@ -16,6 +18,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final LocationBloc locationBloc;
   GoogleMapController? _mapController;
   LatLng? mapCenter;
+  CameraPosition? _currentCameraPosition;
+  double _originalZoom = 15.0;
 
   StreamSubscription<LocationState>? locationStateSubscription;
 
@@ -35,6 +39,12 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<OnCancelRoute>((event, emit) => emit( state.copyWith( onInitRoute:  false, onSelectRoute: false )));
 
     on<DisplayMarkerEvent>((event, emit) => emit( state.copyWith( markers: event.markers )));
+
+    on<OnToggleDegreeView>(onToggleDegreeView);
+
+    on<GetCurrentRouteEvent>((event, emit) => emit( state.copyWith( currentRoute: event.currentRoute )));
+
+    on<FocusOnRouteEvent>(_focusOnRoute);
 
     on<DisplayPolylinesEvent>((event, emit) {
       // Combina los polylines existentes con los nuevos
@@ -56,36 +66,100 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       moveCamera(event.location);
     });
   
-    locationBloc.stream.listen((locationState) { 
+    locationBloc.stream.listen((locationState) {
+      if (!state.isfollowingUser || locationState.lastKnowlocation == null) return;
 
-      if (locationState.lastKnowlocation != null) {
-        add( UpdateUserPolylineEvent( locationState.myLocationHistory ) );
+      final currentLocation = locationState.lastKnowlocation!;
+      final route = state.currentRoute;
+
+      // 1. Si no hay ruta, usa bearing = 0
+      if (route == null) {
+        moveCamera(currentLocation);
+        return;
       }
 
-      if ( !state.isfollowingUser ) return;
-      if ( locationState.lastKnowlocation == null ) return;
-      
-      //moveCamera( locationState.lastKnowlocation! );
+      // 2. Busca el step más cercano (punto de giro)
+      cycling_models.Step nextStep = route.intersections.first;
+      double minDistance = double.infinity;
 
+      for (final step in route.intersections) {
+        final stepLatLng = LatLng(step.maneuver.location[0], step.maneuver.location[1]);
+        final distance = calculateDistance(currentLocation, stepLatLng);
+        if (distance < minDistance) {
+          minDistance = distance;
+          nextStep = step;
+        }
+      }
+
+      // 3. Si está cerca de un step, usa su bearingAfter
+      final double bearing;
+      const thresholdDistance = 10.0; // 10 metros para activar el giro
+
+      if (nextStep != null && minDistance <= thresholdDistance) {
+        bearing = nextStep.maneuver.bearingAfter.toDouble();
+      } else {
+        bearing = route.initialBearing.toDouble(); // Mantén el bearing inicial
+      }
+
+      // 4. Mueve la cámara con el bearing actualizado
+      moveCamera(currentLocation);
     });
   }
 
+  //---------------------------------------------------------------------------------------------------------------------
   void _onInitMap( OnMapInitializedEvent event, Emitter<MapState> emit) {
-
     _mapController = event.controller;
     //_mapController?.animateCamera();
 
     emit( state.copyWith( isMapInitialized: true ) );
 
   }
+  //---------------------------------------------------------------------------------------------------------------------
 
+  //funcion para mantener la camara sobre la posicion del usuario y seguir su movimiento(solo con la camara)
   void _onStartFollowingUser( OnStartFollowingUserEvent event, Emitter<MapState> emit){
     emit( state.copyWith( isfollowingUser: true)  );
-
     if( locationBloc.state.lastKnowlocation == null ) return;
     moveCamera(locationBloc.state.lastKnowlocation! );
-
   }
+
+  //---------------------------------------------------------------------------------------------------------------------
+
+  //funcion para cambiar la vista a en grados, cambio de zoom y centra la camara a la posicion del usuario 
+  void onToggleDegreeView(OnToggleDegreeView event, Emitter<MapState> emit) {
+    emit(state.copyWith(is45DegreeView: event.enable));
+
+    if (_mapController != null && _currentCameraPosition != null) {
+      final newPosition = CameraPosition(
+        target: locationBloc.state.lastKnowlocation!,
+        zoom: event.enable ? event.zoom : 10,
+        tilt: event.enable ? 65 : 0,
+        bearing:  event.bearing,
+      );
+      _currentCameraPosition = newPosition;
+      _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition), duration: Duration(milliseconds: 300));
+    }
+  }
+
+  //-----------------------------------------------------------------------------------------------------------------------
+
+  //cambio a vista general de la ruta seleccionada
+  void _focusOnRoute(FocusOnRouteEvent event, Emitter<MapState> emit) {
+    if (_mapController == null || event.routePoints.isEmpty) return;
+  
+    final bounds = latLngBoundsForRoute(event.routePoints);
+    
+    _mapController?.animateCamera(
+      CameraUpdate.newLatLngBounds(bounds, 100), // 100px de padding
+    );
+  
+    // Resetear vista 3D si está activa
+    if (state.is45DegreeView) {
+      emit(state.copyWith(is45DegreeView: false));
+    }
+  }
+
+  //------------------------------------------------------------------------------------------------------------------------
 
   void _onPolylineNewPoint (UpdateUserPolylineEvent event, Emitter<MapState> emit){
     final myRoute = Polyline(
@@ -100,11 +174,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       final currentPolylines = Map<String, Polyline>.from( state.polylines );
       currentPolylines['myRoute'] = myRoute;
 
-      emit (state.copyWith(polylines: currentPolylines));
+      emit(state.copyWith(polylines: currentPolylines));
+      //moveCamera(event.userLocations.last);
 
   }
 
+  //---------------------------------------------------------------------------------------------------------------------
+
+
   Future drawRoutePolyline(RouteDestination destination) async {
+
+  add(GetCurrentRouteEvent(destination));
+
   final startMarker = await getAssetImageMarker('start_marker.png', 39, 48);
   final endMarker = await getAssetImageMarker('check_end_marker.png', 48, 48 );
   // Usamos IDs distintos para la ruta de "Cómo llegar"
@@ -145,15 +226,27 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   add(DisplayPolylinesEvent(currentPolylines, currentMarkers));
 
-  add(MoveCameraToLocationEvent(destination.points.last));
-
+  //add(MoveCameraToLocationEvent(destination.points.last));
+  
   await Future.delayed(const Duration(milliseconds: 300));
+  
+  add(MoveCameraToLocationEvent(destination.points.first));
+  
+  add(FocusOnRouteEvent(destination.points));
+
   _mapController?.showMarkerInfoWindow(const MarkerId('navigationEnd'));
 }
 
   void moveCamera ( LatLng newLocation) {
     final cameraUpdate = CameraUpdate.newLatLng(newLocation);
-    _mapController?.animateCamera(cameraUpdate);
+    _mapController?.animateCamera(
+      cameraUpdate,
+      duration: Duration(milliseconds: 300)
+    );
+  }
+
+  void updateCurrentCameraPosition(CameraPosition newPosition) {
+    _currentCameraPosition = newPosition;
   }
 
   @override
@@ -163,3 +256,4 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
 }
+

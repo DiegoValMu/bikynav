@@ -13,6 +13,16 @@ class OnMapInitializedEvent extends MapEvent {
   const OnMapInitializedEvent (this.controller);
 }
 
+class OnToggleDegreeView extends MapEvent {
+  final bool enable;
+  final double bearing;
+  final double zoom;
+
+  const OnToggleDegreeView(this.enable, this.bearing, this.zoom);
+}
+
+
+
 class OnStopFollowingUserEvent extends MapEvent {}
 class OnStartFollowingUserEvent extends MapEvent {}
 
@@ -35,6 +45,15 @@ class MoveCameraToLocationEvent extends MapEvent {
   List<Object> get props => [location];
 }
 
+class FocusOnRouteEvent extends MapEvent {  // <-- Extiende MapEvent
+  final List<LatLng> routePoints;
+  
+  const FocusOnRouteEvent(this.routePoints);
+  
+  @override
+  List<Object> get props => [routePoints];
+}
+
 class DisplayPolylinesEvent extends MapEvent{
   final Map<String, Polyline> polylines;
   final Map<String, Marker> markers;
@@ -47,4 +66,9 @@ class DisplayPolylinesEvent extends MapEvent{
 class DisplayMarkerEvent extends MapEvent{
   final Map<String, Marker> markers;
   const DisplayMarkerEvent(this.markers);
+}
+
+class GetCurrentRouteEvent extends MapEvent{
+  final RouteDestination? currentRoute;
+  const GetCurrentRouteEvent(this.currentRoute);
 }
