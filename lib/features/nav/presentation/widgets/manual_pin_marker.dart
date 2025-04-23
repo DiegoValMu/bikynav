@@ -1,17 +1,19 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:bikynav/features/nav/presentation/screens/taller_form_screen.dart';
+import 'package:bikynav/features/nav/presentation/ui/select_marker_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 
-class ManualMarker extends StatelessWidget {
-  const ManualMarker({super.key});
+class ManualPinMarker extends StatelessWidget {
+  const ManualPinMarker({super.key});
 
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
-        return state.displayManualMarker
+        return state.displayManualPinMarker
         ? const _ManualMarkerBody()
         : const SizedBox();
       },
@@ -42,8 +44,10 @@ class _ManualMarkerBody extends StatelessWidget {
               child: BounceInDown(
                 from: 100,
                 child: const Icon(
-                  Icons.location_on_rounded,
-                  size: 60,
+                  Icons.push_pin_outlined,
+                  size: 50,
+                  color: Colors.deepPurple,
+                  fill: 1,
                 )
               )
             ),
@@ -60,22 +64,16 @@ class _ManualMarkerBody extends StatelessWidget {
                 height: 50,
                 shape: const StadiumBorder(),
                 onPressed: () async {
+                  final markerPosition = mapBloc.mapCenter;
+                  if( markerPosition == null ) return;
+                  final res = selectMarkerForm(context);
+                  if(res == 'taller'){
+                    TallerForm( markerPosition: markerPosition );
+                  }
                   
-                  locationBloc.add( OnNewRouteEvent(position!));
-                  
-                  final start = locationBloc.state.lastKnowlocation;
-                  if( start == null ) return;
-                  final end = mapBloc.mapCenter;
-                  if( end == null ) return;
-                  showLoadingMessage(context);
-                  final destination = await searchBloc.getCoorsStartToEnd(start, end);
-                  await mapBloc.drawRoutePolyline(destination);
-                  searchBloc.add( OnDesactivateManualMarkerEvent() );
-                  mapBloc.add( OnInitRoute() );
-                  Navigator.pop(context);
                 },
                 child: const Text(
-                  'Confirmar destino',
+                  'Colocar marcador',
                   style: TextStyle(
                       color: Colors.white, fontWeight: FontWeight.w300),
                 ),
@@ -86,14 +84,17 @@ class _ManualMarkerBody extends StatelessWidget {
       ),
     );
   }
+
 }
+
+
 
 class _BtnBack extends StatelessWidget {
   const _BtnBack();
 
-  void onCancelManualMarker(BuildContext context) {
+  void onCancelManualPinMarker(BuildContext context) {
     final searchBloc = BlocProvider.of<SearchBloc>(context);
-      searchBloc.add(OnDesactivateManualMarkerEvent());
+      searchBloc.add(OnDesactivateManualPinMarkerEvent());
       return;
   }
 
@@ -110,7 +111,7 @@ class _BtnBack extends StatelessWidget {
             color: Colors.black,
           ),
           onPressed: () {
-            onCancelManualMarker(context);
+            onCancelManualPinMarker(context);
           },
         )
       ),

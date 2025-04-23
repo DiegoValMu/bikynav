@@ -20,6 +20,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     on<OnDesactivateManualMarkerEvent>((event, emit) => emit( state.copyWith( displayManualMarker: false ) ) );
 
+    on<OnActivateManualPinMarkerEvent>((event, emit) => emit( state.copyWith( displayManualPinMarker: true ) ) );
+
+    on<OnDesactivateManualPinMarkerEvent>((event, emit) => emit( state.copyWith( displayManualPinMarker: false ) ) );
+
     on<OnNewPlacesFoundEvent>((event, emit) => emit( state.copyWith( places: event.places ) ) );
 
     on<AddToHistoryEvent>((event, emit) => emit( state.copyWith( history: [ event.place, ...state.history ] ) ) );

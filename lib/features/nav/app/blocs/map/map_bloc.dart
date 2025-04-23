@@ -132,7 +132,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     if (_mapController != null && _currentCameraPosition != null) {
       final newPosition = CameraPosition(
         target: locationBloc.state.lastKnowlocation!,
-        zoom: event.enable ? event.zoom : 10,
+        zoom: event.enable ? event.zoom : 15,
         tilt: event.enable ? 65 : 0,
         bearing:  event.bearing,
       );
@@ -233,6 +233,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   add(MoveCameraToLocationEvent(destination.points.first));
   
   add(FocusOnRouteEvent(destination.points));
+
+  
 
   _mapController?.showMarkerInfoWindow(const MarkerId('navigationEnd'));
 }

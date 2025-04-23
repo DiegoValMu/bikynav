@@ -1,6 +1,8 @@
+import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
 import 'package:bikynav/shared/views/nav_items.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 
 class NavOptions extends StatelessWidget {
@@ -32,7 +34,8 @@ class NavOptions extends StatelessWidget {
             Icons.push_pin, 
             'Colocar pin', 
             () {
-              context.push('/scanner_qr');
+              final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+              searchBloc.add(OnActivateManualPinMarkerEvent());
             }
           ),
         ],

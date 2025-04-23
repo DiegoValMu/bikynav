@@ -36,13 +36,13 @@ class BtnFollowUser extends StatelessWidget {
               mapBloc.add(OnToggleDegreeView(
                 true, 
                 initialBearing!.toDouble(),
-                100
+                19
               ));
               //pasar los datos de currentRoute a OnToggleDegreeView(true)
             }, 
             icon: const Icon(
               Icons.remove_red_eye_sharp,
-              size: 25
+              size: 22
               ),
             label: const Text('Centrar vista'),
             style: const ButtonStyle(

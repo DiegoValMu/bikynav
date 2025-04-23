@@ -1,5 +1,6 @@
 
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
     final routeServices = Provider.of<RouteServices>(context);
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
-        return state.displayManualMarker
+        return (state.displayManualMarker || state.displayManualPinMarker )
         ? const SizedBox( )
         : FadeInDown(
           duration: const Duration(milliseconds: 300),
@@ -72,8 +73,6 @@ class _CustomSearchBarBody extends StatelessWidget {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     
-    
-
     // Si es manual
     if (result.manual == true) {
       searchBloc.add(OnActivateManualMarkerEvent());
@@ -83,27 +82,27 @@ class _CustomSearchBarBody extends StatelessWidget {
     // Cualquier otro caso
     if (result.position != null) {
 
-      
+      showLoadingMessage(context);
+
       final start = locationBloc.state.lastKnowlocation;
       if (start == null) return;
+
       final position = result.position;
       final end = LatLng(position!.longitude, position.latitude);
       final destination = await searchBloc.getCoorsStartToEnd(start, end);
 
       onHeightChanged(minHeight);
-
       await mapBloc.drawRoutePolyline(destination);
-
       routeServices.selectNavRoute = result.id;
-
       mapBloc.add( OnInitRoute() );
+
+      hideLoadingMessage(context);
       
     }
   }
 
   @override
   Widget build(BuildContext context) {
-
     final width = MediaQuery.of(context).size.width;
 
     return SafeArea(

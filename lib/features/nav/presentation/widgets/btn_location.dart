@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
@@ -12,20 +13,22 @@ class BtnCurrentLocation extends StatelessWidget {
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
 
-    return CircleAvatar(
-      backgroundColor: Color.fromRGBO(255, 255, 255, 0.8),
-      maxRadius: 25,
-      child: IconButton(
-        icon: const Icon( Icons.my_location_outlined , color: Colors.teal,),
-        onPressed: () {
-          final userLocation = locationBloc.state.lastKnowlocation;
-          if( userLocation == null ){
-            final snack = CustomSnackbar(message: 'no hay ubicacion');
-            ScaffoldMessenger.of(context).showSnackBar(snack);
-            return;
+    return ZoomIn(
+      child: CircleAvatar(
+        backgroundColor: Color.fromRGBO(255, 255, 255, 0.8),
+        maxRadius: 25,
+        child: IconButton(
+          icon: const Icon( Icons.my_location_outlined , color: Colors.teal,),
+          onPressed: () {
+            final userLocation = locationBloc.state.lastKnowlocation;
+            if( userLocation == null ){
+              final snack = CustomSnackbar(message: 'no hay ubicacion');
+              ScaffoldMessenger.of(context).showSnackBar(snack);
+              return;
+            } 
+            mapBloc.moveCamera(userLocation);
           } 
-          mapBloc.moveCamera(userLocation);
-        } 
+        ),
       ),
     );
   }

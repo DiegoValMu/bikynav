@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:animate_do/animate_do.dart';
-import 'package:bikynav/features/nav/config/models/route_destination.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
+import 'package:bikynav/features/nav/presentation/widgets/manual_pin_marker.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/shared/ui/side_menu.dart';
@@ -29,6 +27,7 @@ class _MapScreenState extends State<MapScreen> {
   GoogleMapController? _mapController;
   bool _initialCameraMoveDone = false;
   MapType currentMapType = MapType.normal;
+  bool steps = false;
 
   @override
   void initState() {
@@ -48,8 +47,8 @@ class _MapScreenState extends State<MapScreen> {
   void toggleMapType() {
   setState(() {
     currentMapType = currentMapType == MapType.normal 
-        ? MapType.satellite 
-        : MapType.normal;
+    ? MapType.satellite 
+    : MapType.normal;
   });
 }
 
@@ -105,7 +104,6 @@ class _MapScreenState extends State<MapScreen> {
                     if (!mapState.showMyRoute) {
                       polylines.removeWhere((key, value) => key == 'myRoute');
                     }
-
                     final searchState = BlocProvider.of<SearchBloc>(context, listen: false);
 
                     return SingleChildScrollView(
@@ -116,7 +114,6 @@ class _MapScreenState extends State<MapScreen> {
                             polylines: polylines.values.toSet(),
                             markers: mapState.markers.values.toSet(),
                             mapType: currentMapType,
-                            
                             onMapCreated: (GoogleMapController controller) {
                               _mapController = controller;
                               context.read<MapBloc>().add(OnMapInitializedEvent(controller));
@@ -124,24 +121,23 @@ class _MapScreenState extends State<MapScreen> {
                               if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('route') && mapState.polylines['route']!.points.isNotEmpty && !_initialCameraMoveDone) {
                                 final initialRouteLocation = mapState.polylines['route']!.points.first;
                                 _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
-                                setState(() {
-                                  _initialCameraMoveDone = true;
-                                });
+                                setState(() => _initialCameraMoveDone = true);
                               }
                               if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('myRoute') && mapState.polylines['myRoute']!.points.isNotEmpty && !_initialCameraMoveDone) {
                                 final initialRouteLocation = mapState.polylines['myRoute']!.points.first;
                                 _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
-                                setState(() {
-                                  _initialCameraMoveDone = true;
-                                });
+                                setState(() => _initialCameraMoveDone = true);
                               }
                             },
                           ),
                           if (mapState.onInitRoute || mapState.onSelectRoute)
-                            const Positioned(
+                            Positioned(
                               top: 50,
                               right: 20,
-                              child: BtnCancelRoute(),
+                              child: BtnCancelRoute( 
+                                steps: steps,
+                                onCancel: () => steps = false, 
+                              )
                             ),
                           Positioned(
                             bottom: 120,
@@ -152,21 +148,22 @@ class _MapScreenState extends State<MapScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                if (!searchState.state.displayManualMarker)
-                                  Row(
+                              if (!searchState.state.displayManualMarker)
+                                ZoomIn(
+                                  child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     spacing: 5,
                                     children: [
-                                      
-                                      if(mapState.onSelectRoute)  
+                                      if(mapState.onSelectRoute && !steps)  
                                         FilledButton.icon(
                                           onPressed: () async {
                                             final routeServices = Provider.of<RouteServices>(context, listen: false);
                                             final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
                                             final currentLocation = locationState.lastKnowlocation!;
                                             final routeStart = routeServices.myRoute.ubicacionInicial!;
+                                            
                                             final navigationPath = await searchState.getCoorsStartToEnd(
                                               currentLocation, 
                                               routeStart
@@ -174,28 +171,28 @@ class _MapScreenState extends State<MapScreen> {
                                             
                                             // 4. Dibujamos la ruta de navegación (con IDs distintos)
                                             await mapBloc.drawRoutePolyline(navigationPath);
+                                            setState( () => steps = true );
                                           }, 
-
                                           label: const Text('Como llegar'),
                                           icon: const Icon(Icons.directions),
-                                          style: ButtonStyle(
+                                          style: const ButtonStyle(
                                             minimumSize: WidgetStatePropertyAll(Size(155, 45)),
                                           ),
                                         ),
-                                      if(mapState.onInitRoute)
+                                      if(mapState.onInitRoute || steps)
                                         const BtnFollowUser(), 
                                       Padding(
                                         padding: const EdgeInsets.only( right:  10),
                                         child: Column(
                                           children: [
                                             CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
-                                            
                                             const BtnCurrentLocation(),
                                           ],
                                         ),
                                       ),
                                     ]
                                   ),
+                                ),
                               ],
                             ),
                           ),
@@ -204,9 +201,10 @@ class _MapScreenState extends State<MapScreen> {
                             right: 0,
                             left: 0,
                             child: (mapState.onInitRoute || mapState.onSelectRoute)
-                                  ? const CustomDataDisplay()
-                                  : const CustomSearchBar(),
+                            ? SlideInUp(child: const CustomDataDisplay())
+                            : SlideInUp(child: const CustomSearchBar()),
                             ),
+                          const ManualPinMarker(),
                           const ManualMarker(),
                         ],
                       ),
@@ -224,9 +222,7 @@ class _MapScreenState extends State<MapScreen> {
               child: SideMenu( // Usamos el nuevo widget
                 isMenuOpen: _isMenuOpen,
                 onClose: () {
-                  setState(() {
-                    _isMenuOpen = false;
-                  });
+                  setState(() => _isMenuOpen = false);
                 },
               ),
             ),
@@ -240,11 +236,9 @@ class _MapScreenState extends State<MapScreen> {
                 child: Column(
                   children: [
                     FloatingActionButton(
-                      backgroundColor: Color.fromARGB(200, 255, 255, 255),
+                      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
                       onPressed: () {
-                        setState(() {
-                          _isMenuOpen = true; // Abre el menú
-                        });
+                        setState(() => _isMenuOpen = true);
                       },
                       child: const Icon(Icons.menu, color: Colors.deepPurple,),
                     ),
