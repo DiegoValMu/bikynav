@@ -13,14 +13,16 @@ class MapView extends StatelessWidget {
   final Set<Marker> markers;
   final Function(GoogleMapController)? onMapCreated;
   final MapType mapType;
+  final void Function(LatLng)? onLongPress;
 
-  const MapView({
+  MapView({
     super.key, 
     required this.initialLocation, 
     required this.polylines, 
     required this.markers,
     this.mapType = MapType.normal, 
-    this.onMapCreated
+    this.onMapCreated, 
+    this.onLongPress
     });
 
   @override
@@ -59,6 +61,7 @@ class MapView extends StatelessWidget {
                   
                   //mapBloc.add(OnToggleDegreeView(false, position.bearing));
                 },
+                onLongPress: onLongPress,
                 
                 mapType: mapType,
               //TODO: Markers

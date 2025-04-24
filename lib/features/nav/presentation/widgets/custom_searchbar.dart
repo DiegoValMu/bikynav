@@ -12,7 +12,12 @@ import 'package:bikynav/features/nav/config/models/models.dart';
 import 'package:provider/provider.dart';
 
 class CustomSearchBar extends StatefulWidget {
-  const CustomSearchBar({super.key});
+  final VoidCallback onMenuPressed;
+  
+  const CustomSearchBar({
+    super.key, 
+    required this.onMenuPressed
+  });
 
   @override
   // ignore: library_private_types_in_public_api
@@ -39,6 +44,7 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
             minHeight: _minHeight,
             maxHeight: _maxHeight,
             routeServices: routeServices,
+            onMenuPressed: widget.onMenuPressed,
             onHeightChanged: (double newHeight) {
               setState( () {
                 _height = newHeight.clamp(_minHeight, _maxHeight);
@@ -58,9 +64,12 @@ class _CustomSearchBarBody extends StatelessWidget {
     required this.minHeight,
     required this.maxHeight,
     required this.onHeightChanged, 
-    this.routeServices,
+    this.routeServices, 
+    required this.onMenuPressed,
   });
 
+
+  final VoidCallback onMenuPressed;
   final routeServices;
   final double height; // Altura del contenedor
   final double minHeight; // Altura mínima
@@ -104,89 +113,139 @@ class _CustomSearchBarBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
+    final history = BlocProvider.of<SearchBloc>(context).state.history;
+    final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+    final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
+    final mapBloc = BlocProvider.of<MapBloc>(context);
 
     return SafeArea(
-      bottom: true,
-      child: GestureDetector(
-        onVerticalDragUpdate: (details) {
-          // Cambia la altura según el movimiento del drag
-          onHeightChanged(height - details.delta.dy);
-        },
-        onVerticalDragEnd: (details) {
-          // Establece la altura final en función de la dirección del movimiento
-          if (details.primaryVelocity! < 0) {
-            // Si se deslizaba hacia arriba
-            onHeightChanged(maxHeight); // Expande completamente
-          } else {
-            // Si se deslizaba hacia abajo
-            onHeightChanged(minHeight); // Vuelve a la altura mínima
-          }
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200), // Duración de la animación
-          height: height, // Ajusta la altura según el valor pasado
-          decoration: const BoxDecoration(
-            color: Colors.white, // Color de fondo de la barra de búsqueda
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)), // Esquinas redondeadas (opcional)
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black, // Color de la sombra
-                blurRadius: 2, // Desenfoque de la sombra
-                offset: Offset(0, 0), // Sombra hacia arriba
+  bottom: true,
+  child: GestureDetector(
+    onVerticalDragUpdate: (details) {
+      onHeightChanged(height - details.delta.dy);
+    },
+    onVerticalDragEnd: (details) {
+      if (details.primaryVelocity! < 0) {
+        onHeightChanged(maxHeight);
+      } else {
+        onHeightChanged(minHeight);
+      }
+    },
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      height: height,
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black,
+            blurRadius: 2,
+            offset: Offset(0, 0),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          // Parte superior FIJADA (no desplazable)
+          Column(
+            children: [
+              const DecorativeBar(),
+              Row(
+                spacing: 3,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  GestureDetector(
+                    onTap: () async {
+                      final result = await showSearch(
+                          context: context, delegate: SearchDestinationDelegate());
+                      if (result == null) return;
+                      onSearchResult(context, result);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                      margin: const EdgeInsets.only(bottom: 25),
+                      width: width - 75,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(100),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.search, color: Colors.black87),
+                          SizedBox(width: 10),
+                          Text('¿Dónde quieres ir?',
+                              style: TextStyle(color: Colors.black87)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 25.0),
+                    child: IconButton(
+                      onPressed: onMenuPressed,
+                      icon: const Icon(Icons.menu, color: Colors.black),
+                      iconSize: 28,
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
+                        padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
+                      ),
+                    ),
+                  ),
+                ],
               ),
+              const Divider(),
+              NavOptions(),
+              const Divider(),
             ],
           ),
-          padding: const EdgeInsets.symmetric(horizontal: 20), // Padding horizontal
-          child: SizedBox(
-            height: height,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const DecorativeBar(),
-                GestureDetector(
-                  onTap: () async {
-                    final result = await showSearch(
-                        context: context, delegate: SearchDestinationDelegate());
-                    if (result == null) return;
-            
-                    onSearchResult(context, result);
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-                    margin: const EdgeInsets.only( bottom: 25),
-                    width: width, // Asegura que el ancho sea completo
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(100),
+          
+          // Parte inferior DESPLAZABLE
+          if (history.isNotEmpty)
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text('Recientes'),
                     ),
-                    child: const Row(
+                    ...history.map((place) => Column(
                       children: [
-                        Icon(Icons.search, color: Colors.black87), // Icono de búsqueda
-                        SizedBox(width: 10),
-                        Text('¿Dónde quieres ir?',
-                            style: TextStyle(color: Colors.black87)),
+                        ListTile(
+                          title: Text(place.properties.name, 
+                            style: const TextStyle(fontSize: 15)),
+                          subtitle: Text(place.properties.placeFormatted),
+                          leading: const Icon(Icons.place_outlined, color: Colors.black),
+                          onTap: () async {
+
+                            final result = SearchResult(
+                              id: place.id, // cambiar para que sea dinamico
+                              cancel: false, 
+                              manual: false,
+                              position: LatLng( place.properties.coordinates.longitude, place.properties.coordinates.latitude),
+                              name: place.properties.name,
+                              description: place.properties.placeFormatted
+                            );
+                            onSearchResult(context, result);
+
+                          },
+                        ),
+                        const Divider(),
                       ],
-                    ),
-                  ),
+                    )),
+                  ],
                 ),
-                const Expanded(
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Divider(),
-                        NavOptions(),
-                        Divider(),
-                      ],
-                    ),
-                  ),
-                ),
-                //widgets al expandir
-              ],
+              ),
             ),
-          ),
-        ),
+        ],
       ),
-    );
+    ),
+  ),
+);
   }
 }
 

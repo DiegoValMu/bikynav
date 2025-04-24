@@ -30,6 +30,13 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
   }
 
+  Future<Feature> getInformationPlace(LatLng end ) async {
+    
+    final endPlace = await trafficService.getInformationByCoors(end);
+    
+    return endPlace;
+  }
+
   Future getCoorsStartToEnd( LatLng start, LatLng end ) async {
     final trafficResponse = await trafficService.getCoorsStartToEnd(start, end);
 

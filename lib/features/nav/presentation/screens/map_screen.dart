@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
+import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
 import 'package:bikynav/features/nav/presentation/widgets/manual_pin_marker.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
@@ -28,6 +29,7 @@ class _MapScreenState extends State<MapScreen> {
   bool _initialCameraMoveDone = false;
   MapType currentMapType = MapType.normal;
   bool steps = false;
+  bool markerOn = false;
 
   @override
   void initState() {
@@ -85,6 +87,10 @@ class _MapScreenState extends State<MapScreen> {
         if (didPop) {
           return;
         }
+        if (_isMenuOpen) {
+          setState(() => _isMenuOpen = false);
+          return;
+        } 
         bool shouldPop = await _onWillPop();
         if (shouldPop) {
           Navigator.of(context).pop(); // Realizamos el pop manualmente si el usuario elige "Sí"
@@ -114,6 +120,16 @@ class _MapScreenState extends State<MapScreen> {
                             polylines: polylines.values.toSet(),
                             markers: mapState.markers.values.toSet(),
                             mapType: currentMapType,
+                            onLongPress: (p0) {
+
+                              setState(() {
+                                markerOn = true;
+                              });
+
+                              _setMarker(context, p0, markerOn);
+
+                              
+                            },
                             onMapCreated: (GoogleMapController controller) {
                               _mapController = controller;
                               context.read<MapBloc>().add(OnMapInitializedEvent(controller));
@@ -202,9 +218,21 @@ class _MapScreenState extends State<MapScreen> {
                             left: 0,
                             child: (mapState.onInitRoute || mapState.onSelectRoute)
                             ? SlideInUp(child: const CustomDataDisplay())
-                            : SlideInUp(child: const CustomSearchBar()),
+                            : SlideInUp(child: CustomSearchBar(
+                                  onMenuPressed: () => setState(() => _isMenuOpen = true),
+                              )),
+                          ),
+                          if(markerOn)
+                            Positioned(
+                              bottom: -25,
+                              right: 0,
+                              left: 0,
+                              child: SlideInUp(child: CustomMarkerForm(
+                                onCloseTap: () => setState(() => markerOn = false),
+                              ))
                             ),
-                          const ManualPinMarker(),
+                          //
+                          //const ManualPinMarker(),
                           const ManualMarker(),
                         ],
                       ),
@@ -228,24 +256,6 @@ class _MapScreenState extends State<MapScreen> {
             ),
           ],
         ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.startTop,
-        floatingActionButton: _isMenuOpen
-            ? null
-            : Padding(
-                padding: const EdgeInsets.only(top: 10.0),
-                child: Column(
-                  children: [
-                    FloatingActionButton(
-                      backgroundColor: const Color.fromARGB(200, 255, 255, 255),
-                      onPressed: () {
-                        setState(() => _isMenuOpen = true);
-                      },
-                      child: const Icon(Icons.menu, color: Colors.deepPurple,),
-                    ),
-                    const SizedBox(height: 15),
-                  ],
-                ),
-              ),
       ),
     );
   }
@@ -265,4 +275,30 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
   }
+}
+
+_setMarker(BuildContext context, LatLng p0, bool markerOn) async {
+
+  final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+  final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+
+  final placeData = await searchBloc.getInformationPlace(p0);
+
+  final newMarker = Marker(
+    markerId: const MarkerId('newMarker'), // ID diferente
+    position: p0,
+    infoWindow:  InfoWindow(title: placeData.properties.name),
+    anchor: const Offset(0.5, 1.0),
+  );
+  final updatedMarkers = Map<String, Marker>.from(mapBloc.state.markers);
+  updatedMarkers[newMarker.markerId.value] = newMarker;
+
+  mapBloc.add(DisplayMarkerEvent(updatedMarkers));
+
+  mapBloc.add(MoveCameraToLocationEvent(p0));
+  
+  searchBloc.add(AddToHistoryEvent(placeData));
+
+
+  
 }
