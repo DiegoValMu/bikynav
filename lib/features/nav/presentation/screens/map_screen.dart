@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
-import 'package:bikynav/features/nav/presentation/widgets/manual_pin_marker.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/shared/ui/side_menu.dart';
@@ -37,6 +36,12 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       locationBloc = BlocProvider.of<LocationBloc>(context);
       locationBloc.startFollowingUser(); // Mover aquí la llamada
+    });
+  }
+
+  void _handleMarkerAdded() {
+    setState(() {
+      markerOn = true;
     });
   }
 
@@ -121,13 +126,7 @@ class _MapScreenState extends State<MapScreen> {
                             markers: mapState.markers.values.toSet(),
                             mapType: currentMapType,
                             onLongPress: (p0) {
-
-                              setState(() {
-                                markerOn = true;
-                              });
-
-                              _setMarker(context, p0, markerOn);
-
+                              _setMarker(context, p0, _handleMarkerAdded);
                               
                             },
                             onMapCreated: (GoogleMapController controller) {
@@ -228,7 +227,17 @@ class _MapScreenState extends State<MapScreen> {
                               right: 0,
                               left: 0,
                               child: SlideInUp(child: CustomMarkerForm(
-                                onCloseTap: () => setState(() => markerOn = false),
+                                onCloseTap: () => setState(() { 
+                                  markerOn = false;
+                                  final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+                                  mapBloc.add( OnCancelRoute() );
+                                  mapBloc.add(OnStopFollowingUserEvent());
+                                  if (mapState.markers.isNotEmpty){
+                                    mapState.polylines.remove('navigationRoute');
+                                    mapState.markers.remove('navigationStart');
+                                    mapState.markers.remove('navigationEnd');
+                                  }
+                                }),
                               ))
                             ),
                           //
@@ -277,7 +286,7 @@ class _MapScreenState extends State<MapScreen> {
   }
 }
 
-_setMarker(BuildContext context, LatLng p0, bool markerOn) async {
+_setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
 
   final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
   final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
@@ -299,6 +308,6 @@ _setMarker(BuildContext context, LatLng p0, bool markerOn) async {
   
   searchBloc.add(AddToHistoryEvent(placeData));
 
-
+  onMarkerAdded();
   
 }

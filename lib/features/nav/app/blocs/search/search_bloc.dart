@@ -28,6 +28,11 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     on<AddToHistoryEvent>((event, emit) => emit( state.copyWith( history: [ event.place, ...state.history ] ) ) );
 
+    on<RemoveFromHistory>((event, emit) {
+      final newHistory = state.history.where((place) => place.id != event.placeId).toList();
+      emit(state.copyWith(history: newHistory));
+    });
+
   }
 
   Future<Feature> getInformationPlace(LatLng end ) async {

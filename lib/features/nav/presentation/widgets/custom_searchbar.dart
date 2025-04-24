@@ -25,9 +25,9 @@ class CustomSearchBar extends StatefulWidget {
 }
 
 class _CustomSearchBarState extends State<CustomSearchBar> {
-  double _height = 120; // Altura inicial del contenedor
-  final double _minHeight = 120; // Altura mínima
-  final double _maxHeight = 400; // Altura máxima
+  double _height = 125; // Altura inicial del contenedor
+  final double _minHeight = 125; // Altura mínima
+  final double _maxHeight = 450; // Altura máxima
   
 
   @override
@@ -114,138 +114,141 @@ class _CustomSearchBarBody extends StatelessWidget {
   Widget build(BuildContext context) {
     final width = MediaQuery.of(context).size.width;
     final history = BlocProvider.of<SearchBloc>(context).state.history;
-    final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
-    final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
-    final mapBloc = BlocProvider.of<MapBloc>(context);
 
     return SafeArea(
-  bottom: true,
-  child: GestureDetector(
-    onVerticalDragUpdate: (details) {
-      onHeightChanged(height - details.delta.dy);
-    },
-    onVerticalDragEnd: (details) {
-      if (details.primaryVelocity! < 0) {
-        onHeightChanged(maxHeight);
-      } else {
-        onHeightChanged(minHeight);
-      }
-    },
-    child: AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      height: height,
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black,
-            blurRadius: 2,
-            offset: Offset(0, 0),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Parte superior FIJADA (no desplazable)
-          Column(
-            children: [
-              const DecorativeBar(),
-              Row(
-                spacing: 3,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  GestureDetector(
-                    onTap: () async {
-                      final result = await showSearch(
-                          context: context, delegate: SearchDestinationDelegate());
-                      if (result == null) return;
-                      onSearchResult(context, result);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-                      margin: const EdgeInsets.only(bottom: 25),
-                      width: width - 75,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(100),
-                      ),
-                      child: const Row(
-                        children: [
-                          Icon(Icons.search, color: Colors.black87),
-                          SizedBox(width: 10),
-                          Text('¿Dónde quieres ir?',
-                              style: TextStyle(color: Colors.black87)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 25.0),
-                    child: IconButton(
-                      onPressed: onMenuPressed,
-                      icon: const Icon(Icons.menu, color: Colors.black),
-                      iconSize: 28,
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
-                        padding: WidgetStatePropertyAll(EdgeInsets.all(10)),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const Divider(),
-              NavOptions(),
-              const Divider(),
-            ],
-          ),
-          
-          // Parte inferior DESPLAZABLE
-          if (history.isNotEmpty)
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    bottom: true,
+    child: GestureDetector(
+      onVerticalDragUpdate: (details) {
+        onHeightChanged(height - details.delta.dy);
+      },
+      onVerticalDragEnd: (details) {
+        if (details.primaryVelocity! < 0) {
+          onHeightChanged(maxHeight);
+        } else {
+          onHeightChanged(minHeight);
+        }
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        height: height,
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black,
+              blurRadius: 2,
+              offset: Offset(0, 0),
+            ),
+          ],
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Parte superior FIJADA (no desplazable)
+            Column(
+              children: [
+                const DecorativeBar(),
+                Row(
+                  spacing: 3,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('Recientes'),
-                    ),
-                    ...history.map((place) => Column(
-                      children: [
-                        ListTile(
-                          title: Text(place.properties.name, 
-                            style: const TextStyle(fontSize: 15)),
-                          subtitle: Text(place.properties.placeFormatted),
-                          leading: const Icon(Icons.place_outlined, color: Colors.black),
-                          onTap: () async {
-
-                            final result = SearchResult(
-                              id: place.id, // cambiar para que sea dinamico
-                              cancel: false, 
-                              manual: false,
-                              position: LatLng( place.properties.coordinates.longitude, place.properties.coordinates.latitude),
-                              name: place.properties.name,
-                              description: place.properties.placeFormatted
-                            );
-                            onSearchResult(context, result);
-
-                          },
+                    GestureDetector(
+                      onTap: () async {
+                        final result = await showSearch(
+                            context: context, delegate: SearchDestinationDelegate());
+                        if (result == null) return;
+                        onSearchResult(context, result);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+                        margin: const EdgeInsets.only(bottom: 20),
+                        width: width - 75,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(100),
                         ),
-                        const Divider(),
-                      ],
-                    )),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.search, color: Colors.black87),
+                            SizedBox(width: 10),
+                            Text('¿Dónde quieres ir?',
+                                style: TextStyle(color: Colors.black87)),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: IconButton(
+                        onPressed: onMenuPressed,
+                        icon: const Icon(Icons.menu, color: Colors.black),
+                        iconSize: 28,
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
+                          padding: const WidgetStatePropertyAll(EdgeInsets.all(10)),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
-              ),
+                const Divider(),
+                const NavOptions(),
+                const Divider(),
+              ],
             ),
-        ],
+
+            // Parte inferior DESPLAZABLE
+            if (history.isNotEmpty)
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 5),
+                        child: Text('Recientes'),
+                      ),
+                      ...history.map((place) => Column(
+                        children: [
+                          ListTile(
+                            title: Text(place.properties.name, 
+                              style: const TextStyle(fontSize: 14, height: 1.1)),
+                            subtitle: Text(place.properties.placeFormatted,
+                              style: const TextStyle(fontSize: 11, height: 1.1)
+                            ),
+                            minVerticalPadding: 0,
+                            visualDensity: VisualDensity.compact,
+                            contentPadding: EdgeInsets.symmetric(horizontal: 5, vertical: -15),
+                            leading: const Icon(Icons.place_outlined, color: Colors.black),
+                            onTap: () async {
+                              final searchBloc = BlocProvider.of<SearchBloc>(context);
+                              searchBloc.add(RemoveFromHistory(place.id));
+                              final result = SearchResult(
+                                id: place.id, // cambiar para que sea dinamico
+                                cancel: false, 
+                                manual: false,
+                                position: LatLng( place.properties.coordinates.longitude, place.properties.coordinates.latitude),
+                                name: place.properties.name,
+                                description: place.properties.placeFormatted
+                              );
+                              onSearchResult(context, result);
+
+                            },
+                          ),
+                          const Divider(),
+                        ],
+                      )),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ),
-  ),
-);
+    );
   }
 }
 

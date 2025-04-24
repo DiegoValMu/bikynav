@@ -18,6 +18,11 @@ class OnNewPlacesFoundEvent extends SearchEvent {
   const OnNewPlacesFoundEvent(this.places);
 }
 
+class RemoveFromHistory extends SearchEvent {
+  final String placeId;
+  RemoveFromHistory(this.placeId);
+}
+
 class AddToHistoryEvent extends SearchEvent {
   final Feature place;
   const AddToHistoryEvent(this.place);

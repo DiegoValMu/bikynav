@@ -5,6 +5,7 @@ import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
 class CustomMarkerForm extends StatefulWidget {
@@ -21,13 +22,14 @@ class CustomMarkerForm extends StatefulWidget {
 }
 
 class _CustomMarkerFormState extends State<CustomMarkerForm> {
-  double _height = 120; // Altura inicial del contenedor
-  final double _minHeight = 120; // Altura mínima
-  final double _maxHeight = 400; // Altura máxima
+  double _height = 130; // Altura inicial del contenedor
+  final double _minHeight = 130; // Altura mínima
+  final double _maxHeight = 450; // Altura máxima
   
 
   @override
   Widget build(BuildContext context) {
+    
     final routeServices = Provider.of<RouteServices>(context);
     return BlocBuilder<SearchBloc, SearchState>(
       builder: (context, state) {
@@ -72,10 +74,10 @@ class _CustomMarkerFormBody extends StatelessWidget {
   final ValueChanged<double> onHeightChanged; // Callback para actualizar la altura
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context){
 
     final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
-    
+    final dataPlace = BlocProvider.of<SearchBloc>(context, listen: false).state.history.first;
 
     return SafeArea(
       bottom: true,
@@ -110,26 +112,56 @@ class _CustomMarkerFormBody extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(horizontal: 10), // Padding horizontal
           child: SizedBox(
+            width: double.infinity,
             height: height,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 const DecorativeBar(),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  spacing: 3,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Expanded(
+                      child: ListTile(
+                        leading: IconButton(
+                          onPressed: () async {
+                            final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+                            final locationState = BlocProvider.of<LocationBloc>(context, listen: false).state;
+                            final searchState = BlocProvider.of<SearchBloc>(context, listen: false);
+                            final currentLocation = locationState.lastKnowlocation!;
+                            final place = searchState.state.history.first;
+                            final endPoint = LatLng(place.geometry.coordinates[1], place.geometry.coordinates[0]);
+
+                            if(mapBloc.state.polylines.isNotEmpty){
+                              mapBloc.add( OnCancelRoute() );
+                              mapBloc.add(OnStopFollowingUserEvent());
+                              mapBloc.state.polylines.remove('navigationRoute');
+                              mapBloc.state.markers.remove('navigationStart');
+                              mapBloc.state.markers.remove('navigationEnd');
+                              return;
+                            }
+                            
+                            final navigationPath = await searchState.getCoorsStartToEnd(
+                              currentLocation, 
+                              endPoint
+                            );
+                            
+                            // 4. Dibujamos la ruta de navegación (con IDs distintos)
+                            await mapBloc.drawRoutePolyline(navigationPath);
+                          }, 
+                          icon: Icon(Icons.directions)),
+                        title: Text('${dataPlace.properties.fullAddress}', style: TextStyle(fontSize: 14),),
+                      ),
+                    ),
                     IconButton(
                       onPressed: (){
                         mapBloc.state.markers.remove('newMarker');
-
                         onCloseTap();
                       }, 
                       icon: Icon( Icons.close )
-                    )
+                    ),
                   ],
                 ),
+                
                 const Expanded(
                   child: SingleChildScrollView(
                     child: Column(

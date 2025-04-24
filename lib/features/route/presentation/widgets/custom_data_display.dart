@@ -41,9 +41,9 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
 
     final place = searchBloc.state.history;
     String name = '';
-    double distance = 0; 
-    double tripDuration = 0;
-    double kms;
+    double? distance; 
+    double? tripDuration;
+    double? kms;
 
     List<Feature> features = place;
     if (features.isNotEmpty  && !mapBloc.state.onSelectRoute){
@@ -56,7 +56,7 @@ class _CustomDataDisplayState extends State<CustomDataDisplay> {
       name = dataPlace.properties.name;
       distance = dataPlace.properties.distancia ?? 00;
       final time = (dataPlace.properties.duracion) ?? 00;
-      tripDuration = (time! / 60).floorToDouble();
+      tripDuration = (time / 60).floorToDouble();
 
     }else if ( routeServices.rutas.isNotEmpty ){
       name = routeServices.myRoute.etiqueta!;
