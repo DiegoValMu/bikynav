@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
@@ -90,60 +93,66 @@ class BtnSaveRoute extends StatelessWidget {
             showDialog(
             context: context,
             builder: (BuildContext dialogcontext) {
-              return AlertDialog(
-                title: const Text('Confirmar guardado'),
-                content: SizedBox(
-                  height: 100,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      const Divider(),
-                      const Text('Etiqueta para la ruta'),
-                      CustomTextFormField( 
-                        placeholder: 'Etiqueta',
-                        inputType: TextInputType.name,
-                        controller: nameController,
+              return BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                child: ZoomIn(
+                  child: AlertDialog(
+                    backgroundColor: Colors.white,
+                    title: const Text('Confirmar guardado'),
+                    content: SizedBox(
+                      height: 100,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          const Divider(),
+                          const Text('Etiquetar ruta'),
+                          CustomTextFormField( 
+                            placeholder: 'Etiqueta',
+                            inputType: TextInputType.name,
+                            controller: nameController,
+                          )
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      FilledButton(
+                        onPressed: () async {
+                          myRoute.etiqueta = nameController.text;
+                          await routeServices.routeRegister(myRoute);
+                          stopwatchProvider.resetTimer();
+                          mapBloc.add(OnCancelToggleUserRoute());
+                          mapBloc.add(OnCancelRoute());
+                          mapBloc.state.markers.remove('start');
+                          mapBloc.state.markers.remove('end');
+                  
+                          //necesito un pop que diga ruta guardada
+                  
+                          Navigator.of(context).pop(); // Cierra el diálogo después de la acción
+                  
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Ruta guardada'),
+                              backgroundColor: Colors.green, 
+                            )
+                          );
+                        },
+                        child: const Text('Confirmar')
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          stopwatchProvider.resetTimer();
+                          mapBloc.add(OnCancelToggleUserRoute());
+                          mapBloc.add(OnCancelRoute());
+                          mapBloc.state.markers.remove('start');
+                          mapBloc.state.markers.remove('end');
+                          Navigator.of(context).pop(); // Cierra el diálogo al cancelar
+                        },
+                        child: const Text('Cancelar')
                       )
-                    ],
+                    ]
                   ),
                 ),
-                actions: [
-                  TextButton(
-                    onPressed: () async {
-                      myRoute.etiqueta = nameController.text;
-                      await routeServices.routeRegister(myRoute);
-                      stopwatchProvider.resetTimer();
-                      mapBloc.add(OnCancelToggleUserRoute());
-                      mapBloc.add(OnCancelRoute());
-                      mapBloc.state.markers.remove('start');
-                      mapBloc.state.markers.remove('end');
-
-                      //necesito un pop que diga ruta guardada
-
-                      Navigator.of(context).pop(); // Cierra el diálogo después de la acción
-
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Ruta guardada'),
-                          backgroundColor: Colors.green, 
-                        )
-                      );
-                    },
-                    child: const Text('Confirmar')
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      stopwatchProvider.resetTimer();
-                      mapBloc.add(OnCancelToggleUserRoute());
-                      mapBloc.add(OnCancelRoute());
-                      mapBloc.state.markers.remove('start');
-                      mapBloc.state.markers.remove('end');
-                      Navigator.of(context).pop(); // Cierra el diálogo al cancelar
-                    },
-                    child: const Text('Cancelar')
-                  )
-                ]
               );
             }
           );

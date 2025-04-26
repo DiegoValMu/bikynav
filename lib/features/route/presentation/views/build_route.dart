@@ -10,6 +10,8 @@ Future<void> onRouteTap(BuildContext context, BikeRoute route, MapBloc mapBloc, 
     final customStartMarker = await getAssetImageMarker('start_marker.png', 39, 48);
     final customEndMarker = await getAssetImageMarker('check_end_marker.png', 48, 48 );
 
+    
+
     final startMarker = Marker(
       markerId: const MarkerId('startRoute'),
       position: route.ubicacionInicial!,
@@ -50,5 +52,6 @@ Future<void> onRouteTap(BuildContext context, BikeRoute route, MapBloc mapBloc, 
 
     routeServices.myRoute = route;
     //ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Seleccionaste ${route.etiqueta ?? "una ruta"}')));
+    mapBloc.add(OnStopFollowingUserEvent());
     context.push('/nav');
   }

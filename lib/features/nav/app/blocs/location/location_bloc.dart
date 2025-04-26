@@ -50,7 +50,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     await checkLocationPermission();
     final position = await Geolocator.getCurrentPosition();
 
-    print('Position:  $position');
     add(OnNewUserLocationEvent(LatLng(position.latitude, position.longitude)));
   }
 
@@ -61,7 +60,6 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     positionStream = Geolocator.getPositionStream().listen(
       (event) {
         final position = event;
-        print('Position: $position');
         add(OnNewUserLocationEvent(LatLng(position.latitude, position.longitude)));
       },
       onError: (error) {

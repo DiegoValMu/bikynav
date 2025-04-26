@@ -1,3 +1,4 @@
+import 'package:bikynav/features/nav/config/models/models.dart';
 import 'package:bikynav/features/route/config/models/routes.dart';
 import 'package:bikynav/features/route/config/models/routesById.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ class RouteServices with ChangeNotifier {
   List<dynamic> rutas = [];
   String selectNavRoute = '';
   BikeRoute myRoute = BikeRoute();
+
+  Feature? infoPlace;
 
   RouteServices();
 

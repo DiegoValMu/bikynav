@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
@@ -117,134 +118,145 @@ class _MapScreenState extends State<MapScreen> {
                     }
                     final searchState = BlocProvider.of<SearchBloc>(context, listen: false);
 
-                    return SingleChildScrollView(
-                      child: Stack(
-                        children: [
-                          MapView(
-                            initialLocation: locationState.lastKnowlocation!,
-                            polylines: polylines.values.toSet(),
-                            markers: mapState.markers.values.toSet(),
-                            mapType: currentMapType,
-                            onLongPress: (p0) {
-                              _setMarker(context, p0, _handleMarkerAdded);
-                              
-                            },
-                            onMapCreated: (GoogleMapController controller) {
-                              _mapController = controller;
-                              context.read<MapBloc>().add(OnMapInitializedEvent(controller));
-                              // Mover la cámara a la ubicación inicial de la ruta si está cargada al inicio
-                              if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('route') && mapState.polylines['route']!.points.isNotEmpty && !_initialCameraMoveDone) {
-                                final initialRouteLocation = mapState.polylines['route']!.points.first;
-                                _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
-                                setState(() => _initialCameraMoveDone = true);
-                              }
-                              if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('myRoute') && mapState.polylines['myRoute']!.points.isNotEmpty && !_initialCameraMoveDone) {
-                                final initialRouteLocation = mapState.polylines['myRoute']!.points.first;
-                                _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
-                                setState(() => _initialCameraMoveDone = true);
-                              }
-                            },
-                          ),
-                          if (mapState.onInitRoute || mapState.onSelectRoute)
-                            Positioned(
-                              top: 50,
-                              right: 20,
-                              child: BtnCancelRoute( 
-                                steps: steps,
-                                onCancel: () => steps = false, 
-                              )
-                            ),
+                    return Stack(
+                      children: [
+                        MapView(
+                          initialLocation: locationState.lastKnowlocation!,
+                          polylines: polylines.values.toSet(),
+                          markers: mapState.markers.values.toSet(),
+                          mapType: currentMapType,
+                          onLongPress: (p0) {
+                            _setMarker(context, p0, _handleMarkerAdded);
+                            
+                          },
+                          onMapCreated: (GoogleMapController controller) {
+                            _mapController = controller;
+                            context.read<MapBloc>().add(OnMapInitializedEvent(controller));
+                            // Mover la cámara a la ubicación inicial de la ruta si está cargada al inicio
+                            if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('route') && mapState.polylines['route']!.points.isNotEmpty && !_initialCameraMoveDone) {
+                              final initialRouteLocation = mapState.polylines['route']!.points.first;
+                              _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
+                              setState(() => _initialCameraMoveDone = true);
+                            }
+                            if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('myRoute') && mapState.polylines['myRoute']!.points.isNotEmpty && !_initialCameraMoveDone) {
+                              final initialRouteLocation = mapState.polylines['myRoute']!.points.first;
+                              _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
+                              setState(() => _initialCameraMoveDone = true);
+                            }
+                          },
+                        ),
+                        if (mapState.onInitRoute || mapState.onSelectRoute)
                           Positioned(
-                            bottom: 120,
-                            left: 0,
-                            right: 0,
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                              if (!searchState.state.displayManualMarker)
-                                ZoomIn(
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    spacing: 5,
-                                    children: [
-                                      if(mapState.onSelectRoute && !steps)  
-                                        FilledButton.icon(
-                                          onPressed: () async {
-                                            final routeServices = Provider.of<RouteServices>(context, listen: false);
-                                            final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
-                                            final currentLocation = locationState.lastKnowlocation!;
-                                            final routeStart = routeServices.myRoute.ubicacionInicial!;
-                                            
-                                            final navigationPath = await searchState.getCoorsStartToEnd(
-                                              currentLocation, 
-                                              routeStart
-                                            );
-                                            
-                                            // 4. Dibujamos la ruta de navegación (con IDs distintos)
-                                            await mapBloc.drawRoutePolyline(navigationPath);
-                                            setState( () => steps = true );
-                                          }, 
-                                          label: const Text('Como llegar'),
-                                          icon: const Icon(Icons.directions),
-                                          style: const ButtonStyle(
-                                            minimumSize: WidgetStatePropertyAll(Size(155, 45)),
-                                          ),
-                                        ),
-                                      if(mapState.onInitRoute || steps)
-                                        const BtnFollowUser(), 
-                                      Padding(
-                                        padding: const EdgeInsets.only( right:  10),
-                                        child: Column(
-                                          children: [
-                                            CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
-                                            const BtnCurrentLocation(),
-                                          ],
+                            top: 50,
+                            right: 20,
+                            child: BtnCancelRoute( 
+                              steps: steps,
+                              onCancel: () { 
+                                steps = false;
+                                //markerOn = true;
+                                } 
+                            )
+                          ),
+                        Positioned(
+                          bottom: 120,
+                          left: 0,
+                          right: 0,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                            if (!searchState.state.displayManualMarker)
+                              ZoomIn(
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  spacing: 5,
+                                  children: [
+                                    if(mapState.onSelectRoute && !steps && !mapState.showMyRoute)  
+                                      FilledButton.icon(
+                                        onPressed: () async {
+                                          showLoadingMessage(context);
+                                          final routeServices = Provider.of<RouteServices>(context, listen: false);
+                                          final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+                                          final currentLocation = locationState.lastKnowlocation!;
+                                          final routeStart = routeServices.myRoute.ubicacionInicial!;
+                                          
+                                          final navigationPath = await searchState.getCoorsStartToEnd(
+                                            currentLocation, 
+                                            routeStart
+                                          );
+                                          
+                                          // 4. Dibujamos la ruta de navegación (con IDs distintos)
+                                          await mapBloc.drawRoutePolyline(navigationPath);
+                                          mapBloc.add(OnInitRoute());
+                                          
+                                          hideLoadingMessage(context);
+                                          setState( () => steps = true );
+                                        }, 
+                                        label: const Text('Como llegar'),
+                                        icon: const Icon(Icons.directions),
+                                        style: const ButtonStyle(
+                                          minimumSize: WidgetStatePropertyAll(Size(155, 45)),
                                         ),
                                       ),
-                                    ]
-                                  ),
+                                    if(mapState.onInitRoute && !mapState.showMyRoute || steps )
+                                      const BtnFollowUser(), 
+                                    Padding(
+                                      padding: const EdgeInsets.only( right:  10),
+                                      child: Column(
+                                        children: [
+                                          CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
+                                          const BtnCurrentLocation(),
+                                        ],
+                                      ),
+                                    ),
+                                  ]
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
+                        ),
+                        
+                        if(markerOn)
                           Positioned(
-                            bottom: -25,
+                            bottom: 0,
                             right: 0,
                             left: 0,
-                            child: (mapState.onInitRoute || mapState.onSelectRoute)
-                            ? SlideInUp(child: const CustomDataDisplay())
-                            : SlideInUp(child: CustomSearchBar(
-                                  onMenuPressed: () => setState(() => _isMenuOpen = true),
-                              )),
+                            child: SlideInUp(child: CustomMarkerForm(
+                              onCloseTap: () => setState(() { 
+                                markerOn = false;
+                                final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+                                mapBloc.add( OnCancelRoute() );
+                                mapBloc.add(OnStopFollowingUserEvent());
+                                if (mapState.markers.isNotEmpty){
+                                  mapState.polylines.remove('navigationRoute');
+                                  mapState.markers.remove('navigationStart');
+                                  mapState.markers.remove('navigationEnd');
+                                }
+                              }),
+                              onRouteTap: () {
+                                markerOn = false;
+
+                              } 
+                            ))
                           ),
-                          if(markerOn)
+                          if(!markerOn && !isRouteStart)
                             Positioned(
-                              bottom: -25,
+                              bottom: 0,
                               right: 0,
                               left: 0,
-                              child: SlideInUp(child: CustomMarkerForm(
-                                onCloseTap: () => setState(() { 
-                                  markerOn = false;
-                                  final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
-                                  mapBloc.add( OnCancelRoute() );
-                                  mapBloc.add(OnStopFollowingUserEvent());
-                                  if (mapState.markers.isNotEmpty){
-                                    mapState.polylines.remove('navigationRoute');
-                                    mapState.markers.remove('navigationStart');
-                                    mapState.markers.remove('navigationEnd');
-                                  }
-                                }),
-                              ))
-                            ),
-                          //
-                          //const ManualPinMarker(),
-                          const ManualMarker(),
-                        ],
-                      ),
+                              child: (mapState.onInitRoute || mapState.onSelectRoute)//acaaa
+                              ? SlideInUp(child: CustomDataDisplay())
+                              : SlideInUp(child: CustomSearchBar(
+                                    onMenuPressed: () => setState(() => _isMenuOpen = true),
+                                )),
+                          ),
+                        //
+                        //const ManualPinMarker(),
+                        const ManualMarker(),
+                      ],
                     );
                   },
                 );
@@ -288,10 +300,23 @@ class _MapScreenState extends State<MapScreen> {
 
 _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
 
+  showLoadingMessage(context);
+
   final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
   final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+  final routeServices = Provider.of<RouteServices>(context, listen: false);
+
+  if (mapBloc.state.polylines.isNotEmpty){
+    mapBloc.add( OnCancelRoute() );
+    mapBloc.add(OnStopFollowingUserEvent());
+    mapBloc.state.polylines.remove('navigationRoute');
+    mapBloc.state.markers.remove('navigationStart');
+    mapBloc.state.markers.remove('navigationEnd');
+  }
 
   final placeData = await searchBloc.getInformationPlace(p0);
+  
+  routeServices.infoPlace = placeData;
 
   final newMarker = Marker(
     markerId: const MarkerId('newMarker'), // ID diferente
@@ -301,13 +326,12 @@ _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
   );
   final updatedMarkers = Map<String, Marker>.from(mapBloc.state.markers);
   updatedMarkers[newMarker.markerId.value] = newMarker;
+  hideLoadingMessage(context);
 
   mapBloc.add(DisplayMarkerEvent(updatedMarkers));
-
   mapBloc.add(MoveCameraToLocationEvent(p0));
-  
-  searchBloc.add(AddToHistoryEvent(placeData));
 
-  onMarkerAdded();
   
+  onMarkerAdded();
+
 }

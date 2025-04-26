@@ -19,7 +19,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   GoogleMapController? _mapController;
   LatLng? mapCenter;
   CameraPosition? _currentCameraPosition;
-  double _originalZoom = 15.0;
 
   StreamSubscription<LocationState>? locationStateSubscription;
 
@@ -67,9 +66,14 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     });
   
     locationBloc.stream.listen((locationState) {
+      if (state.showMyRoute) {
+        add( UpdateUserPolylineEvent( locationState.myLocationHistory ) );
+      }
+
       if (!state.isfollowingUser || locationState.lastKnowlocation == null) return;
 
       final currentLocation = locationState.lastKnowlocation!;
+
       final route = state.currentRoute;
 
       // 1. Si no hay ruta, usa bearing = 0
@@ -175,7 +179,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       currentPolylines['myRoute'] = myRoute;
 
       emit(state.copyWith(polylines: currentPolylines));
-      //moveCamera(event.userLocations.last);
+      moveCamera(event.userLocations.last);
 
   }
 

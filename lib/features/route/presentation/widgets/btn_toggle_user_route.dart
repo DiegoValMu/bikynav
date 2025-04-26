@@ -39,13 +39,24 @@ class BtnToggleUserRoute extends StatelessWidget {
             title: 'Ubicación inicial',
           )
         );
+
+        final myRoute = Polyline(
+          polylineId: const PolylineId('myRoute'),
+          color: Colors.black54,
+          width: 5,
+          points: [position], // Inicia con solo la posición actual
+        );
+
+        final currentPolylines = Map<String, Polyline>.from(mapBloc.state.polylines);
+        currentPolylines['myRoute'] = myRoute;
+
         final currentMarkers = Map<String, Marker>.from( mapBloc.state.markers );
         currentMarkers['start'] = startMarker;
         mapBloc.add( DisplayMarkerEvent( currentMarkers ) );
         
         mapBloc.add(OnToggleUserRoute());
         locationBloc.add( OnNewRouteEvent(position));
-        mapBloc.add(OnSelectRoute());
+        mapBloc.add(OnInitRoute());
       },
     );
   }
