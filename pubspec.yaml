@@ -9,6 +9,7 @@ environment:
 dependencies:
   animate_do: ^3.3.4
   animated_check: ^1.0.5
+  animated_marker: ^0.1.4
   bloc: ^8.1.4
   cloud_firestore: ^5.5.0
   cupertino_icons: ^1.0.8
@@ -55,5 +56,5 @@ flutter_icons:
   ios: true
   image_path: "assets/images/login.png"
   adaptive_icon_background: "transparent"
-  image_path_android: "assets/images/login.png" 
+  image_path_android: "assets/images/login.png"
   adaptive_icon_foreground_inset: 0

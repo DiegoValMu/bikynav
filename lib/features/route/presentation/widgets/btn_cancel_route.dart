@@ -1,4 +1,5 @@
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,8 @@ class BtnCancelRoute extends StatelessWidget {
     final stopwatchProvider = Provider.of<StopwatchProvider>(context);
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final routeServices = Provider.of<RouteServices>(context, listen: false);
+    final markerServices = Provider.of<MarkerServices>(context, listen: false); 
+    final markerId = markerServices.setMarker!.markerId.value;
 
     return ZoomIn(
       child: Container(
@@ -46,7 +49,7 @@ class BtnCancelRoute extends StatelessWidget {
                   }
                   
                   if (state.markers.isNotEmpty){
-                    state.markers.remove('newMarker');
+                    state.markers.remove(markerId);
                     state.polylines.remove('route');
                     state.markers.remove('start');
                     state.markers.remove('end');

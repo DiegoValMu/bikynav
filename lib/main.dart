@@ -1,5 +1,6 @@
 import 'package:bikynav/features/bikes/app/services/bike_services.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/app/services/services.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
@@ -50,7 +51,8 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => UserServices()),
         ChangeNotifierProvider(create: (_) => BikeServices()),
         ChangeNotifierProvider(create: (_) => RouteServices()),
-        ChangeNotifierProvider(create: (_) => StopwatchProvider())
+        ChangeNotifierProvider(create: (_) => StopwatchProvider()),
+        ChangeNotifierProvider(create: (_) => MarkerServices()),
       ],
       child: MaterialApp.router(
         routerConfig: appRouter,

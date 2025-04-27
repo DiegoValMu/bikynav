@@ -2,13 +2,17 @@ import 'dart:async';
 import 'package:bikynav/features/nav/app/helpers/calculate_bounds.dart';
 import 'package:bikynav/features/nav/app/helpers/calculate_distance.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
+import 'package:bikynav/features/nav/config/models/markers_model.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/config/models/models.dart';
 import 'package:bikynav/features/nav/config/models/traffic_response_cycling.dart' as cycling_models;
+import 'package:provider/provider.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
@@ -18,7 +22,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   final LocationBloc locationBloc;
   GoogleMapController? _mapController;
   LatLng? mapCenter;
-  CameraPosition? _currentCameraPosition;
+ 
 
   StreamSubscription<LocationState>? locationStateSubscription;
 
@@ -133,14 +137,13 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   void onToggleDegreeView(OnToggleDegreeView event, Emitter<MapState> emit) {
     emit(state.copyWith(is45DegreeView: event.enable));
 
-    if (_mapController != null && _currentCameraPosition != null) {
+    if (_mapController != null) {
       final newPosition = CameraPosition(
         target: locationBloc.state.lastKnowlocation!,
         zoom: event.enable ? event.zoom : 15,
         tilt: event.enable ? 65 : 0,
         bearing:  event.bearing,
       );
-      _currentCameraPosition = newPosition;
       _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition), duration: Duration(milliseconds: 300));
     }
   }
@@ -251,8 +254,39 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     );
   }
 
-  void updateCurrentCameraPosition(CameraPosition newPosition) {
-    _currentCameraPosition = newPosition;
+  void updateCurrentMarkerPosition(CameraPosition newPosition, BuildContext context) {
+    final markerServices = Provider.of<MarkerServices>(context, listen: false);
+
+    markerServices.infoMarkers.forEach((Markers place) {
+
+      if(newPosition.zoom < 12){
+        state.markers.remove('${place.id}');
+        return;
+      }
+
+      if(state.markers.containsKey(place.id)){
+        return;
+      }
+      // Accedemos a la latitud y longitud desde la propiedad 'pos' del objeto 'Markers'
+      if (place.pos != null && place.pos!.length == 2) {
+        final pos = LatLng(place.pos![0], place.pos![1]); // ¡OJO! El orden es [latitud, longitud] en tu JSON
+
+        final newMarker = Marker(
+          markerId: MarkerId(place.id ?? UniqueKey().toString()), // Usa el ID del objeto o genera uno único
+          position: pos,
+          infoWindow: InfoWindow(
+            title: place.etiqueta ?? '', // Usa la etiqueta como título de la ventana de información
+            // Puedes agregar más información aquí si lo deseas
+          ),
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+          // Aquí puedes configurar otras propiedades del marcador si las necesitas
+        );
+        final updatedMarkers = Map<String, Marker>.from(state.markers);
+        updatedMarkers[newMarker.markerId.value] = newMarker;
+        add(DisplayMarkerEvent(updatedMarkers));
+        
+      }
+    });
   }
 
   @override

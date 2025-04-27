@@ -35,6 +35,36 @@ class NavOptions extends StatelessWidget {
               //searchBloc.add(OnActivateManualPinMarkerEvent());
             }
           ),
+          const VerticalDivider(width: 20, thickness: 1),
+          buildNavItem(
+            context, 
+            Icons.home_repair_service, 
+            'Ver Talleres', 
+            () {
+              //final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+              //searchBloc.add(OnActivateManualPinMarkerEvent());
+            }
+          ),
+          const VerticalDivider(width: 20, thickness: 1),
+          buildNavItem(
+            context, 
+            Icons.directions_bike_outlined, 
+            'Mostrar Rutas', 
+            () {
+              //final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+              //searchBloc.add(OnActivateManualPinMarkerEvent());
+            }
+          ),
+          const VerticalDivider(width: 20, thickness: 1),
+          buildNavItem(
+            context, 
+            Icons.emoji_events_outlined, 
+            'Ver Eventos', 
+            () {
+              //final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+              //searchBloc.add(OnActivateManualPinMarkerEvent());
+            }
+          ),
         ],
       ),
     );

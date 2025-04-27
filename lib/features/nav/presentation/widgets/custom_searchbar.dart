@@ -149,7 +149,11 @@ class __CustomSearchBarContentState extends State<_CustomSearchBarContent> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const Divider(),
-                const NavOptions(),
+                const Scrollbar(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: NavOptions()),
+                ),
                 const Divider(),
                 if (history.isNotEmpty)
                   const Padding(

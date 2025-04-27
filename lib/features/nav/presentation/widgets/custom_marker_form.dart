@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/config/models/places_models.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
+import 'package:bikynav/features/users/app/services/user_services.dart';
 import 'package:bikynav/shared/views/custom_draggable_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -53,12 +55,15 @@ class __CustomMarkerFormContentState extends State<_CustomMarkerFormContent> {
   String _selectedType = 'taller';
   String? _imagePath;
 
+  String capitalize(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1);
+  }
+
   @override
   Widget build(BuildContext context) {
     final routeServices = Provider.of<RouteServices>(context, listen: false);
     final place = routeServices.infoPlace!;
-    final lat = place.geometry.coordinates[1];
-    final lng = place.geometry.coordinates[0];
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -81,7 +86,7 @@ class __CustomMarkerFormContentState extends State<_CustomMarkerFormContent> {
                   const SizedBox(height: 10),
                   _buildDynamicFields(),
                   const SizedBox(height: 15),
-                  _buildSaveButton(context, lat, lng),
+                  _buildSaveButton(context, place),
                   const SizedBox(height: 20),
                 ],
               ),
@@ -379,15 +384,37 @@ Future<void> _selectTime(BuildContext context) async {
   }
 }
 
-  Widget _buildSaveButton(BuildContext context, double lat, double lng) {
+  Widget _buildSaveButton(BuildContext context, Feature place) {
     return ElevatedButton(
-      onPressed: () {
+      onPressed: () async {
         if (_labelController.text.isEmpty) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Por favor ingresa un nombre')),
           );
           return;
         }
+
+        final markerServices = Provider.of<MarkerServices>(context, listen: false);
+        final userServices = Provider.of<UserServices>(context, listen: false);
+
+        final pos = [place.geometry.coordinates[1], place.geometry.coordinates[0]];
+
+        final marker = <String, dynamic>{
+          'etiqueta': capitalize(_labelController.text),
+          'contacto': _contactController.text,
+          'email': _emailController.text,
+          'horario': _scheduleController.text,
+          'website': _websiteController.text,
+          'descripcion': _descriptionController.text,
+          'fecha': _dateController.text,
+          'hora': _timeController.text,
+          'imagen': _imagePath,
+          'pos': pos,
+          'ciudad' : place.properties.placeFormatted.split(',').first,
+          'usuario': userServices.usuario.id,
+        };
+
+        await markerServices.markerRegister(marker);
 
         // Aquí iría la lógica para guardar todos los datos
         // Puedes acceder a:
@@ -429,6 +456,7 @@ Future<void> _selectTime(BuildContext context) async {
                 onPressed: () async {
                   showLoadingMessage(context);
                   final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+                  
                   final locationState = BlocProvider.of<LocationBloc>(context, listen: false).state;
                   final currentLocation = locationState.lastKnowlocation!;
                   
@@ -470,7 +498,9 @@ Future<void> _selectTime(BuildContext context) async {
           ),
           IconButton(
             onPressed: (){
-              mapBloc.state.markers.remove('newMarker');
+              final markerServices = Provider.of<MarkerServices>(context, listen: false); 
+              final markerId = markerServices.setMarker!.markerId.value;
+              mapBloc.state.markers.remove('${markerId}');
                 searchBloc.add(AddToHistoryEvent(place));
               widget.onCloseTap();
             }, 

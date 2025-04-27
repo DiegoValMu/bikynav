@@ -1,5 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
+import 'package:bikynav/features/nav/config/models/markers_model.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
@@ -23,6 +25,7 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   late LocationBloc locationBloc;
+  late MarkerServices markerServices;
   bool _isMenuOpen = false;
   bool isRouteStart = false;
   GoogleMapController? _mapController;
@@ -30,13 +33,17 @@ class _MapScreenState extends State<MapScreen> {
   MapType currentMapType = MapType.normal;
   bool steps = false;
   bool markerOn = false;
+  late List<dynamic> infoMarkers = [];
+
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       locationBloc = BlocProvider.of<LocationBloc>(context);
       locationBloc.startFollowingUser(); // Mover aquí la llamada
+      markerServices = Provider.of<MarkerServices>(context, listen: false); 
+      
     });
   }
 
@@ -53,12 +60,13 @@ class _MapScreenState extends State<MapScreen> {
   }
 
   void toggleMapType() {
-  setState(() {
-    currentMapType = currentMapType == MapType.normal 
-    ? MapType.satellite 
-    : MapType.normal;
-  });
-}
+    setState(() {
+      currentMapType = currentMapType == MapType.normal 
+      ? MapType.satellite 
+      : MapType.normal;
+    });
+  }
+
 
   Future<bool> _onWillPop() async {
     return await showDialog(
@@ -116,7 +124,7 @@ class _MapScreenState extends State<MapScreen> {
                     if (!mapState.showMyRoute) {
                       polylines.removeWhere((key, value) => key == 'myRoute');
                     }
-                    final searchState = BlocProvider.of<SearchBloc>(context, listen: false);
+                    final searchState = BlocProvider.of<SearchBloc>(context, listen: false); 
 
                     return Stack(
                       children: [
@@ -230,7 +238,7 @@ class _MapScreenState extends State<MapScreen> {
                                 final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
                                 mapBloc.add( OnCancelRoute() );
                                 mapBloc.add(OnStopFollowingUserEvent());
-                                if (mapState.markers.isNotEmpty){
+                                if (mapState.polylines.isNotEmpty){
                                   mapState.polylines.remove('navigationRoute');
                                   mapState.markers.remove('navigationStart');
                                   mapState.markers.remove('navigationEnd');
@@ -305,6 +313,7 @@ _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
   final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
   final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
   final routeServices = Provider.of<RouteServices>(context, listen: false);
+  final markerServices = Provider.of<MarkerServices>(context, listen: false); 
 
   if (mapBloc.state.polylines.isNotEmpty){
     mapBloc.add( OnCancelRoute() );
@@ -319,11 +328,14 @@ _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
   routeServices.infoPlace = placeData;
 
   final newMarker = Marker(
-    markerId: const MarkerId('newMarker'), // ID diferente
+    markerId: MarkerId('${placeData.id}'), // ID diferente
     position: p0,
     infoWindow:  InfoWindow(title: placeData.properties.name),
     anchor: const Offset(0.5, 1.0),
   );
+
+  markerServices.setMarker = newMarker;
+
   final updatedMarkers = Map<String, Marker>.from(mapBloc.state.markers);
   updatedMarkers[newMarker.markerId.value] = newMarker;
   hideLoadingMessage(context);

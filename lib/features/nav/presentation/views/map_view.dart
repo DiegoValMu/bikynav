@@ -1,10 +1,12 @@
 import 'dart:convert';
 
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/config/themes/wmc2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:provider/provider.dart';
 
 class MapView extends StatelessWidget {
  
@@ -29,6 +31,7 @@ class MapView extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final mapBloc = BlocProvider.of<MapBloc>(context);
+    final markerServices = Provider.of<MarkerServices>(context, listen: false); 
 
     final CameraPosition initialCameraPosition = CameraPosition(
             target: initialLocation,
@@ -55,9 +58,11 @@ class MapView extends StatelessWidget {
                 markers: markers,
                 style: jsonEncode(wmc2MapTheme),
                 onMapCreated: onMapCreated,
-                onCameraMove: ( position ) {
-                  mapBloc.updateCurrentCameraPosition(position);
+                onCameraMove: ( position ) async {
+                  //await markerServices.getMarkers();
+                  //mapBloc.updateCurrentCameraPosition(position, context);
                   mapBloc.mapCenter = position.target;
+                
                   
                   //mapBloc.add(OnToggleDegreeView(false, position.bearing));
                 },
