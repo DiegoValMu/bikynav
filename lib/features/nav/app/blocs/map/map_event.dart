@@ -36,6 +36,10 @@ class OnCancelToggleUserRoute extends MapEvent {}
 class OnCancelRoute extends MapEvent {}
 class OnSelectRoute extends MapEvent {}
 class OnInitRoute extends MapEvent {}
+class OnCancelRoutes extends MapEvent {}
+class OnSelectRoutes extends MapEvent {}
+class OnCancelTallerMarker extends MapEvent {}
+class OnSelectTallerMarker extends MapEvent {}
 
 class MoveCameraToLocationEvent extends MapEvent {
   final LatLng location;

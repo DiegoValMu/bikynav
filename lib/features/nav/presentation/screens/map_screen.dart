@@ -2,6 +2,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/config/models/markers_model.dart';
+import 'package:bikynav/features/nav/presentation/views/custom_marker_data_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
@@ -35,6 +36,9 @@ class _MapScreenState extends State<MapScreen> {
   bool markerOn = false;
   late List<dynamic> infoMarkers = [];
 
+  bool onSelectTallerMarkers = false;
+  bool onSelectRoutesMarkers = false;
+
 
   @override
   void initState() {
@@ -42,7 +46,7 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       locationBloc = BlocProvider.of<LocationBloc>(context);
       locationBloc.startFollowingUser(); // Mover aquí la llamada
-      markerServices = Provider.of<MarkerServices>(context, listen: false); 
+
       
     });
   }
@@ -125,6 +129,20 @@ class _MapScreenState extends State<MapScreen> {
                       polylines.removeWhere((key, value) => key == 'myRoute');
                     }
                     final searchState = BlocProvider.of<SearchBloc>(context, listen: false); 
+                    markerServices = Provider.of<MarkerServices>(context, listen: false); 
+
+                    if(markerServices.infoMarkers.isNotEmpty){
+                      context.read<MapBloc>().updateCurrentMarkerPosition(context);
+                    }
+
+                    if(mapState.onSelectTallerMarker){
+                      onSelectTallerMarkers = true;
+
+                      
+
+                      //context.read<MapBloc>().add(FocusOnRouteEvent(routePoints));
+
+                    }
 
                     return Stack(
                       children: [
@@ -226,6 +244,23 @@ class _MapScreenState extends State<MapScreen> {
                             ],
                           ),
                         ),
+
+                        if(onSelectTallerMarkers)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            left: 0,
+                            child: SlideInUp(child: CustomMarkerDataDisplay(
+                              onCloseTap: () => setState(() { 
+                                onSelectTallerMarkers = false;
+                                
+                              }),
+                              onTallerTap: () {
+                                onSelectTallerMarkers = false;
+
+                              } 
+                            ))
+                          ),
                         
                         if(markerOn)
                           Positioned(
@@ -250,7 +285,7 @@ class _MapScreenState extends State<MapScreen> {
                               } 
                             ))
                           ),
-                          if(!markerOn && !isRouteStart)
+                          if(!markerOn && !isRouteStart && !onSelectTallerMarkers)
                             Positioned(
                               bottom: 0,
                               right: 0,

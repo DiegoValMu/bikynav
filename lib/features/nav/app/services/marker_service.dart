@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:bikynav/features/nav/config/models/markers_model.dart';
+import 'package:bikynav/features/nav/config/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
@@ -11,7 +12,11 @@ class MarkerServices with ChangeNotifier {
 
   List<Markers> infoMarkers = [];
 
+  Feature? dataActualPlace;
+
   Marker? setMarker;
+
+  String? markersSelected;
 
   MarkerServices();
 
@@ -45,5 +50,22 @@ class MarkerServices with ChangeNotifier {
       throw Exception('Error al cargar los datos');
     }
   }
+
+  Future getTallerMarkers(String ciudad) async {
+
+    final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/markers/taller/$ciudad'));
+    if (response.statusCode == 200) {
+      final List<dynamic> decodedJson = json.decode(response.body);
+
+      // Utiliza .map para transformar cada elemento dinámico en un objeto Markers
+      infoMarkers = decodedJson.map((item) => Markers.fromJson(item as Map<String, dynamic>)).toList();
+
+      notifyListeners();  // Notifica a los consumidores
+    } else {
+      throw Exception('Error al cargar los datos');
+    }
+  }
+
+
 
 }

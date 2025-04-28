@@ -2,7 +2,6 @@
 import 'package:bikynav/features/nav/config/models/traffic_response_cycling.dart' as cycling_models;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-import 'package:flutter/material.dart' show Stepper, StepState, ControlAffinity;
 
 class RouteDestination {
   final List<LatLng> points;

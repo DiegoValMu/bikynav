@@ -7,6 +7,8 @@ class MapState extends Equatable {
   final bool showMyRoute;
   final bool onInitRoute;
   final bool onSelectRoute;
+  final bool onSelectTallerMarker;
+  final bool onSelectRoutes;
   final bool is45DegreeView;
   
  
@@ -26,6 +28,8 @@ class MapState extends Equatable {
     this.isfollowingUser = false,
     this.onInitRoute = false,
     this.onSelectRoute = false,
+    this.onSelectTallerMarker = false,
+    this.onSelectRoutes = false,
     this.is45DegreeView = false,
     this.currentRoute
   }): polylines = polylines ?? const {},
@@ -38,6 +42,8 @@ class MapState extends Equatable {
     bool? showMyRoute,
     bool? onInitRoute,
     bool? onSelectRoute,
+    bool? onSelectTallerMarker,
+    bool? onSelectRoutes,
     Map<String, Polyline>? polylines,
     Map<String, Marker>? markers,
     bool? is45DegreeView,
@@ -49,12 +55,25 @@ class MapState extends Equatable {
     showMyRoute: showMyRoute ?? this.showMyRoute,
     markers: markers ?? this.markers,
     onSelectRoute: onSelectRoute ?? this.onSelectRoute,
+    onSelectRoutes: onSelectRoutes ?? this.onSelectRoutes,
+    onSelectTallerMarker: onSelectTallerMarker ?? this.onSelectTallerMarker,
     onInitRoute: onInitRoute ?? this.onInitRoute,
     is45DegreeView: is45DegreeView ?? this.is45DegreeView,
     currentRoute: currentRoute ?? this.currentRoute,
   );
 
   @override
-  List<Object> get props => [ isMapInitialized, isfollowingUser, polylines, showMyRoute, markers , onInitRoute, onSelectRoute, is45DegreeView, currentRoute ?? ''];
+  List<Object> get props => [ 
+    isMapInitialized, 
+    isfollowingUser, polylines, 
+    showMyRoute, 
+    markers , 
+    onInitRoute, 
+    onSelectRoute, 
+    is45DegreeView, 
+    currentRoute ?? '',
+    onSelectRoutes,
+    onSelectTallerMarker
+    ];
 }
 

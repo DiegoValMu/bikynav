@@ -150,6 +150,7 @@ class __CustomSearchBarContentState extends State<_CustomSearchBarContent> {
               children: [
                 const Divider(),
                 const Scrollbar(
+                  thickness: 1,
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: NavOptions()),

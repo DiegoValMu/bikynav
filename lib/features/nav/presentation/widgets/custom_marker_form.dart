@@ -128,6 +128,7 @@ class __CustomMarkerFormContentState extends State<_CustomMarkerFormContent> {
   Widget _buildDynamicFields() {
     switch (_selectedType) {
       case 'taller':
+
         return _buildTallerFields();
       case 'evento':
         return _buildEventoFields();
@@ -408,6 +409,7 @@ Future<void> _selectTime(BuildContext context) async {
           'descripcion': _descriptionController.text,
           'fecha': _dateController.text,
           'hora': _timeController.text,
+          'tipo': _selectedType,
           'imagen': _imagePath,
           'pos': pos,
           'ciudad' : place.properties.placeFormatted.split(',').first,
@@ -416,11 +418,11 @@ Future<void> _selectTime(BuildContext context) async {
 
         await markerServices.markerRegister(marker);
 
-        // Aquí iría la lógica para guardar todos los datos
-        // Puedes acceder a:
-        // _selectedType (tipo de marcador)
-        // Todos los controladores según el tipo seleccionado
+
         // _imagePath para la imagen
+        final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+        final markerId = markerServices.setMarker!.markerId.value;
+        mapBloc.state.markers.remove('${markerId}');
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Marcador guardado con éxito')),
@@ -457,6 +459,7 @@ Future<void> _selectTime(BuildContext context) async {
                   showLoadingMessage(context);
                   final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
                   
+                  
                   final locationState = BlocProvider.of<LocationBloc>(context, listen: false).state;
                   final currentLocation = locationState.lastKnowlocation!;
                   
@@ -479,6 +482,8 @@ Future<void> _selectTime(BuildContext context) async {
 
                   await mapBloc.drawRoutePolyline(navigationPath);
                   mapBloc.add(OnInitRoute());
+
+                  
                   
                   hideLoadingMessage(context);
                   widget.onRouteTap();

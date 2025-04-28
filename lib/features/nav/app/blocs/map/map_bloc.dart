@@ -43,9 +43,18 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     on<DisplayMarkerEvent>((event, emit) => emit( state.copyWith( markers: event.markers )));
 
+    //activar vista 60°
     on<OnToggleDegreeView>(onToggleDegreeView);
 
     on<GetCurrentRouteEvent>((event, emit) => emit( state.copyWith( currentRoute: event.currentRoute )));
+
+    //activar desactivar marcadores de rutas
+    on<OnSelectRoutes>((event, emit) => emit( state.copyWith( onSelectRoutes:  true )));
+    on<OnCancelRoutes>((event, emit) => emit( state.copyWith( onSelectRoutes:  false )));
+
+    //activar desactivar marcadores de talleres
+    on<OnSelectTallerMarker>((event, emit) => emit( state.copyWith( onSelectTallerMarker:  true )));
+    on<OnCancelTallerMarker>((event, emit) => emit( state.copyWith( onSelectTallerMarker:  false )));
 
     on<FocusOnRouteEvent>(_focusOnRoute);
 
@@ -68,6 +77,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     on<MoveCameraToLocationEvent>((event, emit) {
       moveCamera(event.location);
     });
+
+    //escuchar posicion de actual del usuario
   
     locationBloc.stream.listen((locationState) {
       if (state.showMyRoute) {
@@ -254,15 +265,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     );
   }
 
-  void updateCurrentMarkerPosition(CameraPosition newPosition, BuildContext context) {
+  void updateCurrentMarkerPosition(BuildContext context) {
     final markerServices = Provider.of<MarkerServices>(context, listen: false);
 
     markerServices.infoMarkers.forEach((Markers place) {
 
-      if(newPosition.zoom < 12){
-        state.markers.remove('${place.id}');
-        return;
-      }
+      //if(newPosition.zoom < 12){
+      //  state.markers.remove('${place.id}');
+      //  return;
+      //}
 
       if(state.markers.containsKey(place.id)){
         return;
