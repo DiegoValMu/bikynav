@@ -1,12 +1,6 @@
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
-import 'package:bikynav/features/nav/app/blocs/map/map_bloc.dart';
-import 'package:bikynav/features/nav/app/blocs/search/search_bloc.dart';
 import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/config/models/markers_model.dart';
-import 'package:bikynav/features/nav/config/models/models.dart';
-import 'package:bikynav/features/route/app/services/route_service.dart';
-import 'package:bikynav/features/route/presentation/widgets/btn_save_route.dart';
-import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:bikynav/shared/views/custom_draggable_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -97,22 +91,19 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
             ),
             builder: (context, snapshot) {
               // Procesamiento seguro de los datos
-              final data = snapshot.data!;
-              final distance = (data.distance ?? 0) / 1000; // metros a km con valor por defecto
-              final tripDuration = (data.duration ?? 0) / 60; // segundos a minutos con valor por defecto
-              final direccion = data.endPlace?.properties?.name;
+              
               // Manejo de estados de carga y error
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
-                  leading: CircularProgressIndicator(
+                  leading: const CircularProgressIndicator(
                     strokeWidth: 1,
                     strokeCap: StrokeCap.round,
                   ),
                   title: Text('${tallerInfo.etiqueta}'),
-                  subtitle: Text(direccion),
+                  subtitle: const Text('Calculando distancia...'),
                   trailing: TextButton(
-                  child: Icon(Icons.directions, size: 28),
+                  child: const Icon(Icons.directions, size: 28),
                   onPressed: () {
                     // Acción para abrir direcciones
                   }, 
@@ -123,17 +114,20 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
               if (snapshot.hasError) {
                 return ListTile(
                   title: Text('${tallerInfo.etiqueta}'),
-                  subtitle: Text('Error al obtener datos'),
+                  subtitle: const Text('Error al obtener datos'),
                 );
               }
               
               if (!snapshot.hasData) {
                 return ListTile(
                   title: Text('${tallerInfo.etiqueta}'),
-                  subtitle: Text('Datos no disponibles'),
+                  subtitle: const Text('Datos no disponibles'),
                 );
               }
               
+              final data = snapshot.data!;
+              final distance = (data.distance ?? 0) / 1000; // metros a km con valor por defecto
+              final tripDuration = (data.duration ?? 0) / 60; // segundos a minutos con valor por defecto
               
               
               return ListTile(
@@ -142,18 +136,18 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('${tripDuration.floor()} min', style: TextStyle(fontSize: 13)),
-                    Text('${distance.toStringAsFixed(1)} km', style: TextStyle(fontSize: 13)),
+                    Text('${tripDuration.floor()} min', style: const TextStyle(fontSize: 13)),
+                    Text('${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 13)),
                   ],
                 ),
                 title: Text('${tallerInfo.etiqueta}'),
                 subtitle: Text(
-                  direccion != null
+                  data.endPlace.properties.name != null
                     ? 'Dirección: ${data.endPlace.properties.name}'
                     : 'Dirección no disponible'
                 ),
                 trailing: TextButton(
-                  child: Icon(Icons.directions, size: 28),
+                  child: const Icon(Icons.directions, size: 28),
                   onPressed: () {
                     // Acción para abrir direcciones
                   }, 
@@ -185,7 +179,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
                   onPressed: (){
 
                   }, 
-                  icon: Icon(Icons.info),
+                  icon: const Icon(Icons.info),
                   iconSize: 37,
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),

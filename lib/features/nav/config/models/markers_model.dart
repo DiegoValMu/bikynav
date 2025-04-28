@@ -16,7 +16,7 @@ class Markers {
     String? horario;
     String? website;
     String? descripcion;
-    dynamic? fecha;
+    dynamic fecha;
     String? hora;
     List<String>? imagen;
     List<double>? pos;

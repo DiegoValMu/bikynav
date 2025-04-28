@@ -98,7 +98,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
       }
 
       // 2. Busca el step más cercano (punto de giro)
-      cycling_models.Step nextStep = route.intersections.first;
       double minDistance = double.infinity;
 
       for (final step in route.intersections) {
@@ -106,18 +105,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
         final distance = calculateDistance(currentLocation, stepLatLng);
         if (distance < minDistance) {
           minDistance = distance;
-          nextStep = step;
         }
       }
 
       // 3. Si está cerca de un step, usa su bearingAfter
-      final double bearing;
       const thresholdDistance = 10.0; // 10 metros para activar el giro
 
-      if (nextStep != null && minDistance <= thresholdDistance) {
-        bearing = nextStep.maneuver.bearingAfter.toDouble();
+      if (minDistance <= thresholdDistance) {
       } else {
-        bearing = route.initialBearing.toDouble(); // Mantén el bearing inicial
+// Mantén el bearing inicial
       }
 
       // 4. Mueve la cámara con el bearing actualizado

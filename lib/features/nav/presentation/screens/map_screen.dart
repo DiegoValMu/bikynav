@@ -1,7 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bikynav/features/nav/app/services/marker_service.dart';
-import 'package:bikynav/features/nav/config/models/markers_model.dart';
 import 'package:bikynav/features/nav/presentation/views/custom_marker_data_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
@@ -363,7 +362,7 @@ _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
   routeServices.infoPlace = placeData;
 
   final newMarker = Marker(
-    markerId: MarkerId('${placeData.id}'), // ID diferente
+    markerId: MarkerId(placeData.id), // ID diferente
     position: p0,
     infoWindow:  InfoWindow(title: placeData.properties.name),
     anchor: const Offset(0.5, 1.0),
