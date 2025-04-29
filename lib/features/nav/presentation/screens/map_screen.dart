@@ -5,6 +5,7 @@ import 'package:bikynav/features/nav/presentation/views/custom_marker_data_view.
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
+import 'package:bikynav/features/route/presentation/views/custom_routes_data_display.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
 import 'package:bikynav/shared/ui/side_menu.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   late LocationBloc locationBloc;
   late MarkerServices markerServices;
+  late RouteServices routeServices;
   bool _isMenuOpen = false;
   bool isRouteStart = false;
   GoogleMapController? _mapController;
@@ -36,6 +38,7 @@ class _MapScreenState extends State<MapScreen> {
   late List<dynamic> infoMarkers = [];
 
   bool onSelectTallerMarkers = false;
+  bool onSelectEventMarkers = false;
   bool onSelectRoutesMarkers = false;
 
 
@@ -129,18 +132,27 @@ class _MapScreenState extends State<MapScreen> {
                     }
                     final searchState = BlocProvider.of<SearchBloc>(context, listen: false); 
                     markerServices = Provider.of<MarkerServices>(context, listen: false); 
+                    routeServices = Provider.of<RouteServices>(context, listen: false); 
 
                     if(markerServices.infoMarkers.isNotEmpty){
                       context.read<MapBloc>().updateCurrentMarkerPosition(context);
                     }
 
+                    if(routeServices.rutas.isNotEmpty){
+                      context.read<MapBloc>().updateRoutesMarkerPosition(context);
+                    }
+
                     if(mapState.onSelectTallerMarker){
                       onSelectTallerMarkers = true;
+                    }
 
+                    if(mapState.onSelectEventMarker){
+                      onSelectEventMarkers = true;
+                    }
+
+                    if(mapState.onSelectRoutes){
                       
-
-                      //context.read<MapBloc>().add(FocusOnRouteEvent(routePoints));
-
+                      onSelectRoutesMarkers = true;
                     }
 
                     return Stack(
@@ -151,6 +163,12 @@ class _MapScreenState extends State<MapScreen> {
                           markers: mapState.markers.values.toSet(),
                           mapType: currentMapType,
                           onLongPress: (p0) {
+                            markerServices.infoMarkers.clear();
+                            
+                            context.read<MapBloc>().add(OnCancelTallerMarker());
+                            context.read<MapBloc>().add(OnCancelEventMarker());
+                            onSelectTallerMarkers = false;
+                            onSelectEventMarkers = false;
                             _setMarker(context, p0, _handleMarkerAdded);
                             
                           },
@@ -260,6 +278,39 @@ class _MapScreenState extends State<MapScreen> {
                               } 
                             ))
                           ),
+                        if(onSelectEventMarkers)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            left: 0,
+                            child: SlideInUp(child: CustomMarkerDataDisplay(
+                              onCloseTap: () => setState(() { 
+                                onSelectEventMarkers = false;
+                                
+                              }),
+                              onTallerTap: () {
+                                onSelectEventMarkers = false;
+
+                              } 
+                            ))
+                          ),
+
+                        if(onSelectRoutesMarkers)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            left: 0,
+                            child: SlideInUp(child: CustomRoutesDataDisplay(
+                              onCloseTap: () => setState(() { 
+                                onSelectRoutesMarkers = false;
+                                
+                              }),
+                              onTallerTap: () {
+                                onSelectRoutesMarkers = false;
+
+                              } 
+                            ))
+                          ),
                         
                         if(markerOn)
                           Positioned(
@@ -284,7 +335,7 @@ class _MapScreenState extends State<MapScreen> {
                               } 
                             ))
                           ),
-                          if(!markerOn && !isRouteStart && !onSelectTallerMarkers)
+                          if(!markerOn && !isRouteStart && !onSelectTallerMarkers & !onSelectEventMarkers & !onSelectRoutesMarkers)
                             Positioned(
                               bottom: 0,
                               right: 0,
@@ -342,12 +393,16 @@ class _MapScreenState extends State<MapScreen> {
 
 _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
 
+  
+
   showLoadingMessage(context);
 
   final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
   final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
   final routeServices = Provider.of<RouteServices>(context, listen: false);
   final markerServices = Provider.of<MarkerServices>(context, listen: false); 
+
+  mapBloc.state.markers.clear();
 
   if (mapBloc.state.polylines.isNotEmpty){
     mapBloc.add( OnCancelRoute() );

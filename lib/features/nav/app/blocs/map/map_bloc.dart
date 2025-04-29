@@ -4,6 +4,7 @@ import 'package:bikynav/features/nav/app/helpers/calculate_distance.dart';
 import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/config/models/markers_model.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -51,6 +52,15 @@ class MapBloc extends Bloc<MapEvent, MapState> {
     //activar desactivar marcadores de rutas
     on<OnSelectRoutes>((event, emit) => emit( state.copyWith( onSelectRoutes:  true )));
     on<OnCancelRoutes>((event, emit) => emit( state.copyWith( onSelectRoutes:  false )));
+
+    //activar desactivar marcadores de rutas
+    on<OnSelectEventMarker>((event, emit) => emit( state.copyWith( onSelectEventMarker:  true )));
+    on<OnCancelEventMarker>((event, emit) => emit( state.copyWith( onSelectEventMarker:  false )));
+
+     //activar desactivar marcadores de rutas
+    on<InSelectRoutes>((event, emit) => emit( state.copyWith( inSelectRoutes:  true )));
+    on<InCancelRoutes>((event, emit) => emit( state.copyWith( inSelectRoutes:  false )));
+
 
     //activar desactivar marcadores de talleres
     on<OnSelectTallerMarker>((event, emit) => emit( state.copyWith( onSelectTallerMarker:  true )));
@@ -263,13 +273,17 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
   void updateCurrentMarkerPosition(BuildContext context) {
     final markerServices = Provider.of<MarkerServices>(context, listen: false);
+    BitmapDescriptor? eventMarker;
+
+    if(state.onSelectEventMarker){
+      eventMarker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueMagenta);
+    }
+
+    if(state.onSelectTallerMarker){
+      eventMarker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet);
+    }
 
     markerServices.infoMarkers.forEach((Markers place) {
-
-      //if(newPosition.zoom < 12){
-      //  state.markers.remove('${place.id}');
-      //  return;
-      //}
 
       if(state.markers.containsKey(place.id)){
         return;
@@ -285,13 +299,46 @@ class MapBloc extends Bloc<MapEvent, MapState> {
             title: place.etiqueta ?? '', // Usa la etiqueta como título de la ventana de información
             // Puedes agregar más información aquí si lo deseas
           ),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+          icon: eventMarker!,
           // Aquí puedes configurar otras propiedades del marcador si las necesitas
         );
         final updatedMarkers = Map<String, Marker>.from(state.markers);
         updatedMarkers[newMarker.markerId.value] = newMarker;
         add(DisplayMarkerEvent(updatedMarkers));
         
+      }
+    });
+  }
+
+   void updateRoutesMarkerPosition(BuildContext context) {
+    final routeServices = Provider.of<RouteServices>(context, listen: false);
+    BitmapDescriptor? eventMarker;
+
+    eventMarker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+
+    routeServices.rutas.forEach((place) {
+
+      if(state.markers.containsKey(place["id"])  || state.inSelectRoutes){
+        return;
+      }
+      // Accedemos a la latitud y longitud desde la propiedad 'pos' del objeto 'Markers'
+      if (place["ubicacion_inicial"] != null && place["ubicacion_inicial"]!.length == 2) {
+        final pos = LatLng(place["ubicacion_inicial"]![0], place["ubicacion_inicial"]![1]); // ¡OJO! El orden es [latitud, longitud] en tu JSON
+
+        final newMarker = Marker(
+          markerId: MarkerId(place["id"] ?? UniqueKey().toString()), // Usa el ID del objeto o genera uno único
+          position: pos,
+          infoWindow: InfoWindow(
+            title: place["etiqueta"] ?? '', // Usa la etiqueta como título de la ventana de información
+            // Puedes agregar más información aquí si lo deseas
+          ),
+          icon: eventMarker!,
+          // Aquí puedes configurar otras propiedades del marcador si las necesitas
+        );
+        final updatedMarkers = Map<String, Marker>.from(state.markers);
+        updatedMarkers[newMarker.markerId.value] = newMarker;
+        add(DisplayMarkerEvent(updatedMarkers));
+        add(InSelectRoutes());
       }
     });
   }

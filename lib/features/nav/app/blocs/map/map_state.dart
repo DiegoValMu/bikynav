@@ -8,7 +8,9 @@ class MapState extends Equatable {
   final bool onInitRoute;
   final bool onSelectRoute;
   final bool onSelectTallerMarker;
+  final bool onSelectEventMarker;
   final bool onSelectRoutes;
+  final bool inSelectRoutes;  
   final bool is45DegreeView;
   
  
@@ -29,7 +31,9 @@ class MapState extends Equatable {
     this.onInitRoute = false,
     this.onSelectRoute = false,
     this.onSelectTallerMarker = false,
+    this.onSelectEventMarker = false,
     this.onSelectRoutes = false,
+    this.inSelectRoutes = false,
     this.is45DegreeView = false,
     this.currentRoute
   }): polylines = polylines ?? const {},
@@ -43,7 +47,9 @@ class MapState extends Equatable {
     bool? onInitRoute,
     bool? onSelectRoute,
     bool? onSelectTallerMarker,
+    bool? onSelectEventMarker,
     bool? onSelectRoutes,
+    bool? inSelectRoutes,
     Map<String, Polyline>? polylines,
     Map<String, Marker>? markers,
     bool? is45DegreeView,
@@ -55,8 +61,10 @@ class MapState extends Equatable {
     showMyRoute: showMyRoute ?? this.showMyRoute,
     markers: markers ?? this.markers,
     onSelectRoute: onSelectRoute ?? this.onSelectRoute,
+    inSelectRoutes: inSelectRoutes ?? this.inSelectRoutes,
     onSelectRoutes: onSelectRoutes ?? this.onSelectRoutes,
     onSelectTallerMarker: onSelectTallerMarker ?? this.onSelectTallerMarker,
+    onSelectEventMarker: onSelectEventMarker ?? this.onSelectEventMarker,
     onInitRoute: onInitRoute ?? this.onInitRoute,
     is45DegreeView: is45DegreeView ?? this.is45DegreeView,
     currentRoute: currentRoute ?? this.currentRoute,
@@ -73,7 +81,9 @@ class MapState extends Equatable {
     is45DegreeView, 
     currentRoute ?? '',
     onSelectRoutes,
-    onSelectTallerMarker
+    onSelectTallerMarker,
+    onSelectEventMarker,
+    inSelectRoutes
     ];
 }
 

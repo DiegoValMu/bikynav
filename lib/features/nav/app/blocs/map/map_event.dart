@@ -41,6 +41,12 @@ class OnSelectRoutes extends MapEvent {}
 class OnCancelTallerMarker extends MapEvent {}
 class OnSelectTallerMarker extends MapEvent {}
 
+class OnCancelEventMarker extends MapEvent {}
+class OnSelectEventMarker extends MapEvent {}
+
+class InCancelRoutes extends MapEvent {}
+class InSelectRoutes extends MapEvent {}
+
 class MoveCameraToLocationEvent extends MapEvent {
   final LatLng location;
   const MoveCameraToLocationEvent(this.location);

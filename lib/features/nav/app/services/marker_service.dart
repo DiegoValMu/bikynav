@@ -66,6 +66,21 @@ class MarkerServices with ChangeNotifier {
     }
   }
 
+  Future getEventMarkers(String ciudad) async {
+
+    final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/markers/evento/$ciudad'));
+    if (response.statusCode == 200) {
+      final List<dynamic> decodedJson = json.decode(response.body);
+
+      // Utiliza .map para transformar cada elemento dinámico en un objeto Markers
+      infoMarkers = decodedJson.map((item) => Markers.fromJson(item as Map<String, dynamic>)).toList();
+
+      notifyListeners();  // Notifica a los consumidores
+    } else {
+      throw Exception('Error al cargar los datos');
+    }
+  }
+
 
 
 }

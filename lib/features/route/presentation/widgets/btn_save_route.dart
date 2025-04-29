@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:animate_do/animate_do.dart';
+import 'package:bikynav/features/nav/config/models/places_models.dart';
 import 'package:bikynav/features/nav/presentation/widgets/widgets.dart';
 import 'package:bikynav/features/route/app/helpers/real_time_provider.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
@@ -24,6 +25,7 @@ class BtnSaveRoute extends StatelessWidget {
     //final searchBloc = BlocProvider.of<SearchBloc>(context);
     final routeServices = Provider.of<RouteServices>(context, listen: false);
     final userServices = Provider.of<UserServices>(context, listen: false);
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
 
     final stopwatchProvider = Provider.of<StopwatchProvider>(context);
 
@@ -39,6 +41,9 @@ class BtnSaveRoute extends StatelessWidget {
       builder: (context, state) {
         return TextButton.icon(
           onPressed: () async {
+            final actualLocation = locationBloc.state.lastKnowlocation;
+            Feature? dataActualPlace = await searchBloc.getInformationPlace(actualLocation!);
+            final ciudadActual = dataActualPlace.properties.placeFormatted.split(',').first;
             stopwatchProvider.stopTimer();
 
             final startMarker = Marker(
@@ -75,6 +80,7 @@ class BtnSaveRoute extends StatelessWidget {
               myRoute.distancia = distance;
             }
 
+            myRoute.ciudad = ciudadActual;
             myRoute.tiempoUtilizado = stopwatchProvider.totalTimeStopped;
             myRoute.ubicacionInicial = ubicacionInicial;
             myRoute.ubicacionFinal = ubicacionFinal;

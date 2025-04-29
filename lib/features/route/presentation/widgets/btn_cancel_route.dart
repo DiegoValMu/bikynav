@@ -24,7 +24,6 @@ class BtnCancelRoute extends StatelessWidget {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final routeServices = Provider.of<RouteServices>(context, listen: false);
     final markerServices = Provider.of<MarkerServices>(context, listen: false); 
-    final markerId = markerServices.setMarker!.markerId.value;
 
     return ZoomIn(
       child: Container(
@@ -49,6 +48,7 @@ class BtnCancelRoute extends StatelessWidget {
                   }
                   
                   if (state.markers.isNotEmpty){
+                    final markerId = markerServices.setMarker!.markerId.value;
                     state.markers.remove(markerId);
                     state.polylines.remove('route');
                     state.markers.remove('start');

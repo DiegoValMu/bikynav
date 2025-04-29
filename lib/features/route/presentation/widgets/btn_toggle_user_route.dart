@@ -1,4 +1,5 @@
 
+import 'package:bikynav/features/nav/config/models/places_models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
@@ -14,8 +15,8 @@ class BtnToggleUserRoute extends StatelessWidget {
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
-    //final searchBloc = BlocProvider.of<SearchBloc>(context);
-      final stopwatchProvider = Provider.of<StopwatchProvider>(context);
+    
+    final stopwatchProvider = Provider.of<StopwatchProvider>(context);
 
     final LatLng? position = locationBloc.state.lastKnowlocation;
 
@@ -30,7 +31,8 @@ class BtnToggleUserRoute extends StatelessWidget {
           ],
         ),
       ),
-      onTap: () {
+      onTap: () async {
+
         stopwatchProvider.resetTimer();
         final startMarker = Marker(
           markerId: const MarkerId('start'),

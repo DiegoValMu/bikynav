@@ -1,17 +1,16 @@
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
-import 'package:bikynav/features/nav/app/services/marker_service.dart';
-import 'package:bikynav/features/nav/config/models/markers_model.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/shared/views/custom_draggable_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 
-class CustomMarkerDataDisplay extends CustomDraggableSheet {
+class CustomRoutesDataDisplay extends CustomDraggableSheet {
   final VoidCallback onCloseTap;
   final VoidCallback onTallerTap;
   
-  CustomMarkerDataDisplay({
+  CustomRoutesDataDisplay({
     super.key, 
     required this.onCloseTap,
     required this.onTallerTap,
@@ -49,7 +48,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
   @override
   Widget build(BuildContext context) {
     final mapBloc = BlocProvider.of<MapBloc>(context);
-    final markerServices = Provider.of<MarkerServices>(context, listen: false); 
+    final routeServices = Provider.of<RouteServices>(context, listen: false); 
 
 
 
@@ -58,18 +57,22 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
         const DecorativeBar(),
         Padding(
           padding: const EdgeInsets.only(bottom: 10),
-          child: titleAndClose(markerServices, mapBloc),
+          child: titleAndClose(routeServices, mapBloc),
         ),
         const Divider(),
-         _tallerListActualCity(markerServices.infoMarkers),
+         _tallerListActualCity(routeServices.rutas),
         
       ],
     );
   }
 
- Expanded _tallerListActualCity(List<Markers> infoMarkers) {
+ Expanded _tallerListActualCity(List<dynamic> infoMarkers) {
   final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
   final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
+
+  final pos = locationBloc.state.lastKnowlocation;
+
+  final dataCity = searchBloc.getInformationPlace(pos!);
   
   return Expanded(
     child: Scrollbar(
@@ -81,12 +84,12 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
         shrinkWrap: true,
         controller: _historyScrollController,
         itemBuilder: (context, index) {
-          final tallerInfo = infoMarkers[index];
-          final posTaller = LatLng(tallerInfo.pos![0], tallerInfo.pos![1]);
+          final routeInfo = infoMarkers[index];
+          final posTaller = LatLng(routeInfo["ubicacion_inicial"][0], routeInfo["ubicacion_inicial"][1]);
           
           return FutureBuilder(
             future: searchBloc.getCoorsStartToEnd(
-              locationBloc.state.lastKnowlocation!, 
+              pos, 
               posTaller
             ),
             builder: (context, snapshot) {
@@ -100,7 +103,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
                     strokeWidth: 1,
                     strokeCap: StrokeCap.round,
                   ),
-                  title: Text('${tallerInfo.etiqueta}'),
+                  title: Text('${routeInfo["etiqueta"]}'),
                   subtitle: const Text('Calculando distancia...'),
                   trailing: TextButton(
                   child: const Icon(Icons.directions, size: 28),
@@ -113,14 +116,14 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
               
               if (snapshot.hasError) {
                 return ListTile(
-                  title: Text('${tallerInfo.etiqueta}'),
+                  title: Text('${routeInfo["etiqueta"]}'),
                   subtitle: const Text('Error al obtener datos'),
                 );
               }
               
               if (!snapshot.hasData) {
                 return ListTile(
-                  title: Text('${tallerInfo.etiqueta}'),
+                  title: Text('${routeInfo["etiqueta"]}'),
                   subtitle: const Text('Datos no disponibles'),
                 );
               }
@@ -140,7 +143,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
                     Text('${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 13)),
                   ],
                 ),
-                title: Text('${tallerInfo.etiqueta}'),
+                title: Text('${routeInfo["etiqueta"]}'),
                 subtitle: Text(
                   data.endPlace.properties.name != null
                     ? 'Dirección: ${data.endPlace.properties.name}'
@@ -161,62 +164,52 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
   );
 }
 
-  Row titleAndClose(MarkerServices markerServices, MapBloc mapBloc){
+  titleAndClose(RouteServices routeServices, MapBloc mapBloc){
     
-    final markerServices = Provider.of<MarkerServices>(context, listen: false); 
+  final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
+  final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
 
-    final actualDataPlace = markerServices.dataActualPlace;
+  final pos = locationBloc.state.lastKnowlocation;
 
-    String? markerType;
-
-
-    if(mapBloc.state.onSelectTallerMarker){
-      markerType = 'Talleres';
-    }
-
-    if(mapBloc.state.onSelectEventMarker){
-      markerType = 'Eventos';
-    }
-
-    
+    final actualDataPlace = routeServices.infoPlace;
 
     return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: ListTile(
-                leading: IconButton(
-                  onPressed: (){
-
-                  }, 
-                  icon: const Icon(Icons.info),
-                  iconSize: 37,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: ListTile(
+                  leading: IconButton(
+                    onPressed: (){
+      
+                    }, 
+                    icon: const Icon(Icons.info),
+                    iconSize: 37,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                    
+                  title: Text('Rutas en ${actualDataPlace!.properties.placeFormatted.split(',').first}', 
+                    style: const TextStyle(fontSize: 18),),
                   
-                title: Text('${markerType} en ${actualDataPlace!.properties.placeFormatted.split(',').first}', 
-                  style: const TextStyle(fontSize: 18),),
-                
-              )),
-            IconButton(
-              onPressed: (){
-                markerServices.infoMarkers.clear();
-                mapBloc.state.markers.clear();
-                mapBloc.add(OnCancelTallerMarker());
-                mapBloc.add(OnCancelEventMarker());
-                widget.onCloseTap();
-              }, 
-              icon: const Icon(Icons.close),
-                style: ButtonStyle(
-                  backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
-                ),
-            ),
-          ],
-        );
+                )),
+              IconButton(
+                onPressed: (){
+                  routeServices.rutas.clear();
+                  mapBloc.state.markers.clear();
+                  mapBloc.add(OnCancelTallerMarker());
+                  mapBloc.add(OnCancelEventMarker());
+                  widget.onCloseTap();
+                }, 
+                icon: const Icon(Icons.close),
+                  style: ButtonStyle(
+                    backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
+                  ),
+              ),
+            ],
+          );
+      }
   }
-}
 
 class DecorativeBar extends StatelessWidget {
   const DecorativeBar({super.key});

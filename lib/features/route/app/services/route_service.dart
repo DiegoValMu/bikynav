@@ -26,6 +26,7 @@ class RouteServices with ChangeNotifier {
       'ubicacion_final': rt.ubicacionFinal,
       'tiempo': rt.tiempoUtilizado,
       'ruta': rt.ruta,
+      'ciudad': rt.ciudad,
       'fecha': rt.fecha.toString(),
       'usuario': rt.usrId,
     };
@@ -52,6 +53,18 @@ class RouteServices with ChangeNotifier {
     });
     if (response.statusCode == 200) {
       rutas = json.decode(response.body);
+      notifyListeners();  // Notifica a los consumidores
+    } else {
+      throw Exception('Error al cargar los datos');
+    }
+  }
+
+  Future getRoutesByCity( String ciudad) async {
+    final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$ciudad'));
+    if (response.statusCode == 200) {
+      rutas = json.decode(response.body);
+
+
       notifyListeners();  // Notifica a los consumidores
     } else {
       throw Exception('Error al cargar los datos');

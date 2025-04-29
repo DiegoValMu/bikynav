@@ -8,6 +8,7 @@ class BikeRoute {
   LatLng? ubicacionInicial;
   LatLng? ubicacionFinal;
   DateTime? fecha;
+  String? ciudad;
   int? tiempoUtilizado;
   Map<String, Polyline>? ruta;
   List<String>? imagen;
@@ -24,6 +25,7 @@ class BikeRoute {
     this.tiempoUtilizado,
     this.ruta,
     this.imagen,
+    this.ciudad,
     this.usuario,
     this.distancia,
   });
@@ -51,6 +53,7 @@ class BikeRoute {
       etiqueta: json['etiqueta'],  // Asumiendo que el nombre de la ruta viene desde el backend
       ubicacionInicial: ubicacionInicial,
       ubicacionFinal: ubicacionFinal,
+      ciudad: json['ciudad'],
       fecha: json['fecha'] != null ? DateTime.parse(json['fecha']) : null,
       tiempoUtilizado: json['tiempo'] != null ? int.tryParse(json['tiempo']) : null,
       ruta: json['ruta'] != null
@@ -73,6 +76,7 @@ class BikeRoute {
           ? [ubicacionFinal!.latitude, ubicacionFinal!.longitude]
           : null,
       'fecha': fecha?.toIso8601String(),
+      'ciudad': ciudad,
       'tiempo': tiempoUtilizado?.toString(),
       'ruta': ruta?.map((key, polyline) => MapEntry(key, {
                 'polylineId': polyline.polylineId.value,

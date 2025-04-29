@@ -4,6 +4,8 @@ import 'package:bikynav/features/nav/app/blocs/search/search_bloc.dart';
 import 'package:bikynav/features/nav/app/helpers/show_loading_message.dart';
 import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/config/models/markers_model.dart';
+import 'package:bikynav/features/route/app/services/route_service.dart';
+import 'package:bikynav/features/route/config/models/routes.dart';
 import 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
 import 'package:bikynav/shared/views/nav_items.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,39 @@ class NavOptions extends StatelessWidget {
   const NavOptions({
     super.key,
   });
+
+  Future<void> _handleMarkersAction(
+    BuildContext context, {
+    required String markerType,
+    required Function markerEvent,
+  }) async {
+    showLoadingMessage(context);
+    
+    final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+    final markerServices = Provider.of<MarkerServices>(context, listen: false);
+    final locationBloc = BlocProvider.of<LocationBloc>(context);
+    final actualLocation = locationBloc.state.lastKnowlocation;
+    final searchBloc = BlocProvider.of<SearchBloc>(context);
+    
+    markerServices.dataActualPlace = await searchBloc.getInformationPlace(actualLocation!);
+    final ciudadActual = markerServices.dataActualPlace!.properties.placeFormatted.split(',').first;
+
+    await (markerType == 'taller' 
+      ? markerServices.getTallerMarkers(ciudadActual)
+      : markerServices.getEventMarkers(ciudadActual));
+    
+    hideLoadingMessage(context);
+    markerServices.markersSelected = markerType;
+    
+    markerEvent();
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    final markers = markerServices.infoMarkers;
+    final markerPoints = markers.map((marcador) => 
+      LatLng(marcador.pos![0], marcador.pos![1])).toList();
+
+    mapBloc.add(FocusOnRouteEvent(markerPoints));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,42 +85,11 @@ class NavOptions extends StatelessWidget {
             Icons.home_repair_service, 
             'Ver Talleres', 
             () async {
-              showLoadingMessage(context);
-              final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
-              final markerServices = Provider.of<MarkerServices>(context, listen: false); 
-              final locationBloc = BlocProvider.of<LocationBloc>(context);
-              final actualLocation = locationBloc.state.lastKnowlocation;
-              final searchBloc = BlocProvider.of<SearchBloc>(context);
-              markerServices.dataActualPlace = await searchBloc.getInformationPlace(actualLocation!);
-
-              final ciudadActual = markerServices.dataActualPlace!.properties.placeFormatted.split(',').first;
-
-              await markerServices.getTallerMarkers(ciudadActual);
-              hideLoadingMessage(context);
-
-              
-
-              markerServices.markersSelected = 'taller';
-
-
-              mapBloc.add(OnSelectTallerMarker());
-              await Future.delayed(const Duration(milliseconds: 300));
-
-
-              //vista de todos los talleres de la ciudad 
-
-              final talleres = markerServices.infoMarkers;
-              List<LatLng>? markerPoints = [];
-
-              talleres.map((Markers marcador) {
-                markerPoints.add(LatLng(marcador.pos![0], marcador.pos![1]));
-              }).toList();
-
-              mapBloc.add(FocusOnRouteEvent(markerPoints));
-
-              //--------------------------------------------------------------
-              
-              
+              await _handleMarkersAction(
+                context,
+                markerType: 'taller',
+                markerEvent: () => BlocProvider.of<MapBloc>(context).add(OnSelectTallerMarker()),
+              );
             }
           ),
           const VerticalDivider(width: 20, thickness: 1),
@@ -93,9 +97,32 @@ class NavOptions extends StatelessWidget {
             context, 
             Icons.directions_bike_outlined, 
             'Mostrar Rutas', 
-            () {
-              //final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
-              //searchBloc.add(OnActivateManualPinMarkerEvent());
+            () async {
+              showLoadingMessage(context);
+              final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+              final markerServices = Provider.of<MarkerServices>(context, listen: false);
+              final routeServices = Provider.of<RouteServices>(context, listen: false);
+              final locationBloc = BlocProvider.of<LocationBloc>(context);
+              final actualLocation = locationBloc.state.lastKnowlocation;
+              final searchBloc = BlocProvider.of<SearchBloc>(context);
+
+              routeServices.infoPlace = await searchBloc.getInformationPlace(actualLocation!);
+              final ciudadActual = routeServices.infoPlace!.properties.placeFormatted.split(',').first;
+
+              await routeServices.getRoutesByCity(ciudadActual);
+              BlocProvider.of<MapBloc>(context).add(OnSelectRoutes());
+
+              hideLoadingMessage(context);
+              markerServices.markersSelected = 'routes';
+
+              await Future.delayed(const Duration(milliseconds: 300));
+
+              final routes = routeServices.rutas;
+
+              final markerPoints = routes.map((marcador) => 
+                LatLng(marcador["ubicacion_inicial"][0], marcador["ubicacion_inicial"][1])).toList();
+
+              mapBloc.add(FocusOnRouteEvent(markerPoints));
             }
           ),
           const VerticalDivider(width: 20, thickness: 1),
@@ -103,9 +130,12 @@ class NavOptions extends StatelessWidget {
             context, 
             Icons.emoji_events_outlined, 
             'Ver Eventos', 
-            () {
-              //final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
-              //searchBloc.add(OnActivateManualPinMarkerEvent());
+            () async {
+              await _handleMarkersAction(
+                context,
+                markerType: 'evento',
+                markerEvent: () => BlocProvider.of<MapBloc>(context).add(OnSelectEventMarker()),
+              );
             }
           ),
         ],
