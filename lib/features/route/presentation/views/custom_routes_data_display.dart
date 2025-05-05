@@ -1,4 +1,5 @@
 import 'package:bikynav/features/nav/app/blocs/blocs.dart';
+import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/shared/views/custom_draggable_sheet.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
           child: titleAndClose(routeServices, mapBloc),
         ),
         const Divider(),
-         _tallerListActualCity(routeServices.rutas),
+         _tallerListActualCity(routeServices.rutas2),
         
       ],
     );
@@ -173,6 +174,8 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
 
     final actualDataPlace = routeServices.infoPlace;
 
+    final markerServices = Provider.of<MarkerServices>(context, listen: false); 
+
     return Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -195,10 +198,11 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
                 )),
               IconButton(
                 onPressed: (){
-                  routeServices.rutas.clear();
-                  mapBloc.state.markers.clear();
-                  mapBloc.add(OnCancelTallerMarker());
-                  mapBloc.add(OnCancelEventMarker());
+                  markerServices.setMarker = null;
+                  markerServices.infoMarkers.clear();
+                  routeServices.rutas2.clear();
+                  
+                  
                   widget.onCloseTap();
                 }, 
                 icon: const Icon(Icons.close),

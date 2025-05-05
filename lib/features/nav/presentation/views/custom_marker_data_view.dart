@@ -164,7 +164,6 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
   Row titleAndClose(MarkerServices markerServices, MapBloc mapBloc){
     
     final markerServices = Provider.of<MarkerServices>(context, listen: false); 
-
     final actualDataPlace = markerServices.dataActualPlace;
 
     String? markerType;
@@ -173,7 +172,6 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
     if(mapBloc.state.onSelectTallerMarker){
       markerType = 'Talleres';
     }
-
     if(mapBloc.state.onSelectEventMarker){
       markerType = 'Eventos';
     }
@@ -204,8 +202,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
               onPressed: (){
                 markerServices.infoMarkers.clear();
                 mapBloc.state.markers.clear();
-                mapBloc.add(OnCancelTallerMarker());
-                mapBloc.add(OnCancelEventMarker());
+                
                 widget.onCloseTap();
               }, 
               icon: const Icon(Icons.close),

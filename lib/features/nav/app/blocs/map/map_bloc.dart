@@ -316,7 +316,7 @@ class MapBloc extends Bloc<MapEvent, MapState> {
 
     eventMarker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
 
-    routeServices.rutas.forEach((place) {
+    routeServices.rutas2.forEach((place) {
 
       if(state.markers.containsKey(place["id"])  || state.inSelectRoutes){
         return;

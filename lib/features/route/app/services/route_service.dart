@@ -8,6 +8,7 @@ import 'dart:convert';
 class RouteServices with ChangeNotifier {
 
   List<dynamic> rutas = [];
+  List<dynamic> rutas2 = [];
   String selectNavRoute = '';
   BikeRoute myRoute = BikeRoute();
 
@@ -62,7 +63,7 @@ class RouteServices with ChangeNotifier {
   Future getRoutesByCity( String ciudad) async {
     final response = await http.get(Uri.parse('https://serverbikynav-production.up.railway.app/api/recorridos/$ciudad'));
     if (response.statusCode == 200) {
-      rutas = json.decode(response.body);
+      rutas2 = json.decode(response.body);
 
 
       notifyListeners();  // Notifica a los consumidores

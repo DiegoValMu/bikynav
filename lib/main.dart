@@ -33,7 +33,9 @@ void main() async {
       BlocProvider(create: (context) => GpsBloc() ),
       BlocProvider(create: (context) => LocationBloc() ), 
       BlocProvider(create: (context) => MapBloc( locationBloc: BlocProvider.of<LocationBloc>( context ) ) ),
-      BlocProvider(create: (context) => SearchBloc( trafficService: TrafficService() ) )
+      BlocProvider(create: (context) => SearchBloc( 
+                                            trafficService: TrafficService(),
+                                            mapBloc: BlocProvider.of<MapBloc>( context ) ) )
       ], 
     child: const MainApp()
     )

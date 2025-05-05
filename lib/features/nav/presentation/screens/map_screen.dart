@@ -3,7 +3,7 @@ import 'package:bikynav/features/nav/app/helpers/helpers.dart';
 import 'package:bikynav/features/nav/app/services/marker_service.dart';
 import 'package:bikynav/features/nav/presentation/views/custom_marker_data_view.dart';
 import 'package:bikynav/features/nav/presentation/widgets/custom_change_map_view.dart';
-import 'package:bikynav/features/nav/presentation/widgets/custom_marker_form.dart';
+import 'package:bikynav/features/nav/presentation/views/custom_marker_form.dart';
 import 'package:bikynav/features/route/app/services/route_service.dart';
 import 'package:bikynav/features/route/presentation/views/custom_routes_data_display.dart';
 import 'package:bikynav/features/route/presentation/widgets/custom_data_display.dart';
@@ -138,7 +138,7 @@ class _MapScreenState extends State<MapScreen> {
                       context.read<MapBloc>().updateCurrentMarkerPosition(context);
                     }
 
-                    if(routeServices.rutas.isNotEmpty){
+                    if(routeServices.rutas2.isNotEmpty){
                       context.read<MapBloc>().updateRoutesMarkerPosition(context);
                     }
 
@@ -262,7 +262,7 @@ class _MapScreenState extends State<MapScreen> {
                           ),
                         ),
 
-                        if(onSelectTallerMarkers)
+                        if(onSelectTallerMarkers || onSelectEventMarkers)
                           Positioned(
                             bottom: 0,
                             right: 0,
@@ -270,26 +270,16 @@ class _MapScreenState extends State<MapScreen> {
                             child: SlideInUp(child: CustomMarkerDataDisplay(
                               onCloseTap: () => setState(() { 
                                 onSelectTallerMarkers = false;
+                                onSelectEventMarkers = false;
+                                context.read<MapBloc>().add(OnCancelTallerMarker());
+                                context.read<MapBloc>().add(OnCancelEventMarker());
+                                
                                 
                               }),
                               onTallerTap: () {
                                 onSelectTallerMarkers = false;
+                                onSelectEventMarkers = false;
 
-                              } 
-                            ))
-                          ),
-                        if(onSelectEventMarkers)
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            left: 0,
-                            child: SlideInUp(child: CustomMarkerDataDisplay(
-                              onCloseTap: () => setState(() { 
-                                onSelectEventMarkers = false;
-                                
-                              }),
-                              onTallerTap: () {
-                                onSelectEventMarkers = false;
 
                               } 
                             ))
@@ -303,10 +293,15 @@ class _MapScreenState extends State<MapScreen> {
                             child: SlideInUp(child: CustomRoutesDataDisplay(
                               onCloseTap: () => setState(() { 
                                 onSelectRoutesMarkers = false;
+                                context.read<MapBloc>().add(OnCancelTallerMarker());
+                                context.read<MapBloc>().add(OnCancelEventMarker());
+                                context.read<MapBloc>().add(OnCancelRoutes());
+                                context.read<MapBloc>().add(InCancelRoutes());
+                                context.read<MapBloc>().state.markers.clear();
                                 
                               }),
                               onTallerTap: () {
-                                onSelectRoutesMarkers = false;
+                                
 
                               } 
                             ))
@@ -364,7 +359,10 @@ class _MapScreenState extends State<MapScreen> {
               child: SideMenu( // Usamos el nuevo widget
                 isMenuOpen: _isMenuOpen,
                 onClose: () {
-                  setState(() => _isMenuOpen = false);
+                  setState(() {
+                    _isMenuOpen = false;
+
+                  });
                 },
               ),
             ),

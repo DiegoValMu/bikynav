@@ -46,10 +46,14 @@ class BtnCancelRoute extends StatelessWidget {
                     state.polylines.remove('myRoute');
                     mapBloc.add( OnCancelToggleUserRoute() );
                   }
-                  
-                  if (state.markers.isNotEmpty){
+
+                  if(markerServices.setMarker != null){
                     final markerId = markerServices.setMarker!.markerId.value;
                     state.markers.remove(markerId);
+                  }
+                  
+                  if (state.markers.isNotEmpty){
+                    
                     state.polylines.remove('route');
                     state.markers.remove('start');
                     state.markers.remove('end');

@@ -9,7 +9,7 @@ export 'package:bikynav/features/route/presentation/widgets/btn_cancel_route.dar
 
 export 'package:bikynav/features/nav/presentation/widgets/manual_marker.dart';
 
-export 'package:bikynav/features/nav/presentation/widgets/custom_searchbar.dart';
+export 'package:bikynav/features/nav/presentation/views/custom_searchbar.dart';
 
 export 'package:bikynav/features/route/presentation/widgets/btn_toggle_user_route.dart';
 

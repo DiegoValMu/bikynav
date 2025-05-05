@@ -35,9 +35,13 @@ class NavOptions extends StatelessWidget {
     markerServices.dataActualPlace = await searchBloc.getInformationPlace(actualLocation!);
     final ciudadActual = markerServices.dataActualPlace!.properties.placeFormatted.split(',').first;
 
-    await (markerType == 'taller' 
-      ? markerServices.getTallerMarkers(ciudadActual)
-      : markerServices.getEventMarkers(ciudadActual));
+    if(markerType == 'taller'){
+      await markerServices.getTallerMarkers(ciudadActual);
+    }
+
+    if(markerType == 'evento'){
+      await markerServices.getEventMarkers(ciudadActual);
+    }
     
     hideLoadingMessage(context);
     markerServices.markersSelected = markerType;
@@ -117,7 +121,7 @@ class NavOptions extends StatelessWidget {
 
               await Future.delayed(const Duration(milliseconds: 300));
 
-              final routes = routeServices.rutas;
+              final routes = routeServices.rutas2;
 
               final markerPoints = routes.map((marcador) => 
                 LatLng(marcador["ubicacion_inicial"][0], marcador["ubicacion_inicial"][1])).toList();

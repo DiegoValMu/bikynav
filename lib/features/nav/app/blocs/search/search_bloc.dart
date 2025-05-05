@@ -1,3 +1,4 @@
+import 'package:bikynav/features/nav/app/blocs/map/map_bloc.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -9,10 +10,12 @@ part 'search_event.dart';
 part 'search_state.dart';
 
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
+  final MapBloc mapBloc;
 
   TrafficService trafficService;
 
   SearchBloc({
+    required this.mapBloc,
     required this.trafficService
   }) : super( const SearchState() ) {
 
@@ -43,6 +46,7 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   }
 
   Future getCoorsStartToEnd( LatLng start, LatLng end ) async {
+
     final trafficResponse = await trafficService.getCoorsStartToEnd(start, end);
 
     //informacion del destino
@@ -67,9 +71,12 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     endPlace.properties.distancia = kms;
     endPlace.properties.duracion = duration;
 
-    if ( !state.history.contains( endPlace) ){
-      add( AddToHistoryEvent( endPlace ) );
+    if( !mapBloc.state.onSelectRoutes && !mapBloc.state.onSelectTallerMarker && !mapBloc.state.onSelectEventMarker){
+      if ( !state.history.contains(endPlace) ){
+        add( AddToHistoryEvent( endPlace ) );
+      }
     }
+    
 
     final destination = RouteDestination(
       points: latLngList, 
