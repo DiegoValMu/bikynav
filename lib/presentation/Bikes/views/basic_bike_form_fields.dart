@@ -1,0 +1,84 @@
+import 'package:bikynav/presentation/Navegacion/widgets/widgets.dart';
+import 'package:flutter/material.dart';
+
+class BasicFormFields extends StatefulWidget {
+  final TextEditingController etiquetaController;
+  final TextEditingController marcaController;
+  final TextEditingController modeloController;
+  final String? selectedColorPrincipal;
+  final ValueChanged<String?> onColorPrincipalChanged;
+
+  const BasicFormFields({
+    super.key,
+    required this.etiquetaController,
+    required this.marcaController,
+    required this.modeloController,
+    this.selectedColorPrincipal,
+    required this.onColorPrincipalChanged,
+  });
+
+  @override
+  State<BasicFormFields> createState() => _BasicFormFieldsState();
+}
+
+class _BasicFormFieldsState extends State<BasicFormFields> {
+  List<String> colores = [
+    'Rojo',
+    'Azul',
+    'Verde',
+    'Amarillo',
+    'Negro',
+    'Blanco',
+    'Naranja',
+    'Morado'
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const Divider(),
+        CustomTextFormField(
+          controller: widget.etiquetaController,
+          icon: Icons.edit,
+          placeholder: 'Etiqueta',
+          inputType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 10),
+        CustomTextFormField(
+          controller: widget.marcaController,
+          icon: Icons.directions_bike,
+          placeholder: 'Marca',
+          inputType: TextInputType.name,
+        ),
+        const SizedBox(height: 10),
+        CustomTextFormField(
+          controller: widget.modeloController,
+          icon: Icons.build,
+          placeholder: 'Modelo',
+          inputType: TextInputType.name,
+        ),
+        const SizedBox(height: 10),
+        DropdownButtonFormField<String>(
+          decoration: InputDecoration(
+            labelText: 'Color principal',
+            prefixIcon: const Icon(Icons.colorize_sharp, color: Colors.grey),
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide.none,
+            ),
+          ),
+          value: widget.selectedColorPrincipal,
+          items: colores
+              .map((color) =>
+                  DropdownMenuItem(value: color, child: Text(color)))
+              .toList(),
+          onChanged: widget.onColorPrincipalChanged,
+        ),
+        const SizedBox(height: 10),
+      ],
+    );
+  }
+}
