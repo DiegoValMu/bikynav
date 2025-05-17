@@ -5,21 +5,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/custom_data_display.dart';
+import '../../Navegacion/widgets/widgets.dart';
 
 class RouteDisplay extends CustomDraggableSheet {
-  final String id;
   
-  RouteDisplay({super.key, required this.id}) : super(
+  RouteDisplay({super.key}) : super(
     minHeight: 100,
     maxHeight: 450,
-    child: _RouteDisplayContent(id: id),
+    child: _RouteDisplayContent(),
   );
 }
 
 class _RouteDisplayContent extends StatefulWidget {
-  final String id;
-  const _RouteDisplayContent({required this.id});
+
+  const _RouteDisplayContent();
 
   @override
   State<_RouteDisplayContent> createState() => _RouteDisplayContentState();
@@ -52,6 +51,7 @@ class _RouteDisplayContentState extends State<_RouteDisplayContent> {
       ],
     );
   }
+
 
   Widget _buildRouteInfo(double duration, double distance) {
     return SizedBox(

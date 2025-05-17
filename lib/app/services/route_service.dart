@@ -1,6 +1,4 @@
 import 'package:bikynav/config/models/models.dart';
-import 'package:bikynav/config/models/routes.dart';
-import 'package:bikynav/config/models/routesById.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';

@@ -10,18 +10,17 @@ import 'package:provider/provider.dart';
 import '../widgets/decorative_bar.dart';
 
 class DirectionDisplay extends CustomDraggableSheet {
-  final String id;
+
   
-  DirectionDisplay({super.key, required this.id}) : super(
+  DirectionDisplay({super.key}) : super(
     minHeight: 100,
     maxHeight: 450,
-    child: _DirectionDisplayContent(id: id),
+    child: _DirectionDisplayContent(),
   );
 }
 
 class _DirectionDisplayContent extends StatefulWidget {
-  final String id;
-  const _DirectionDisplayContent({required this.id});
+  const _DirectionDisplayContent();
 
   @override
   State<_DirectionDisplayContent> createState() => _DirectionDisplayContentState();
@@ -40,7 +39,9 @@ class _DirectionDisplayContentState extends State<_DirectionDisplayContent> {
     );
 
     final name = feature.properties.name;
-    final distance = feature.properties.distancia ?? 0;
+    final kms = feature.properties.distancia ?? 0;
+    final distance = (kms * 10).roundToDouble() / 10;
+
     final tripDuration = (feature.properties.duracion ?? 0) / 60;
 
     return Column(
@@ -59,6 +60,8 @@ class _DirectionDisplayContentState extends State<_DirectionDisplayContent> {
       ],
     );
   }
+
+
   
 
    Widget _buildDirectionInfo(double duration, double distance) {

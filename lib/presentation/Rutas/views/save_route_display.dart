@@ -1,20 +1,28 @@
+import 'package:bikynav/app/blocs/blocs.dart';
 import 'package:bikynav/app/helpers/real_time_provider.dart';
 import 'package:bikynav/presentation/shared/views/custom_draggable_sheet.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 import '../../shared/widgets/custom_decorative_bar.dart';
 import '../widgets/btn_save_route.dart';
 
 class SaveRouteDisplay extends CustomDraggableSheet {
-  SaveRouteDisplay({super.key}) : super(
+  final VoidCallback onCloseTap;
+  SaveRouteDisplay({
+    required this.onCloseTap,
+    super.key}) : super(
     minHeight: 100,
     maxHeight: 450,
-    child: const _SaveRouteDisplayContent(),
+    child:_SaveRouteDisplayContent(onCloseTap: onCloseTap,),
   );
 }
 
 class _SaveRouteDisplayContent extends StatefulWidget {
-  const _SaveRouteDisplayContent();
+  final VoidCallback onCloseTap;
+  const _SaveRouteDisplayContent({
+    required this.onCloseTap
+  });
 
   @override
   State<_SaveRouteDisplayContent> createState() => _SaveRouteDisplayContentState();
@@ -43,10 +51,27 @@ class _SaveRouteDisplayContentState extends State<_SaveRouteDisplayContent> {
             leading: _buildTimerDisplay(minutes, displaySeconds),
             title: const BtnSaveRoute(),
             contentPadding: EdgeInsets.zero,
+            trailing: _onCancelRoute(context),
           ),
         ),
+        Divider(),
+        
       ],
     );
+  }
+
+  IconButton _onCancelRoute(BuildContext context) {
+    return IconButton(
+            onPressed: (){
+              final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+             
+              mapBloc.add(OnCancelToggleUserRoute());
+              mapBloc.add(OnCancelRoute());
+              mapBloc.state.markers.remove('start');
+              mapBloc.state.markers.remove('end');
+              widget.onCloseTap;
+            }, 
+            icon: Icon(Icons.close));
   }
 
   Widget _buildTimerDisplay(String minutes, String seconds) {

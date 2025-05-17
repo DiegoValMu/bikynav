@@ -167,6 +167,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
 
   titleAndClose(RouteServices routeServices, MapBloc mapBloc){
     
+    
   final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
   final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
 

@@ -58,7 +58,7 @@ class BtnToggleUserRoute extends StatelessWidget {
         
         mapBloc.add(OnToggleUserRoute());
         locationBloc.add( OnNewRouteEvent(position));
-        mapBloc.add(OnInitRoute());
+        //mapBloc.add(OnInitRoute());
       },
     );
   }

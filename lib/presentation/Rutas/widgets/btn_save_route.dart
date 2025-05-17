@@ -165,7 +165,7 @@ class BtnSaveRoute extends StatelessWidget {
 
           },
           icon: const Icon(Icons.save),
-          label: const Text('Guardar ruta'),
+          label: const Text('Guardar'),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 12.0),
             side: const BorderSide(color: Colors.purple, width: 1.5),
