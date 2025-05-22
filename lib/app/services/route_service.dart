@@ -9,8 +9,12 @@ class RouteServices with ChangeNotifier {
   List<dynamic> rutas2 = [];
   String selectNavRoute = '';
   BikeRoute myRoute = BikeRoute();
+  List<dynamic> alternativeRoutes = [];
 
   Feature? infoPlace;
+  Feature? infoStartPlace;
+  Feature? infoEndPlace;
+  RouteDestination? directions;
 
   RouteServices();
 

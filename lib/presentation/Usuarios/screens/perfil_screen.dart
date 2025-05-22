@@ -1,5 +1,6 @@
 
 import 'package:bikynav/app/services/user_services.dart';
+import 'package:bikynav/presentation/shared/widgets/custom_build_info_row.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -133,26 +134,7 @@ class PerfilScreen extends StatelessWidget {
     );
   }
 
-  Widget buildInfoRow(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(value),
-          ),
-        ],
-      ),
-    );
-  }
+  
 
   
 

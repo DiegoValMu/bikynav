@@ -166,54 +166,46 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
 }
 
   titleAndClose(RouteServices routeServices, MapBloc mapBloc){
-    
-    
-  final searchBloc = BlocProvider.of<SearchBloc>(context, listen: false);
-  final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
-
-  final pos = locationBloc.state.lastKnowlocation;
-
+    final locationBloc = BlocProvider.of<LocationBloc>(context, listen: false);
+    final pos = locationBloc.state.lastKnowlocation;
     final actualDataPlace = routeServices.infoPlace;
-
     final markerServices = Provider.of<MarkerServices>(context, listen: false); 
 
     return Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Expanded(
-                child: ListTile(
-                  leading: IconButton(
-                    onPressed: (){
-      
-                    }, 
-                    icon: const Icon(Icons.info),
-                    iconSize: 37,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                    
-                  title: Text('Rutas en ${actualDataPlace!.properties.placeFormatted.split(',').first}', 
-                    style: const TextStyle(fontSize: 18),),
-                  
-                )),
-              IconButton(
-                onPressed: (){
-                  markerServices.setMarker = null;
-                  markerServices.infoMarkers.clear();
-                  routeServices.rutas2.clear();
-                  
-                  
-                  widget.onCloseTap();
-                }, 
-                icon: const Icon(Icons.close),
-                  style: ButtonStyle(
-                    backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
-                  ),
-              ),
-            ],
-          );
-      }
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Expanded(
+          child: ListTile(
+            leading: IconButton(
+              onPressed: (){
+
+              }, 
+              icon: const Icon(Icons.info),
+              iconSize: 37,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+              
+            title: Text('Rutas en ${actualDataPlace!.properties.placeFormatted.split(',').first}', 
+              style: const TextStyle(fontSize: 18),),
+            
+          )),
+        IconButton(
+          onPressed: (){
+            markerServices.setMarker = null;
+            markerServices.infoMarkers.clear();
+            routeServices.rutas2.clear();
+            widget.onCloseTap();
+          }, 
+          icon: const Icon(Icons.close),
+            style: ButtonStyle(
+              backgroundColor: WidgetStatePropertyAll(Colors.grey[200]),
+            ),
+        ),
+      ],
+    );
+    }
   }
 
 class DecorativeBar extends StatelessWidget {

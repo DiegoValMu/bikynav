@@ -41,7 +41,8 @@ class _MapScreenState extends State<MapScreen> {
   bool onSelectTallerMarkers = false;
   bool onSelectEventMarkers = false;
   bool onSelectRoutesMarkers = false;
-
+  bool cameraFollowUser = false;
+  int count = 2;
 
   @override
   void initState() {
@@ -49,8 +50,6 @@ class _MapScreenState extends State<MapScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       locationBloc = BlocProvider.of<LocationBloc>(context);
       locationBloc.startFollowingUser(); // Mover aquí la llamada
-
-      
     });
   }
 
@@ -152,6 +151,15 @@ class _MapScreenState extends State<MapScreen> {
                       onSelectRoutesMarkers = true;
                     }
 
+                    if(mapState.onSelectRoute && count >= 0){
+                      count--;
+                      if(count >= 0){
+                        final mapBloc = BlocProvider.of<MapBloc>(context);
+                        final routePoints = routeServices.myRoute.ruta!['myRoute']?.points; 
+                        mapBloc.add(FocusOnRouteEvent(routePoints!));
+                      }
+                    }
+
                     return _mapViewAndDisplays(locationState, polylines, mapState, context, searchState);
                   },
                 );
@@ -184,7 +192,7 @@ class _MapScreenState extends State<MapScreen> {
       children: [
         mapViewCall(locationState, polylines, mapState, context),
 
-        if (mapState.onInitRoute)
+        if (mapState.onInitRoute || mapState.onSelectRoute)
           Positioned(
             top: 50,
             right: 20,
@@ -196,40 +204,7 @@ class _MapScreenState extends State<MapScreen> {
                 } 
             )
           ),
-        Positioned(
-          bottom: 120,
-          left: 0,
-          right: 0,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-            if (!searchState.state.displayManualMarker)
-              ZoomIn(
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  spacing: 5,
-                  children: [
-                    if(mapState.onInitRoute && !mapState.showMyRoute )
-                      const BtnFollowUser(), 
-                    Padding(
-                      padding: const EdgeInsets.only( right:  10),
-                      child: Column(
-                        children: [
-                          CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
-                          const BtnCurrentLocation(),
-                        ],
-                      ),
-                    ),
-                  ]
-                ),
-              ),
-            ],
-          ),
-        ),
+        _mapItems(searchState, mapState),
         //Display de los diferentes menus
         if(onSelectTallerMarkers || onSelectEventMarkers)
           Positioned(
@@ -326,6 +301,73 @@ class _MapScreenState extends State<MapScreen> {
         const ManualMarker(),
       ],
     );
+    
+  }
+
+  Positioned _mapItems(SearchBloc searchState, MapState mapState) {
+    return Positioned(
+      bottom: 120,
+      left: 0,
+      right: 0,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+        if (!searchState.state.displayManualMarker)
+          ZoomIn(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: 5,
+              children: [
+                if(mapState.onSelectRoute && !cameraFollowUser)
+                  FilledButton.icon(
+                    onPressed: (){
+                      context.read<MapBloc>().add(OnStartFollowingUserEvent());
+                      context.read<MapBloc>().add(const OnToggleDegreeView(false, 0, 20));
+                      setState(() {
+                        cameraFollowUser = true;
+                      });
+                    }, 
+                  icon: const Icon(Icons.remove_red_eye), 
+                  label: const Text('Centrar Vista')
+                ),
+                if(cameraFollowUser)
+                  OutlinedButton.icon(
+                    onPressed: (){
+                      context.read<MapBloc>().add(OnStopFollowingUserEvent());
+                      context.read<MapBloc>().add(const OnToggleDegreeView(false, 0, 15));
+                      setState(() {
+                        cameraFollowUser = false;
+                        count = 1;
+                      });
+                    },
+                    style: const ButtonStyle(
+                      minimumSize: WidgetStatePropertyAll(Size(155, 45)),
+                      backgroundColor: WidgetStatePropertyAll(Color.fromRGBO(255, 255, 255, 0.8),)
+                    ), 
+                    label: const Text('Vista completa'),
+                    icon: const Icon(Icons.roundabout_right_rounded),
+                  ),
+                if(mapState.onInitRoute && !mapState.showMyRoute )
+                  const BtnFollowUser(), 
+                Padding(
+                  padding: const EdgeInsets.only( right:  10),
+                  child: Column(
+                    children: [
+                      CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
+                      const BtnCurrentLocation(),
+                    ],
+                  ),
+                ),
+              ]
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   MapView mapViewCall(LocationState locationState, Map<String, Polyline> polylines, MapState mapState, BuildContext context) {
@@ -356,7 +398,11 @@ class _MapScreenState extends State<MapScreen> {
         if (mapState.onInitRoute || mapState.onSelectRoute && mapState.polylines.containsKey('myRoute') && mapState.polylines['myRoute']!.points.isNotEmpty && !_initialCameraMoveDone) {
           final initialRouteLocation = mapState.polylines['myRoute']!.points.first;
           _mapController?.animateCamera(CameraUpdate.newLatLng(initialRouteLocation));
-          setState(() => _initialCameraMoveDone = true);
+          
+          setState(() {
+            _initialCameraMoveDone = true;
+            } 
+          );
         }
       },
     );

@@ -9,6 +9,7 @@ class RouteDestination {
   final double distance;
   final dynamic endPlace;
   final int initialBearing;
+  final List<dynamic> alternativeRoutes;
   final List<cycling_models.Step> intersections; 
 
   RouteDestination({
@@ -17,6 +18,7 @@ class RouteDestination {
     required this.distance,
     required this.endPlace,
     required this.initialBearing,
+    required this.alternativeRoutes,
     required this.intersections,
   });
 }

@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bikynav/app/blocs/blocs.dart';
 import 'package:bikynav/app/delegates/delegates.dart';
 import 'package:bikynav/app/helpers/show_loading_message.dart';
@@ -50,6 +52,9 @@ class __CustomSearchBarContentState extends State<_CustomSearchBarContent> {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final locationBloc = BlocProvider.of<LocationBloc>(context);
     final routeServices = Provider.of<RouteServices>(context, listen: false);
+
+    final start = locationBloc.state.lastKnowlocation;
+    routeServices.infoStartPlace = await searchBloc.getInformationPlace(start!);
     
     if (result.manual == true) {
       searchBloc.add(OnActivateManualMarkerEvent());
@@ -59,12 +64,13 @@ class __CustomSearchBarContentState extends State<_CustomSearchBarContent> {
     if (result.position != null) {
       showLoadingMessage(context);
 
-      final start = locationBloc.state.lastKnowlocation;
       if (start == null) return;
 
       final position = result.position;
       final end = LatLng(position!.longitude, position.latitude);
       final destination = await searchBloc.getCoorsStartToEnd(start, end);
+
+      routeServices.alternativeRoutes = jsonDecode(destination);
 
       await mapBloc.drawRoutePolyline(destination);
       routeServices.selectNavRoute = result.id;

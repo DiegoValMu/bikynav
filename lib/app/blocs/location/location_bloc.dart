@@ -48,7 +48,15 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
   Future getCurrentPosition() async {
     await checkLocationPermission();
-    final position = await Geolocator.getCurrentPosition();
+
+    final LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.best, // Precisión (equivalente a desiredAccuracy)
+      distanceFilter: 0, // Distancia mínima en metros para actualizar
+    );
+
+    final position = await Geolocator.getCurrentPosition(
+      locationSettings: locationSettings,
+    );
 
     add(OnNewUserLocationEvent(LatLng(position.latitude, position.longitude)));
   }

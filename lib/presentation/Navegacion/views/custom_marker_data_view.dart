@@ -51,8 +51,6 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
     final mapBloc = BlocProvider.of<MapBloc>(context);
     final markerServices = Provider.of<MarkerServices>(context, listen: false); 
 
-
-
     return Column(
       children: [
         const DecorativeBar(),

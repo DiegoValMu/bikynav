@@ -215,8 +215,8 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   // Usamos IDs distintos para la ruta de "Cómo llegar"
   final navigationRoute = Polyline(
     polylineId: const PolylineId('navigationRoute'), // ID diferente
-    color: const Color.fromARGB(185, 0, 0, 0), // Color distinto para diferenciar
-    width: 5,
+    color: Colors.black, // Color distinto para diferenciar
+    width: 8,
     points: destination.points,
     startCap: Cap.roundCap,
     endCap: Cap.roundCap
@@ -258,7 +258,6 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   
   add(FocusOnRouteEvent(destination.points));
 
-  
 
   _mapController?.showMarkerInfoWindow(const MarkerId('navigationEnd'));
 }

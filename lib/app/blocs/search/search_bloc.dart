@@ -31,6 +31,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
 
     on<AddToHistoryEvent>((event, emit) => emit( state.copyWith( history: [ event.place, ...state.history ] ) ) );
 
+    on<AddToRoutesEvent>((event, emit) => emit( state.copyWith( alternativeRoutes: event.routes ) ) );
+
     on<RemoveFromHistory>((event, emit) {
       final newHistory = state.history.where((place) => place.id != event.placeId).toList();
       emit(state.copyWith(history: newHistory));
@@ -56,6 +58,10 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
     final distance = route.distance;
     final duration = route.duration;
     final geometry = route.geometry;
+
+    final alternativeRoutes = trafficResponse.routes;
+
+    add(AddToRoutesEvent(alternativeRoutes));
 
     final points = decodePolyline( geometry, accuracyExponent: 6);
 
@@ -83,7 +89,8 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
       duration: duration, 
       distance: distance,
       endPlace: endPlace, 
-      initialBearing: initialBearing, // Añadir esto
+      initialBearing: initialBearing, 
+      alternativeRoutes: alternativeRoutes,
       intersections: legs,
       );
     
