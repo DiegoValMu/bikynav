@@ -7,6 +7,7 @@ import 'package:bikynav/config/models/models.dart';
 import 'package:bikynav/presentation/Navegacion/widgets/widgets.dart';
 import 'package:bikynav/app/services/route_service.dart';
 import 'package:bikynav/presentation/shared/views/custom_draggable_sheet.dart';
+import 'package:bikynav/presentation/shared/widgets/decorative_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -111,7 +112,7 @@ class __CustomSearchBarContentState extends State<_CustomSearchBarContent> {
             },
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-              margin: const EdgeInsets.only(bottom: 20),
+              margin: const EdgeInsets.only(bottom: 20, top: 5),
               width: width - 75,
               decoration: BoxDecoration(
                 color: Colors.grey[200],

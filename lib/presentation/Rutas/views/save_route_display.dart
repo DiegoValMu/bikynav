@@ -1,10 +1,10 @@
 import 'package:bikynav/app/blocs/blocs.dart';
 import 'package:bikynav/app/helpers/real_time_provider.dart';
 import 'package:bikynav/presentation/shared/views/custom_draggable_sheet.dart';
+import 'package:bikynav/presentation/shared/widgets/decorative_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
-import '../../shared/widgets/custom_decorative_bar.dart';
 import '../widgets/btn_save_route.dart';
 
 class SaveRouteDisplay extends CustomDraggableSheet {
@@ -43,16 +43,22 @@ class _SaveRouteDisplayContentState extends State<_SaveRouteDisplayContent> {
     final displaySeconds = (seconds % 60).toString().padLeft(2, '0');
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         const DecorativeBar(),
-        Padding(
-          padding: const EdgeInsets.only(top: 5),
-          child: ListTile(
-            leading: _buildTimerDisplay(minutes, displaySeconds),
-            title: const BtnSaveRoute(),
-            contentPadding: EdgeInsets.zero,
-            trailing: _onCancelRoute(context),
-          ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: ListTile(
+                leading: _buildTimerDisplay(minutes, displaySeconds),
+                title: const BtnSaveRoute(),
+                contentPadding: EdgeInsets.zero,
+                trailing: _onCancelRoute(context),
+              ),
+            ),
+          ],
         ),
         Divider(),
         
@@ -62,28 +68,27 @@ class _SaveRouteDisplayContentState extends State<_SaveRouteDisplayContent> {
 
   IconButton _onCancelRoute(BuildContext context) {
     return IconButton(
-            onPressed: (){
-              final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
-             
-              mapBloc.add(OnCancelToggleUserRoute());
-              mapBloc.add(OnCancelRoute());
-              mapBloc.state.markers.remove('start');
-              mapBloc.state.markers.remove('end');
-              widget.onCloseTap;
-            }, 
-            icon: Icon(Icons.close));
+    onPressed: (){
+      final mapBloc = BlocProvider.of<MapBloc>(context, listen: false);
+     
+      mapBloc.add(OnCancelToggleUserRoute());
+      mapBloc.add(OnCancelRoute());
+      mapBloc.state.markers.remove('start');
+      mapBloc.state.markers.remove('end');
+      widget.onCloseTap;
+    }, 
+    icon: Icon(Icons.close));
   }
 
   Widget _buildTimerDisplay(String minutes, String seconds) {
-    return SizedBox(
-      width: 80,
-      child: Row(
-        children: [
-          const Icon(Icons.timelapse, size: 15),
-          const SizedBox(width: 3),
-          Text('$minutes:$seconds', style: const TextStyle(fontSize: 12)),
-        ],
-      ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Icon(Icons.timer_outlined, size: 18),
+        const SizedBox(width: 3),
+        Text('$minutes:$seconds min', style: const TextStyle(fontSize: 12)),
+      ],
     );
   }
 }

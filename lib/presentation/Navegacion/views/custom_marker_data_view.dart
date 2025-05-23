@@ -2,6 +2,7 @@ import 'package:bikynav/app/blocs/blocs.dart';
 import 'package:bikynav/app/services/marker_service.dart';
 import 'package:bikynav/config/models/markers_model.dart';
 import 'package:bikynav/presentation/shared/views/custom_draggable_sheet.dart';
+import 'package:bikynav/presentation/shared/widgets/decorative_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -54,10 +55,7 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
     return Column(
       children: [
         const DecorativeBar(),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: titleAndClose(markerServices, mapBloc),
-        ),
+        titleAndClose(markerServices, mapBloc),
         const Divider(),
          _tallerListActualCity(markerServices.infoMarkers),
         
@@ -125,7 +123,6 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
               
               final data = snapshot.data!;
               final distance = (data.distance ?? 0) / 1000; // metros a km con valor por defecto
-              final tripDuration = (data.duration ?? 0) / 60; // segundos a minutos con valor por defecto
               
               
               return ListTile(
@@ -134,8 +131,9 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('${tripDuration.floor()} min', style: const TextStyle(fontSize: 13)),
-                    Text('${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 13)),
+                    
+                    Text('a ${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 13)),
+                    Text('de ti', style: const TextStyle(fontSize: 13)),
                   ],
                 ),
                 title: Text('${tallerInfo.etiqueta}'),
@@ -174,14 +172,13 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
       markerType = 'Eventos';
     }
 
-    
-
     return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Expanded(
               child: ListTile(
+                contentPadding: EdgeInsets.zero,
                 leading: IconButton(
                   onPressed: (){
 
@@ -210,26 +207,5 @@ class _CustomDataDisplayContentState extends State<_CustomDataDisplayContent> {
             ),
           ],
         );
-  }
-}
-
-class DecorativeBar extends StatelessWidget {
-  const DecorativeBar({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 5),
-      child: Center(
-        child: Container(
-          height: 5,
-          width: 40,
-          decoration: BoxDecoration(
-            color: Colors.grey[400],
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      ),
-    );
   }
 }

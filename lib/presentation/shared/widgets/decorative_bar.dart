@@ -10,7 +10,7 @@ class DecorativeBar extends StatelessWidget {
     return Container(
       height: 5, 
       width: 40,
-      margin: const EdgeInsets.only(top: 8, bottom: 10),
+      margin: const EdgeInsets.only(top: 8, bottom: 5),
       decoration: BoxDecoration(
         color: Colors.grey[400],
         borderRadius: BorderRadius.circular(10), 

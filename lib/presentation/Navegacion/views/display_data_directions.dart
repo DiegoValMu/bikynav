@@ -3,11 +3,11 @@ import 'package:bikynav/app/services/route_service.dart';
 import 'package:bikynav/config/models/models.dart';
 import 'package:bikynav/presentation/shared/views/custom_draggable_sheet.dart';
 import 'package:bikynav/presentation/shared/views/display_titles.dart';
+import 'package:bikynav/presentation/shared/widgets/decorative_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/decorative_bar.dart';
 
 class DirectionDisplay extends CustomDraggableSheet {
 

@@ -310,37 +310,44 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   }
 
    void updateRoutesMarkerPosition(BuildContext context) {
-    final routeServices = Provider.of<RouteServices>(context, listen: false);
-    BitmapDescriptor? eventMarker;
+  final routeServices = Provider.of<RouteServices>(context, listen: false);
+  BitmapDescriptor? eventMarker;
 
-    eventMarker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
+  eventMarker = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueOrange);
 
-    routeServices.rutas2.forEach((place) {
+  // Creamos un nuevo mapa basado en los marcadores actuales
+  final updatedMarkers = Map<String, Marker>.from(state.markers);
 
-      if(state.markers.containsKey(place["id"])  || state.inSelectRoutes){
-        return;
-      }
-      // Accedemos a la latitud y longitud desde la propiedad 'pos' del objeto 'Markers'
-      if (place["ubicacion_inicial"] != null && place["ubicacion_inicial"]!.length == 2) {
-        final pos = LatLng(place["ubicacion_inicial"]![0], place["ubicacion_inicial"]![1]); // ¡OJO! El orden es [latitud, longitud] en tu JSON
+  routeServices.rutas2.forEach((place) {
+    if (state.markers.containsKey(place["id"]) || state.inSelectRoutes) {
+      return; // Si ya existe el marcador o está en selección, lo saltamos
+    }
 
-        final newMarker = Marker(
-          markerId: MarkerId(place["id"] ?? UniqueKey().toString()), // Usa el ID del objeto o genera uno único
-          position: pos,
-          infoWindow: InfoWindow(
-            title: place["etiqueta"] ?? '', // Usa la etiqueta como título de la ventana de información
-            // Puedes agregar más información aquí si lo deseas
-          ),
-          icon: eventMarker!,
-          // Aquí puedes configurar otras propiedades del marcador si las necesitas
-        );
-        final updatedMarkers = Map<String, Marker>.from(state.markers);
-        updatedMarkers[newMarker.markerId.value] = newMarker;
-        add(DisplayMarkerEvent(updatedMarkers));
-        add(InSelectRoutes());
-      }
-    });
-  }
+    if (place["ubicacion_inicial"] != null && place["ubicacion_inicial"]!.length == 2) {
+      final pos = LatLng(
+        place["ubicacion_inicial"]![0],
+        place["ubicacion_inicial"]![1],
+      );
+
+      final newMarker = Marker(
+        markerId: MarkerId(place["id"] ?? UniqueKey().toString()),
+        position: pos,
+        infoWindow: InfoWindow(
+          title: place["etiqueta"] ?? '',
+        ),
+        icon: eventMarker!,
+      );
+
+      // Agregamos el nuevo marcador al mapa acumulativo
+      updatedMarkers[newMarker.markerId.value] = newMarker;
+    }
+  });
+
+  // Fuera del bucle, enviamos TODOS los marcadores actualizados
+  add(DisplayMarkerEvent(updatedMarkers));
+  // Si es necesario, enviamos InSelectRoutes solo una vez
+  add(InSelectRoutes());
+}
 
   @override
   Future<void> close() {

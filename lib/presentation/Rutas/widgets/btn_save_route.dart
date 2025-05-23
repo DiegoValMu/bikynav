@@ -167,7 +167,7 @@ class BtnSaveRoute extends StatelessWidget {
           icon: const Icon(Icons.save),
           label: const Text('Guardar'),
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 12.0),
+            padding: const EdgeInsets.symmetric(vertical: 10.0),
             side: const BorderSide(color: Colors.purple, width: 1.5),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(25), // Bordes redondeados

@@ -1,13 +1,11 @@
-import 'package:bikynav/app/blocs/map/map_bloc.dart';
 import 'package:bikynav/app/services/route_service.dart';
 import 'package:bikynav/config/models/places_models.dart';
 import 'package:bikynav/presentation/shared/views/custom_draggable_sheet.dart';
 import 'package:bikynav/presentation/shared/views/display_titles.dart';
+import 'package:bikynav/presentation/shared/widgets/decorative_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../../Navegacion/widgets/widgets.dart';
 
 class RouteDisplay extends CustomDraggableSheet {
   

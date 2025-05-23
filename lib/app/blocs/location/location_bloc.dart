@@ -9,7 +9,7 @@ part 'location_event.dart';
 part 'location_state.dart';
 
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
-  StreamSubscription? positionStream;
+  StreamSubscription<Position>? positionStream;
 
   LocationBloc() : super(const LocationState()) {
     on<OnStartFollowingUser>((event, emit) => emit(state.copyWith(followingUser: true)));
@@ -19,6 +19,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         state.copyWith(
           lastKnowlocation: event.newLocation,
           myLocationHistory: [event.newLocation],
+          speed: null, // Resetear velocidad en nueva ruta
         ),
       );
     });
@@ -27,6 +28,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
         state.copyWith(
           lastKnowlocation: event.newLocation,
           myLocationHistory: [...state.myLocationHistory, event.newLocation],
+          speed: event.speed, // Actualizar velocidad
         ),
       );
     });
@@ -50,25 +52,38 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     await checkLocationPermission();
 
     final LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.best, // Precisión (equivalente a desiredAccuracy)
-      distanceFilter: 0, // Distancia mínima en metros para actualizar
+      accuracy: LocationAccuracy.bestForNavigation, // Mejor precisión para velocidad
+      distanceFilter: 0,
     );
 
     final position = await Geolocator.getCurrentPosition(
       locationSettings: locationSettings,
     );
 
-    add(OnNewUserLocationEvent(LatLng(position.latitude, position.longitude)));
+    add(OnNewUserLocationEvent(
+      LatLng(position.latitude, position.longitude),
+      position.speed, // Incluir velocidad
+    ));
   }
 
   void startFollowingUser() async {
     await checkLocationPermission();
-    positionStream?.cancel(); // Cancela cualquier flujo previo
+    positionStream?.cancel();
     add(OnStartFollowingUser());
-    positionStream = Geolocator.getPositionStream().listen(
-      (event) {
-        final position = event;
-        add(OnNewUserLocationEvent(LatLng(position.latitude, position.longitude)));
+    
+    final locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.bestForNavigation,
+      distanceFilter: 3, // metros (ajustable)
+    );
+
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen(
+      (Position position) {
+        add(OnNewUserLocationEvent(
+          LatLng(position.latitude, position.longitude),
+          position.speed >= 0 ? position.speed : null, // Filtrar valores negativos
+        ));
       },
       onError: (error) {
         print('Error in position stream: $error');

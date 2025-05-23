@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/decorative_bar.dart';
+import '../../shared/widgets/decorative_bar.dart';
 
 
 class DirectionDisplay extends CustomDraggableSheet {

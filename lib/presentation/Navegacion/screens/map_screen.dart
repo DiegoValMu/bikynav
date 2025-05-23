@@ -3,6 +3,7 @@ import 'package:bikynav/app/helpers/helpers.dart';
 import 'package:bikynav/app/services/services.dart';
 import 'package:bikynav/presentation/Navegacion/views/custom_marker_data_view.dart';
 import 'package:bikynav/presentation/Navegacion/views/display_data_directions.dart';
+import 'package:bikynav/presentation/Navegacion/views/speedometer.dart';
 import 'package:bikynav/presentation/Navegacion/widgets/custom_change_map_view.dart';
 import 'package:bikynav/presentation/Navegacion/views/custom_marker_form.dart';
 import 'package:bikynav/presentation/Rutas/views/custom_routes_data_display.dart';
@@ -322,6 +323,12 @@ class _MapScreenState extends State<MapScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               spacing: 5,
               children: [
+                //aca speedometer
+                if(mapState.onSelectRoute || mapState.onInitRoute || mapState.showMyRoute)
+                  CustomSpeedDometer(),
+
+                Spacer(),
+
                 if(mapState.onSelectRoute && !cameraFollowUser)
                   FilledButton.icon(
                     onPressed: (){
@@ -433,9 +440,10 @@ _setMarker(BuildContext context, LatLng p0, VoidCallback onMarkerAdded) async {
   final routeServices = Provider.of<RouteServices>(context, listen: false);
   final markerServices = Provider.of<MarkerServices>(context, listen: false); 
 
-  mapBloc.state.markers.clear();
+  
 
   if (mapBloc.state.polylines.isNotEmpty){
+    mapBloc.state.markers.clear();
     mapBloc.add( OnCancelRoute() );
     mapBloc.add(OnStopFollowingUserEvent());
     mapBloc.state.polylines.remove('navigationRoute');

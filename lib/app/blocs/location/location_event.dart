@@ -7,12 +7,14 @@ sealed class LocationEvent extends Equatable {
   List<Object> get props => [];
 }
 
-
 class OnNewUserLocationEvent extends LocationEvent {
   final LatLng newLocation;
+  final double? speed; // Añadir velocidad al evento
 
-  const OnNewUserLocationEvent(this.newLocation);
+  const OnNewUserLocationEvent(this.newLocation, [this.speed]);
   
+  @override
+  List<Object> get props => [newLocation, speed ?? 0];
 }
 
 class OnNewRouteEvent extends LocationEvent {
@@ -20,6 +22,8 @@ class OnNewRouteEvent extends LocationEvent {
 
   const OnNewRouteEvent(this.newLocation);
   
+  @override
+  List<Object> get props => [newLocation];
 }
 
 class OnStartFollowingUser extends LocationEvent {}
