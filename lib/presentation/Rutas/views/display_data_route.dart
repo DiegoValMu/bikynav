@@ -28,8 +28,6 @@ class _RouteDisplayContentState extends State<_RouteDisplayContent> {
   @override
   Widget build(BuildContext context) {
     final routeServices = Provider.of<RouteServices>(context);
-    
-
     final name = routeServices.myRoute.etiqueta!;
     final kms = routeServices.myRoute.distancia!;
 

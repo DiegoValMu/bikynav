@@ -5,6 +5,7 @@ import 'package:bikynav/app/helpers/helpers.dart';
 import 'package:bikynav/app/services/marker_service.dart';
 import 'package:bikynav/config/models/markers_model.dart';
 import 'package:bikynav/app/services/route_service.dart';
+import 'package:bikynav/presentation/Navegacion/screens/map_screen.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
@@ -13,18 +14,18 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:bikynav/app/blocs/blocs.dart';
 import 'package:bikynav/config/models/models.dart';
 import 'package:bikynav/config/models/traffic_response_cycling.dart' as cycling_models;
+import 'package:hydrated_bloc/hydrated_bloc.dart';
 import 'package:provider/provider.dart';
 
 part 'map_event.dart';
 part 'map_state.dart';
 
-class MapBloc extends Bloc<MapEvent, MapState> {
+class MapBloc extends HydratedBloc<MapEvent, MapState> {
 
   final LocationBloc locationBloc;
   GoogleMapController? _mapController;
   LatLng? mapCenter;
  
-
   StreamSubscription<LocationState>? locationStateSubscription;
 
   MapBloc({
@@ -353,6 +354,37 @@ class MapBloc extends Bloc<MapEvent, MapState> {
   Future<void> close() {
     locationStateSubscription?.cancel();
     return super.close();
+  }
+  
+  @override
+  MapState? fromJson(Map<String, dynamic> json) {
+    try {
+    // Versión actual
+    if (json.containsKey('version') && json['version'] == 2) {
+      return MapState.fromJson(json);
+    }
+    // Migrar desde versión anterior
+    else {
+      return _migrateFromV1(json);
+    }
+    } catch (e) {
+      // En caso de error, devolver estado inicial
+      return const MapState();
+    }
+  }
+
+  MapState _migrateFromV1(Map<String, dynamic> json) {
+  // Lógica para convertir formato antiguo a nuevo
+    return MapState.fromJson({
+      ...json,
+      'version': 2,
+      // transformaciones adicionales
+    });
+  }
+
+  @override
+  Map<String, dynamic>? toJson(MapState state) {
+    return state.toJson();
   }
 
 }

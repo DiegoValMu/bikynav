@@ -11,6 +11,9 @@ part 'location_state.dart';
 class LocationBloc extends Bloc<LocationEvent, LocationState> {
   StreamSubscription<Position>? positionStream;
 
+  double? smoothedSpeed;
+  final double smoothingFactor = 0.3;
+
   LocationBloc() : super(const LocationState()) {
     on<OnStartFollowingUser>((event, emit) => emit(state.copyWith(followingUser: true)));
     on<OnStopFollowingUser>((event, emit) => emit(state.copyWith(followingUser: false)));
@@ -24,13 +27,23 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
       );
     });
     on<OnNewUserLocationEvent>((event, emit) {
+      smoothedSpeed = smoothedSpeed == null 
+      ? event.speed 
+      : smoothedSpeed! * (1 - smoothingFactor) + (event.speed ?? 0) * smoothingFactor;
       emit(
         state.copyWith(
           lastKnowlocation: event.newLocation,
           myLocationHistory: [...state.myLocationHistory, event.newLocation],
-          speed: event.speed, // Actualizar velocidad
+          speed: smoothedSpeed, // Actualizar velocidad
         ),
       );
+    });
+    on<UpdateDistanceFilter>((event, emit) {
+      emit(state.copyWith(distanceFilter: event.distanceFilter.toDouble()));
+      if (state.followingUser) {
+        // Reiniciar el seguimiento con el nuevo filtro
+        startFollowingUser();
+      }
     });
   }
 
@@ -66,6 +79,10 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     ));
   }
 
+  //--------------------------------------------------------------------
+
+  
+
   void startFollowingUser() async {
     await checkLocationPermission();
     positionStream?.cancel();
@@ -73,7 +90,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     
     final locationSettings = LocationSettings(
       accuracy: LocationAccuracy.bestForNavigation,
-      distanceFilter: 3, // metros (ajustable)
+      distanceFilter: state.distanceFilter!.toInt(), // metros (ajustable)
     );
 
     positionStream = Geolocator.getPositionStream(

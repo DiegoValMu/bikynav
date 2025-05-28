@@ -1,3 +1,4 @@
+import 'package:bikynav/config/models/polygons_model.dart' as polygons;
 import 'package:bikynav/config/models/traffic_response_cycling.dart';
 import 'package:dio/dio.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart' show LatLng;
@@ -64,6 +65,39 @@ class TrafficService {
 
     return placesResponse.features[0];
   }
+
+  Future<Feature> getPolygonByCoorsAndMinutes( LatLng coors, int minutes, String metod ) async {
+
+    final url = 'https://api.mapbox.com/isochrone/v1/mapbox/$metod/${coors.longitude},${coors.latitude}';
+
+    final resp = await _dioPlaces.get( url, queryParameters: {
+      'contours_minutes': minutes,
+      'polygons': true,
+      'denoise': 1,
+      'access_token': 'pk.eyJ1IjoiZGllZ28tdmFsZGVycmFtYS1tdSIsImEiOiJjbTIwdnh2eGwwMHNzMm9xNXF6a29kOXM1In0.Uo-wVrhKnVMGvNZX0D-KJQ'
+    } );
+
+    final placesResponse = PlacesResponse.fromMap(resp.data);
+
+    return placesResponse.features[0];
+  }
+
+  Future<polygons.PolygonsResponse> getPolygonByCoorsAndMeters( LatLng coors, int meters, String metod ) async {
+
+    final url = 'https://api.mapbox.com/isochrone/v1/mapbox/$metod/${coors.longitude},${coors.latitude}';
+
+    final resp = await _dioPlaces.get( url, queryParameters: {
+      'contours_meters': meters,
+      'polygons': true,
+      'denoise': 1,
+      'access_token': 'pk.eyJ1IjoiZGllZ28tdmFsZGVycmFtYS1tdSIsImEiOiJjbTIwdnh2eGwwMHNzMm9xNXF6a29kOXM1In0.Uo-wVrhKnVMGvNZX0D-KJQ'
+    } );
+
+    final poligonResponse = polygons.PolygonsResponse.fromMap(resp.data);
+
+    return poligonResponse;
+  }
+
 
 
 

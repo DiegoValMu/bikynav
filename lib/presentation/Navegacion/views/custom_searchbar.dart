@@ -71,7 +71,7 @@ class __CustomSearchBarContentState extends State<_CustomSearchBarContent> {
       final end = LatLng(position!.longitude, position.latitude);
       final destination = await searchBloc.getCoorsStartToEnd(start, end);
 
-      routeServices.alternativeRoutes = jsonDecode(destination);
+      routeServices.alternativeRoutes.add(destination);
 
       await mapBloc.drawRoutePolyline(destination);
       routeServices.selectNavRoute = result.id;

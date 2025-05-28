@@ -4,6 +4,7 @@ import 'package:bikynav/app/services/services.dart';
 import 'package:bikynav/presentation/Navegacion/views/custom_marker_data_view.dart';
 import 'package:bikynav/presentation/Navegacion/views/display_data_directions.dart';
 import 'package:bikynav/presentation/Navegacion/views/speedometer.dart';
+import 'package:bikynav/presentation/Navegacion/widgets/custom_btn_accuracy.dart';
 import 'package:bikynav/presentation/Navegacion/widgets/custom_change_map_view.dart';
 import 'package:bikynav/presentation/Navegacion/views/custom_marker_form.dart';
 import 'package:bikynav/presentation/Rutas/views/custom_routes_data_display.dart';
@@ -18,6 +19,7 @@ import 'package:bikynav/app/blocs/blocs.dart';
 import 'package:bikynav/presentation/Navegacion/views/views.dart';
 import 'package:bikynav/presentation/Navegacion/widgets/widgets.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -26,7 +28,7 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> {
+class _MapScreenState extends State<MapScreen> with AutomaticKeepAliveClientMixin, WidgetsBindingObserver{
   late LocationBloc locationBloc;
   late MarkerServices markerServices;
   late RouteServices routeServices;
@@ -46,8 +48,12 @@ class _MapScreenState extends State<MapScreen> {
   int count = 2;
 
   @override
+  bool get wantKeepAlive => true; 
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       locationBloc = BlocProvider.of<LocationBloc>(context);
       locationBloc.startFollowingUser(); // Mover aquí la llamada
@@ -62,9 +68,40 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     locationBloc.stopFollowingUser();
     super.dispose();
   }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // App minimizada: Guardar estado crítico
+      _saveState();
+    } else if (state == AppLifecycleState.resumed) {
+      // App vuelve al primer plano: Restaurar estado si es necesario
+      _restoreState();
+    }
+  }
+
+  void _saveState() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('markerOn', markerOn);
+    await prefs.setBool('onSelectTallerMarkers', onSelectTallerMarkers);
+    await prefs.setBool('onSelectEventMarkers', onSelectEventMarkers);
+    // Guarda otros estados relevantes...
+  }
+
+  Future<void> _restoreState() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      markerOn = prefs.getBool('markerOn') ?? false;
+      onSelectTallerMarkers = prefs.getBool('onSelectTallerMarkers') ?? false;
+      onSelectEventMarkers = prefs.getBool('onSelectEventMarkers') ?? false;
+      // Restaura otros estados...
+    });
+  }
+
 
   void toggleMapType() {
     setState(() {
@@ -100,6 +137,7 @@ class _MapScreenState extends State<MapScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context); 
     return PopScope(
       canPop: false, // Inicialmente no permitimos el pop por defecto
       onPopInvoked: (didPop) async {
@@ -204,6 +242,17 @@ class _MapScreenState extends State<MapScreen> {
                 //markerOn = true;
                 } 
             )
+          ),
+
+          if(mapState.showMyRoute)
+          Positioned(
+            right: 10,
+            bottom: 250, // Ajusta esta posición según necesites
+            child: CustomButtonAccuracy(
+              onPressed: () {
+                // Acción adicional si es necesaria
+              },
+            ),
           ),
         _mapItems(searchState, mapState),
         //Display de los diferentes menus
@@ -364,6 +413,7 @@ class _MapScreenState extends State<MapScreen> {
                   padding: const EdgeInsets.only( right:  10),
                   child: Column(
                     children: [
+                      
                       CustomChangeMapView( onPressed: toggleMapType, currentMapType: currentMapType,),
                       const BtnCurrentLocation(),
                     ],

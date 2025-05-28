@@ -26,5 +26,13 @@ class OnNewRouteEvent extends LocationEvent {
   List<Object> get props => [newLocation];
 }
 
+class UpdateDistanceFilter extends LocationEvent {
+  final int distanceFilter;
+  const UpdateDistanceFilter(this.distanceFilter);
+  
+  @override
+  List<Object> get props => [distanceFilter];
+}
+
 class OnStartFollowingUser extends LocationEvent {}
 class OnStopFollowingUser extends LocationEvent {}

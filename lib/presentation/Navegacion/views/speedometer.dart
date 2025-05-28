@@ -12,10 +12,11 @@ class CustomSpeedDometer extends StatelessWidget {
       builder: (context, state) {
         // Obtener velocidad y convertir de m/s a km/h
         final speedKmh = state.speed != null ? state.speed! * 3.6 : null;
-        final speedText = speedKmh != null ? '${speedKmh.toStringAsFixed(1)}' : '--';
+        final speedText = speedKmh != null ? '${speedKmh.toStringAsFixed(0)}' : '--';
         
         // Color basado en la velocidad
-        Color speedColor = Colors.black45;
+        Color speedColor = Colors.black87;
+        Color textColor = Colors.white;
         if (speedKmh != null) {
           if (speedKmh > 5) speedColor = Colors.green;
           if (speedKmh > 20) speedColor = Colors.orange;
@@ -26,34 +27,38 @@ class CustomSpeedDometer extends StatelessWidget {
           padding: const EdgeInsets.only(left: 8.0),
           child: ZoomIn(
             child: Container(
+              height: 50,
               decoration: BoxDecoration(
                 border: Border.all(
                   color: speedColor,
                   strokeAlign: BorderSide.strokeAlignOutside,
-                  width: 2,
+                  width: 4,
                 ),
                 borderRadius: BorderRadius.circular(25),
               ),
               child: CircleAvatar(
-                backgroundColor: Color.fromRGBO(255, 255, 255, 0.8),
+                backgroundColor: Color.fromRGBO(0, 0, 0, 0.7),
                 maxRadius: 25,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.speed, size: 16, color: speedColor),
                     Text(
                       speedText,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: speedColor,
+                        color: textColor,
+                        
                       ),
                     ),
                     Text(
                       'km/h',
                       style: TextStyle(
-                        fontSize: 8,
-                        color: Colors.black54,
+                        fontSize: 10,
+                        color: textColor,
+                        height: 0.8,
                       ),
                     ),
                   ],
