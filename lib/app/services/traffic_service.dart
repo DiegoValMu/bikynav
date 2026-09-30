@@ -12,6 +12,7 @@ class TrafficService {
   final Dio _dioPlaces;
 
   final String _baseTrafficUrl = 'https://api.mapbox.com/directions/v5/mapbox';
+  final String apiKey = dotenv.get('API_KEY', fallback: 'SIN_CLAVE');
 
   TrafficService()
     : _dioTraffic = Dio()..interceptors.add( TrafficInterceptor() ),
@@ -43,7 +44,7 @@ class TrafficService {
     final resp = await _dioPlaces.get( url, queryParameters: {
       'q': query,
       'proximity': '${ proximity.longitude},${ proximity.latitude }',
-      'access_token': 'pk.eyJ1IjoiZGllZ28tdmFsZGVycmFtYS1tdSIsImEiOiJjbTIwdnh2eGwwMHNzMm9xNXF6a29kOXM1In0.Uo-wVrhKnVMGvNZX0D-KJQ'
+      'access_token': apiKey
     } );
 
     final placesResponse = PlacesResponse.fromMap( resp.data );
@@ -58,7 +59,7 @@ class TrafficService {
       'longitude': coors.longitude,
       'latitude': coors.latitude,
       'limit': 1,
-      'access_token': 'pk.eyJ1IjoiZGllZ28tdmFsZGVycmFtYS1tdSIsImEiOiJjbTIwdnh2eGwwMHNzMm9xNXF6a29kOXM1In0.Uo-wVrhKnVMGvNZX0D-KJQ'
+      'access_token': apiKey
     } );
 
     final placesResponse = PlacesResponse.fromMap(resp.data);
@@ -74,7 +75,7 @@ class TrafficService {
       'contours_minutes': minutes,
       'polygons': true,
       'denoise': 1,
-      'access_token': 'pk.eyJ1IjoiZGllZ28tdmFsZGVycmFtYS1tdSIsImEiOiJjbTIwdnh2eGwwMHNzMm9xNXF6a29kOXM1In0.Uo-wVrhKnVMGvNZX0D-KJQ'
+      'access_token': apiKey
     } );
 
     final placesResponse = PlacesResponse.fromMap(resp.data);
@@ -90,7 +91,7 @@ class TrafficService {
       'contours_meters': meters,
       'polygons': true,
       'denoise': 1,
-      'access_token': 'pk.eyJ1IjoiZGllZ28tdmFsZGVycmFtYS1tdSIsImEiOiJjbTIwdnh2eGwwMHNzMm9xNXF6a29kOXM1In0.Uo-wVrhKnVMGvNZX0D-KJQ'
+      'access_token': apiKey
     } );
 
     final poligonResponse = polygons.PolygonsResponse.fromMap(resp.data);
